@@ -143,8 +143,13 @@ public class ArenaManager {
 	        ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", makeSection(section, "settings"));
 	        
 	        section.set("world", world.getName());
+	        section.set("enabled", true);
+	        
 	        section.set("max-players", 16);
 	        section.set("min-players", 4);
+	        
+	        section.set("arena-time", 900);
+	        section.set("hill-clock", 60);
 	        
 	        plugin.saveConfig();
 

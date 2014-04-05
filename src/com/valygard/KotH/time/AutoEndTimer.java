@@ -21,6 +21,9 @@ public class AutoEndTimer {
 	private Arena arena;
 	private int seconds;
 	private Timer timer;
+	
+	// Hill-timer to start when match starts
+	private HillTimer hilltimer;
 
 	/**
 	 * Our primary constructor.
@@ -30,12 +33,16 @@ public class AutoEndTimer {
 		this.plugin		= arena.getPlugin();
 		this.arena		= arena;
 		this.seconds	= seconds;
+		
+		this.hilltimer	= new HillTimer(arena, arena.getSettings().getInt("hill-clock"));
 	}
 
 	public void startTimer() {
 		if (seconds > 5 && timer == null) {
 			timer = new Timer(seconds);
 			timer.runTaskTimer(plugin, 20, 20);
+			
+			hilltimer.startTimer();
 		}
 	}
 

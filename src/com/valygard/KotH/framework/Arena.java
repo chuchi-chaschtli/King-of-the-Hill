@@ -76,12 +76,6 @@ public class Arena {
 			this.minPlayers		= settings.getInt("min-players");
 			this.maxPlayers		= settings.getInt("max-players");
 
-			// Important locations; team spawns, lobby and spectator.
-			this.red 			= getLocation("redspawn");
-			this.blue			= getLocation("bluespawn");
-			this.lobby			= getLocation("lobby");
-			this.spec			= getLocation("spectators");
-
 			// The different groups a player can be in.
 			this.arenaPlayers	= new HashSet<Player>();
 			this.lobbyPlayers	= new HashSet<Player>();
@@ -92,6 +86,9 @@ public class Arena {
 			// Boolean values.
 			this.running		= false;
 			this.enabled		= settings.getBoolean("enabled", true);
+			
+			this.startTimer		= new AutoStartTimer(this, 30);
+			this.endTimer		= new AutoEndTimer(this, settings.getInt("arena-time"));
 		}
 
 		public void addPlayer(Player p) {
@@ -278,8 +275,12 @@ public class Arena {
 		public ConfigurationSection getSettings() {
 			return settings;
 		}
+		
+		public ConfigurationSection getWarps() {
+			return warps;
+		}
 
-		private Location getLocation(String path) {
+		public Location getLocation(String path) {
 			return parseLocation(warps, path, world);
 		}
 
@@ -292,6 +293,7 @@ public class Arena {
 		}
 
 		public Location getLobby() {
+			lobby = getLocation("lobby");
 			return lobby;
 		}
 
@@ -302,12 +304,35 @@ public class Arena {
 		}
 
 		public Location getSpec() {
+			spec = getLocation("spectators");
 			return spec;
 		}
 
 		public void setSpec(Location spec) {
 			this.spec = spec;
 			warps.set("spectators", spec);
+			plugin.saveConfig();
+		}
+		
+		public Location getRedSpawn() {
+			red = getLocation("redspawn");
+			return red;
+		}
+		
+		public void setRedSpawn(Location red) {
+			this.red = red;
+			warps.set("spectators", red);
+			plugin.saveConfig();
+		}
+		
+		public Location getBlueSpawn() {
+			blue = getLocation("bluespawn");
+			return blue;
+		}
+		
+		public void setBlueSpawn(Location blue) {
+			this.blue = blue;
+			warps.set("spectators", blue);
 			plugin.saveConfig();
 		}
 
@@ -356,5 +381,17 @@ public class Arena {
 		
 		public boolean hasPlayer(Player p) {
 			return getData(p) != null;
+		}
+		
+		public AutoStartTimer getStartTimer() {
+			return startTimer;
+		}
+		
+		public AutoEndTimer getEndTimer() {
+			return endTimer;
+		}
+		
+		public int getLength() {
+			return settings.getInt("arena-time");
 		}
 }
