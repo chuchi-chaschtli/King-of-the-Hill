@@ -18,6 +18,7 @@ import org.bukkit.material.Wool;
 
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.event.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**
@@ -70,6 +71,13 @@ public class HillManager {
 		// We aren't going to change anymore if this is the last hill.
 		if (utils.isLastHill() || !arena.isRunning()) {
 			arena.forceEnd();
+			return;
+		}
+		
+		HillChangeEvent event = new HillChangeEvent(arena);
+		arena.getPlugin().getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			Messenger.info("The hill change was cancelled by an external force.");
 			return;
 		}
 		
