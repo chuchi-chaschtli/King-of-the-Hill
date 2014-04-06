@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.valygard.KotH.command.CommandManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.ConfigUtil;
@@ -25,13 +26,20 @@ public class KotH extends JavaPlugin {
 	public static File MESSAGES_FILE;
 	
 	private ArenaManager am;
+	private CommandManager cm;
 
 	public void onEnable() {
+		// Define all variables, such as class instances
+		initializeVariables();
+		
 		// Load the regular configuration file
 		loadConfigFile();
 
 		// Load the messages file.
 		loadMessagesFile();
+		
+		// Register the command base
+		registerCommands();
 	}
 	
 	public void onDisable() {
@@ -41,7 +49,17 @@ public class KotH extends JavaPlugin {
 				arena.forceEnd();
 		}
 	}
+	
+	private void initializeVariables() {
+		am = new ArenaManager(this);
+		cm = new CommandManager(this);
+	}
 
+	private void registerCommands() {
+		getCommand("koth").setExecutor(cm);
+		getCommand("kingofthehill").setExecutor(cm);
+	}
+	
 	public boolean has(Player p, String s) {
         return p.hasPermission(s);
     }
@@ -76,7 +94,7 @@ public class KotH extends JavaPlugin {
             e.printStackTrace();
             Messenger.severe("Could not create messages.yml!");
             Messenger.severe("The plugin cannot work without messages; disabling plugin.");
-            this.setEnabled(false);
+            setEnabled(false);
         }
 
         // Otherwise, load the messages from the file
@@ -89,7 +107,7 @@ public class KotH extends JavaPlugin {
             e.printStackTrace();
             Messenger.severe("Could not load messages.yml!");
             Messenger.severe("The plugin cannot work without messages; disabling plugin.");
-            this.setEnabled(false);
+            setEnabled(false);
         }
     }
 
