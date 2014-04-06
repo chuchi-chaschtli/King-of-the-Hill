@@ -207,7 +207,7 @@ public class HillManager {
 		Location l = utils.getCurrentHill();
 		int radius = arena.getSettings().getInt("hill-radius");
 		
-		// Slightly modified version of WorldEdit code cylinder code:
+		// Slightly modified version of WorldEdit cylinder code:
 		// <https://github.com/sk89q/worldedit/blob/master/src/main/java/com/sk89q/worldedit/EditSession.java> (Line 1249)
 		final double invRadius = 1 / radius;
 		

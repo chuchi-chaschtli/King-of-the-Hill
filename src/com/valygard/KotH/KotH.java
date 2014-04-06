@@ -40,6 +40,9 @@ public class KotH extends JavaPlugin {
 		
 		// Register the command base
 		registerCommands();
+		
+		// Load all arenas
+		am.loadArenas();
 	}
 	
 	public void onDisable() {
