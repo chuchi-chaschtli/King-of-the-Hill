@@ -10,6 +10,7 @@ import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.hill.HillTask;
 import com.valygard.KotH.util.TimeUtil;
 
 /**
@@ -23,7 +24,7 @@ public class AutoEndTimer {
 	private Timer timer;
 	
 	// Hill-timer to start when match starts
-	private HillTimer hilltimer;
+	private HillTask hilltimer;
 
 	/**
 	 * Our primary constructor.
@@ -34,7 +35,7 @@ public class AutoEndTimer {
 		this.arena		= arena;
 		this.seconds	= seconds;
 		
-		this.hilltimer	= new HillTimer(arena, arena.getSettings().getInt("hill-clock"));
+		this.hilltimer	= arena.getHillTimer();
 	}
 
 	public void startTimer() {
@@ -42,7 +43,7 @@ public class AutoEndTimer {
 			timer = new Timer(seconds);
 			timer.runTaskTimer(plugin, 20, 20);
 			
-			hilltimer.startTimer();
+			hilltimer.runTask();
 		}
 	}
 
@@ -109,7 +110,7 @@ public class AutoEndTimer {
 			 * 
 			 * FIXME: Add scoreReached();
 			 */
-			if (arena.getPlayersInArena().isEmpty() /*|| arena.scoreReached()*/) {
+			if (arena.getPlayersInArena().isEmpty() || arena.scoreReached()) {
 				arena.forceEnd();
 				halt();
 				return;

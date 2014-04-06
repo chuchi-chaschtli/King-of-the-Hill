@@ -39,13 +39,6 @@ public class HillUtils {
 				/ arena.getSettings().getInt("hill-clock")));
 	}
 
-	// Check if remaining time is equal to a switch time.
-	public boolean isSwitchTime() {
-		return (arena.getLength()
-				- (getRotationsLeft() * arena.getSettings()
-						.getInt("hill-clock")) == arena.getEndTimer().getRemaining());
-	}
-
 	// Get the current hill location
 	public Location getCurrentHill() {
 		List<String> hills = arena.getWarps().getStringList("hills");
@@ -70,7 +63,7 @@ public class HillUtils {
 		List<String> hills = arena.getWarps().getStringList("hills");
 		int current = getHillRotations() - getRotationsLeft();
 
-		if (getRotationsLeft() <= 0)
+		if (isLastHill())
 			return null;
 
 		if (hills.get(current) != null)
@@ -83,5 +76,40 @@ public class HillUtils {
 			return arena.getLocation(hills.get(current - size));
 		}
 	}
+	
+	// Basically the opposite of getNextHill();
+	public Location getPreviousHill() {
+		List<String> hills = arena.getWarps().getStringList("hills");
+		int current = getHillRotations() - getRotationsLeft();
+		
+		// There was no previous hill...
+		if (isFirstHill())
+			return null;
 
+		if (hills.get(current - 2) != null)
+			return arena.getLocation(hills.get(current - 2));
+		
+		else {
+			int size = hills.size();
+			return arena.getLocation(hills.get(current - size - 2));
+		}
+	}
+	
+	public boolean isFirstHill() {
+		return (getRotationsLeft() == getHillRotations());
+	}
+	
+	public boolean isLastHill() {
+		return (getRotationsLeft() <= 0);
+	}
+	
+	// Check if remaining time is equal to a switch time.
+	public boolean isSwitchTime() {
+		if (isLastHill())
+			return false;
+		
+		return (arena.getLength()
+				- (getRotationsLeft() * arena.getSettings()
+						.getInt("hill-clock")) == arena.getEndTimer().getRemaining());
+	}
 }

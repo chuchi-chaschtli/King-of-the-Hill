@@ -149,7 +149,11 @@ public class ArenaManager {
 	        section.set("min-players", 4);
 	        
 	        section.set("arena-time", 900);
+	        
 	        section.set("hill-clock", 60);
+	        section.set("hill-radius", 5);
+	        section.set("hill-block", "beacon");
+	        section.set("score-to-win", 120);
 	        
 	        plugin.saveConfig();
 

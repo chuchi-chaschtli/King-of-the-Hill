@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,6 +27,9 @@ import com.valygard.KotH.Msg;
 import com.valygard.KotH.PlayerData;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
+import com.valygard.KotH.hill.HillManager;
+import com.valygard.KotH.hill.HillTask;
+import com.valygard.KotH.hill.HillUtils;
 import com.valygard.KotH.time.AutoEndTimer;
 import com.valygard.KotH.time.AutoStartTimer;
 
@@ -59,6 +63,11 @@ public class Arena {
 		// Important timers
 		private AutoStartTimer startTimer;
 		private AutoEndTimer endTimer;
+		
+		// Hill-relevant
+		private HillManager hillManager;
+		private HillUtils	hillUtils;
+		private HillTask	hillTimer;
 
 		/**
 		 * The primary constructor requires the arena name (obviously).
@@ -89,6 +98,10 @@ public class Arena {
 			
 			this.startTimer		= new AutoStartTimer(this, 30);
 			this.endTimer		= new AutoEndTimer(this, settings.getInt("arena-time"));
+			
+			this.hillUtils		= new HillUtils(this);
+			this.hillManager	= new HillManager(this);
+			this.hillTimer		= new HillTask(this);
 		}
 
 		public void addPlayer(Player p) {
@@ -198,7 +211,7 @@ public class Arena {
 					System.out.println("[KotH] Invincibility glitch attempt stopped!");
 				}
 
-				//TODO: Balance teams and teleport players to their spawn
+				balanceTeams(p);
 				p.setHealth(p.getMaxHealth());
 				p.setFireTicks(0);
 				p.setAllowFlight(false);
@@ -212,6 +225,8 @@ public class Arena {
 			running = true;
 
 			Messenger.announce(this, Msg.ARENA_START);
+			hillManager.begin();
+			hillTimer.runTask();
 
 			endTimer.startTimer();
 			return true;
@@ -233,13 +248,17 @@ public class Arena {
 				return false;
 			}
 			
+			declareWinner();
+			
 			for (Player p : arenaPlayers)
 				removePlayer(p);
 			
 			endTimer.halt();
 			running = false;
-
-			Messenger.announce(this, Msg.ARENA_END);
+			
+			arenaPlayers.clear();
+			redPlayers.clear();
+			bluePlayers.clear();
 
 			return true;
 		}
@@ -252,6 +271,20 @@ public class Arena {
 		public void forceEnd() {
 			endTimer.halt();
 			endArena();
+		}
+		
+		public boolean scoreReached() {
+			int winScore = settings.getInt("score-to-win");
+			return (hillTimer.getBlueScore() >= winScore || hillTimer.getRedScore() >= winScore);
+		}
+		
+		public void declareWinner() {
+			if (getWinner().equals(redPlayers))
+				Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED + "Red team");
+			else if (getWinner().equals(bluePlayers))
+				Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE + "Blue team");
+			else
+				Messenger.announce(this, Msg.ARENA_DRAW);
 		}
 
 		///////////////////////////////////////////
@@ -393,5 +426,26 @@ public class Arena {
 		
 		public int getLength() {
 			return settings.getInt("arena-time");
+		}
+		
+		public HillManager getHillManager() {
+			return hillManager;
+		}
+		
+		public HillUtils getHillUtils() {
+			return hillUtils;
+		}
+		
+		public HillTask getHillTimer() {
+			return hillTimer;
+		}
+		
+		public Set<Player> getWinner() {
+			if (hillTimer.getBlueScore() > hillTimer.getRedScore())
+				return bluePlayers;
+			else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
+				return redPlayers;
+			else
+				return null;
 		}
 }
