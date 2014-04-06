@@ -4,9 +4,10 @@
  */
 package com.valygard.KotH.hill;
 
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 
 import com.valygard.KotH.framework.Arena;
 
@@ -41,57 +42,60 @@ public class HillUtils {
 
 	// Get the current hill location
 	public Location getCurrentHill() {
-		List<String> hills = arena.getWarps().getStringList("hills");
+		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft();
 
 		// We subtract 1 because hills.get(0) will look like
 		// "arena.warps.hills.1" in config..
-		if (hills.get(current - 1) != null)
-			return arena.getLocation(hills.get(current - 1));
+		if (hills.contains(current - 1))
+			return arena.getLocation(section.getString(String.valueOf(current - 1)));
 
 		// If there are 6 hills, and we are on the 8th rotation, we will use
 		// hills.get(8 - 6 - 1 (=1, or arena.warps.hills.2"));
 		else {
 			int size = hills.size();
-			return arena.getLocation(hills.get(current - size - 1));
+			return arena.getLocation(section.getString(String.valueOf(current - size - 1)));
 		}
 	}
 
 	// An astute eye will note that all that is changed is our removal of the
 	// -1, and we check if there are any rotations left.
 	public Location getNextHill() {
-		List<String> hills = arena.getWarps().getStringList("hills");
+		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft();
 
 		if (isLastHill())
 			return null;
 
-		if (hills.get(current) != null)
-			return arena.getLocation(hills.get(current));
+		if (hills.contains(current))
+			return arena.getLocation(section.getString(String.valueOf(current)));
 
 		// If there are 6 hills, and we are on the 8th rotation, we will use
 		// hills.get(8 - 6 (=2, or arena.warps.hills.3"));
 		else {
 			int size = hills.size();
-			return arena.getLocation(hills.get(current - size));
+			return arena.getLocation(section.getString(String.valueOf(current - size)));
 		}
 	}
 	
 	// Basically the opposite of getNextHill();
 	public Location getPreviousHill() {
-		List<String> hills = arena.getWarps().getStringList("hills");
+		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft();
 		
 		// There was no previous hill...
 		if (isFirstHill())
 			return null;
 
-		if (hills.get(current - 2) != null)
-			return arena.getLocation(hills.get(current - 2));
+		if (hills.contains(current - 2))
+			return arena.getLocation(section.getString(String.valueOf(current)));
 		
 		else {
 			int size = hills.size();
-			return arena.getLocation(hills.get(current - size - 2));
+			return arena.getLocation(section.getString(String.valueOf(current - size - 2)));
 		}
 	}
 	
