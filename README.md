@@ -1,6 +1,6 @@
 <b><i>Welcome to the GitHub source for the Bukkit Plugin King of the Hill.</b></i>
 
-<a href="https://github.com/AoHRuthless/King-of-the-Hill/issues>
+<a href="https://github.com/AoHRuthless/King-of-the-Hill/issues">
 <b>This is the first plugin dedicated solely to King of the Hill and the first that will be constantly updated.</b>
 <b>If you have any issues, report them to the bug tracker at: https://github.com/AoHRuthless/King-of-the-Hill/issues</b></a>
 
