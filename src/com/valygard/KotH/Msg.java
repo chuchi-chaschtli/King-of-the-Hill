@@ -18,8 +18,16 @@ public enum Msg {
 	ARENA_DISABLED("This arena has been disabled."),
 	ARENA_DRAW("The arena ended in a draw."),
 	ARENA_END("Arena ended."),
+	ARENA_NO_PERMISSION("You do not have permission to this arena."),
+	ARENA_NULL("The arena specified does not exist"),
 	ARENA_START("The arena has begun!"),
 	ARENA_VICTOR("% &rhas won the arena!"),
+	CMD_HELP("Use &e/koth help&r to view a list of commands."),
+	CMD_MULTIPLE_MATCHES("Did you mean one of these commands?"),
+    CMD_NO_MATCHES("Command not found. Type &e/koth help&r"),
+    CMD_NO_PERMISSION("You do not have access to this command."), 
+    CMD_NOT_ENOUGH_ARGS("You did not specify enough arguments."),
+    CMD_NOT_FROM_CONSOLE("Only players may use this command."),
 	HILLS_ONE_LEFT("There is &b1 hill&r remaining!"),
 	HILLS_SWITCHED("The hill has moved positions!"),
 	JOIN_ARENA("You have joined &e%."),
@@ -28,7 +36,8 @@ public enum Msg {
 	JOIN_ARENA_IS_RUNNING("This arena is already in progress."),
 	LEAVE_ARENA("You have left the arena. Thanks for playing!"),
 	LEAVE_ARENA_NOT_RUNNING("This arena is not running."),
-	LEAVE_NOT_PLAYING("You are not in the arena.");
+	LEAVE_NOT_PLAYING("You are not in the arena."),
+	MISC_LIST_ARENAS("Available arenas: %");
 
 	private String value;
 
