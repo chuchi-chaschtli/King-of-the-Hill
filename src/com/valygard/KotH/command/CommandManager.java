@@ -19,6 +19,11 @@ import org.bukkit.entity.Player;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.command.setup.ConfigCmd;
+import com.valygard.KotH.command.setup.CreateArenaCmd;
+import com.valygard.KotH.command.setup.RemoveArenaCmd;
+import com.valygard.KotH.command.setup.SetHillCmd;
+import com.valygard.KotH.command.setup.SetWarpCmd;
 import com.valygard.KotH.command.user.JoinCmd;
 import com.valygard.KotH.command.user.LeaveCmd;
 import com.valygard.KotH.command.user.ListArenaCmd;
@@ -177,6 +182,13 @@ public class CommandManager implements CommandExecutor
     	register(LeaveCmd.class);
     	register(ListArenaCmd.class);
     	register(ListPlayersCmd.class);
+    	
+    	// Setup Commands
+    	register(CreateArenaCmd.class);
+    	register(RemoveArenaCmd.class);
+    	register(SetWarpCmd.class);
+    	register(SetHillCmd.class);
+    	register(ConfigCmd.class);
     }
 
     public void register(Class<? extends Command> c) {

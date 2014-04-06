@@ -36,6 +36,11 @@ public class JoinCmd implements Command {
 			return false;
 		}
 		
+		if (!am.getArenaWithName(args[0]).isReady()) {
+			Messenger.tell(sender, Msg.ARENA_NOT_READY);
+			return false;
+		}
+		
 		if (!sender.hasPermission("koth.arenas." + args[0])) {
 			Messenger.tell(sender, Msg.ARENA_NO_PERMISSION);
 			return false;

@@ -160,6 +160,18 @@ public class ArenaManager {
 	        // Load the arena
 	        return (load ? loadArena(arenaName) : null);
 		}
+		
+		public void removeArena(Arena arena) {
+			String name = arena.getName();
+			
+			if (arena.isRunning())
+				arena.forceEnd();
+			
+			config.set("arenas." + name, null);
+			plugin.saveConfig();
+			
+			Messenger.info("The arena '" + name + "' has been removed.");
+		}
 
 		///////////////////////////////////////////
 		//

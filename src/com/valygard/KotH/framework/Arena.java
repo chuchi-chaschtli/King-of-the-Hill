@@ -68,6 +68,9 @@ public class Arena {
 		private HillManager hillManager;
 		private HillUtils	hillUtils;
 		private HillTask	hillTimer;
+		
+		// Is the arena ready to be used?
+		private boolean ready;
 
 		/**
 		 * The primary constructor requires the arena name (obviously).
@@ -102,6 +105,8 @@ public class Arena {
 			this.hillUtils		= new HillUtils(this);
 			this.hillManager	= new HillManager(this);
 			this.hillTimer		= new HillTask(this);
+			
+			this.ready			= false;
 		}
 
 		public void addPlayer(Player p) {
@@ -447,5 +452,22 @@ public class Arena {
 				return redPlayers;
 			else
 				return null;
+		}
+		
+		public boolean isReady() {
+			ready = false;
+			if (red == null || blue == null || spec == null || lobby == null)
+				return ready;
+			
+			if (getLocation("hills") == null)
+				return ready;
+			
+			ready = true;
+			return ready;
+		}
+		
+		public boolean setReady(boolean ready) {
+			this.ready	= ready;
+			return ready;
 		}
 }
