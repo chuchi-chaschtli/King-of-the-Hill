@@ -12,6 +12,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.ConfigUtil;
 
 /**
@@ -21,6 +23,8 @@ import com.valygard.KotH.util.ConfigUtil;
 public class KotH extends JavaPlugin {
 	public static YamlConfiguration MESSAGES;
 	public static File MESSAGES_FILE;
+	
+	private ArenaManager am;
 
 	public void onEnable() {
 		// Load the regular configuration file
@@ -28,6 +32,14 @@ public class KotH extends JavaPlugin {
 
 		// Load the messages file.
 		loadMessagesFile();
+	}
+	
+	public void onDisable() {
+		// End all arenas
+		for (Arena arena : am.getArenas()) {
+			if (arena.isRunning())
+				arena.forceEnd();
+		}
 	}
 
 	public boolean has(Player p, String s) {
@@ -101,5 +113,9 @@ public class KotH extends JavaPlugin {
 				Messenger.severe("Could not load config.yml!");
 			}
 		}
+	}
+	
+	public ArenaManager getArenaManager() {
+		return am;
 	}
 }
