@@ -2,8 +2,8 @@
 
 <a href="https://github.com/AoHRuthless/King-of-the-Hill/issues">
 <b>This is the first plugin dedicated solely to King of the Hill and the first that will be constantly updated.</b>
-<b>If you have any issues, report them to the bug tracker at: https://github.com/AoHRuthless/King-of-the-Hill/issues</b></a>
+<b>If you have any issues, report them to the bug tracker.</b></a>
 
 <a href="http://valygard.com">
 ![KotH LogoType](https://raw.githubusercontent.com/AoHRuthless/King-of-the-Hill/master/media/KotHLogo.jpg)<br>
-<b><i>Join our server; IP: mc.valygard.com</i></b></a>
+<b><i>Join our server at mc.valygard.com</i></b></a>
