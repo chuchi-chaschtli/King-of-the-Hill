@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.valygard.KotH.event.HillScoreEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**
@@ -37,6 +38,12 @@ public class HillTask {
 			public void run() {
 				if (utils.isSwitchTime())
 					manager.changeHills();
+				
+				// Call scoring event
+				HillScoreEvent event = new HillScoreEvent(arena);
+				arena.getPlugin().getServer().getPluginManager().callEvent(event);
+				if (event.isCancelled())
+					return;
 				
 				// Update scores
 				Set<Player> dominant = manager.getDominantTeam();
