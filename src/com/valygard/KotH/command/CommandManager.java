@@ -19,6 +19,10 @@ import org.bukkit.entity.Player;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.command.admin.DisableCmd;
+import com.valygard.KotH.command.admin.EnableCmd;
+import com.valygard.KotH.command.admin.ForceEndCmd;
+import com.valygard.KotH.command.admin.ForceStartCmd;
 import com.valygard.KotH.command.setup.ConfigCmd;
 import com.valygard.KotH.command.setup.CreateArenaCmd;
 import com.valygard.KotH.command.setup.RemoveArenaCmd;
@@ -189,6 +193,12 @@ public class CommandManager implements CommandExecutor
     	register(SetWarpCmd.class);
     	register(SetHillCmd.class);
     	register(ConfigCmd.class);
+    	
+    	// Admin commands
+    	register(EnableCmd.class);
+    	register(DisableCmd.class);
+    	register(ForceStartCmd.class);
+    	register(ForceEndCmd.class);
     }
 
     public void register(Class<? extends Command> c) {
