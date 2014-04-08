@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.valygard.KotH.command.CommandManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
+import com.valygard.KotH.listener.GlobalListener;
 import com.valygard.KotH.util.ConfigUtil;
 
 /**
@@ -41,6 +42,9 @@ public class KotH extends JavaPlugin {
 		// Register the command base
 		registerCommands();
 		
+		// Register our listeners
+		registerListeners();
+		
 		// Load all arenas
 		am.loadArenas();
 	}
@@ -61,6 +65,10 @@ public class KotH extends JavaPlugin {
 	private void registerCommands() {
 		getCommand("koth").setExecutor(cm);
 		getCommand("kingofthehill").setExecutor(cm);
+	}
+	
+	private void registerListeners() {
+		getServer().getPluginManager().registerEvents(new GlobalListener(this), this);
 	}
 	
 	public boolean has(Player p, String s) {

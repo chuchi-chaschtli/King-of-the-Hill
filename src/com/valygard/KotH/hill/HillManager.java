@@ -159,6 +159,21 @@ public class HillManager {
 		return true;
 	}
 	
+	public boolean containsLoc(Location loc) {
+		Location l = utils.getCurrentHill();
+		
+		int radius = arena.getSettings().getInt("hill-radius");
+		
+		// We don't care about y values.
+		if (loc.getBlockX() < l.getBlockX() - radius || loc.getBlockX() > l.getBlockX() + radius)
+			return false;
+		
+		if (loc.getBlockZ() < l.getBlockZ() - radius || loc.getBlockZ() > l.getBlockZ() + radius)
+			return false;
+		
+		return true;
+	}
+	
 	public int getPlayerCount() {
 		int count = 0;
 		for (Player p : arena.getPlayersInArena()) {
