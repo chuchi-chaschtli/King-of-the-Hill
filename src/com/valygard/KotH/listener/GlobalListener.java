@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -22,6 +23,7 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillUtils;
+import com.valygard.KotH.util.resources.UpdateChecker;
 
 /**
  * @author Anand
@@ -155,6 +157,20 @@ public class GlobalListener implements Listener {
 			player.sendMessage(getChatFormat(p, e.getMessage()));
 			e.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	public void onJoinEvent(PlayerJoinEvent e) {
+		Player p = e.getPlayer();
+		
+		// Updater check; only notify on certain specifications.
+		if (!p.hasPermission("koth.admin") && !p.isOp() && !p.hasPermission("koth.admin.update"))
+			return;
+		
+		if (!plugin.getConfig().getBoolean("global.check-for-updates"))
+			return;
+		
+		UpdateChecker.checkForUpdates(plugin, p);
 	}
 
 	// --------------------------- //

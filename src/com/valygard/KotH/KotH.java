@@ -150,6 +150,7 @@ public class KotH extends JavaPlugin {
 	private void addDefaults() {
 		if (getConfig().getConfigurationSection("global") == null) {
 			getConfig().set("global.enabled", true);
+			getConfig().set("global.check-for-updates", true);
 		}
 		
 		if (getConfig().getConfigurationSection("arenas") == null) {
@@ -172,5 +173,10 @@ public class KotH extends JavaPlugin {
 	
 	public ArenaManager getArenaManager() {
 		return am;
+	}
+	
+	// UpdateChecker
+	public File getFile() {
+		return getFile();
 	}
 }

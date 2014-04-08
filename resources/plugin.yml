@@ -74,6 +74,7 @@ permissions:
       koth.admin.forceend: true
       koth.admin.breakblocks: true
       koth.admin.placeblocks: true
+      koth.admin.update: true
   koth.admin.enable:
     default: false
     description: Enable the plugin or individual arenas.
@@ -92,3 +93,6 @@ permissions:
   koth.admin.placeblocks:
     default: false
     description: Be able to place blocks during a match.
+  koth.admin.update:
+    default: false
+    description: Allow players to be notified of updates.
