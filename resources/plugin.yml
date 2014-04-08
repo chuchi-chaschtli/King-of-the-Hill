@@ -12,6 +12,7 @@ commands:
     description: Command for King of the Hill.
     
 permissions:
+# ---------- Users ---------- #
   koth.user:
     default: true
     children:
@@ -20,8 +21,23 @@ permissions:
       koth.user.listarenas: true
       koth.user.listplayers: true
       koth.user.info: true
-  
-  
+  koth.user.join:
+    default: false
+    description: Join an arena.
+  koth.user.leave:
+    default: false
+    description: Leave an arena.
+  koth.user.listarenas:
+    default: false
+    description: List all available arenas.
+  koth.user.listplayers:
+    default: false
+    description: List players in an arena.
+  koth.user.info:
+    default: false
+    description: Get the scoop on an arena.
+
+# ---------- Setup ---------- #
   koth.setup:
     default: op
     children:
@@ -31,7 +47,23 @@ permissions:
       koth.setup.config: true
       koth.setup.sethill: true
       koth.setup.setwarps: true
+  koth.setup.addarena:
+    default: false
+    description: Add a new arena.
+  koth.setup.removearena:
+    default: false
+    description: Remove an existing arena.
+  koth.setup.config:
+    default: false
+    description: Save or reload the config.yml in-game.
+  koth.setup.sethill:
+    default: false 
+    description: Add a new hill to an arena.
+  koth.setup.setwarps:
+    default: false
+    description: Set an important arena warp.
       
+# ---------- Admin ---------- #
   koth.admin:
     default: op
     children:
@@ -42,3 +74,21 @@ permissions:
       koth.admin.forceend: true
       koth.admin.breakblocks: true
       koth.admin.placeblocks: true
+  koth.admin.enable:
+    default: false
+    description: Enable the plugin or individual arenas.
+  koth.admin.disable:
+    default: false
+    description: Disable the plugin or individual arenas.
+  koth.admin.forcestart:
+    default: false
+    description: Force an arena to begin.
+  koth.admin.forceend:
+    default: false
+    description: Force an arena to end.
+  koth.admin.breakblocks:
+    default: false
+    description: Be able to break blocks while in a match.
+  koth.admin.placeblocks:
+    default: false
+    description: Be able to place blocks during a match.
