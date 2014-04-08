@@ -38,6 +38,7 @@ public enum Msg {
 	JOIN_ARENA("You have joined &e%."),
 	JOIN_ARENA_IS_FULL("Sorry, &e%&r is full."),
 	JOIN_ARENA_IS_RUNNING("This arena is already in progress."),
+	JOIN_ARENA_SPECTATOR("You are now watching! Enjoy!"),
 	LEAVE_ARENA("You have left the arena. Thanks for playing!"),
 	LEAVE_ARENA_NOT_RUNNING("This arena is not running."),
 	LEAVE_NOT_PLAYING("You are not in the arena."),

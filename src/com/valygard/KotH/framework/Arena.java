@@ -118,6 +118,9 @@ public class Arena {
 			
 			if (running) {
 				Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
+				Messenger.tell(p, Msg.JOIN_ARENA_SPECTATOR);
+				specPlayers.add(p);
+				p.teleport(spec);
 				return;
 			}
 			
@@ -147,11 +150,6 @@ public class Arena {
 		 *  and then announce the winner of the match.
 		 */
 		public void removePlayer(Player p) {
-			if (!running) {
-				Messenger.tell(p, Msg.LEAVE_ARENA_NOT_RUNNING);
-				return;
-			}	
-
 			if (!hasPlayer(p)) {
 				Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 				return;
@@ -173,6 +171,12 @@ public class Arena {
 			pd.restoreData();
 
 			Messenger.tell(p, Msg.LEAVE_ARENA);
+			
+			if (arenaPlayers.contains(p)) arenaPlayers.remove(p);
+			if (bluePlayers.contains(p)) bluePlayers.remove(p);
+			if (redPlayers.contains(p)) redPlayers.remove(p);
+			if (lobbyPlayers.contains(p)) lobbyPlayers.remove(p);
+			if (specPlayers.contains(p)) specPlayers.remove(p);
 		}
 
 		public void balanceTeams(Player p) {
@@ -264,6 +268,7 @@ public class Arena {
 			arenaPlayers.clear();
 			redPlayers.clear();
 			bluePlayers.clear();
+			specPlayers.clear();
 
 			return true;
 		}
