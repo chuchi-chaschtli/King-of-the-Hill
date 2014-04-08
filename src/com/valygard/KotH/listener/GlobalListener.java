@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -34,6 +35,10 @@ public class GlobalListener implements Listener {
 		this.plugin = plugin;
 		this.am = plugin.getArenaManager();
 	}
+	
+	// --------------------------- //
+	// EVENTS
+	// --------------------------- //
 
 	@EventHandler
 	public void onArenaDeath(PlayerDeathEvent e) {
@@ -130,9 +135,32 @@ public class GlobalListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
+	
+	@EventHandler
+	public void onAsyncChat(AsyncPlayerChatEvent e) {
+		Player p = e.getPlayer();
+		
+		Arena arena = am.getArenaWithPlayer(p);
+		if (arena == null)
+			return;
+		
+		if (!arena.getSettings().getBoolean("secluded-chat"))
+			return;
+		
+		// Eliminate default message
+		e.setCancelled(true);
+		e.setMessage(null);
+		
+		for (Player player : arena.getPlayersInArena()) {
+			player.sendMessage(getChatFormat(p, e.getMessage()));
+			e.setCancelled(true);
+		}
+	}
 
-	// Send a different message based on the killer's health in a
-	// PlayerDeathEvent.
+	// --------------------------- //
+	// MISC.
+	// --------------------------- //
+	
 	private String getKillMessage(Player killer, Player killed) {
 		String name = ChatColor.YELLOW + killed.getName() + ChatColor.RESET;
 		if (killer.getHealth() <= 3.5)
@@ -144,6 +172,17 @@ public class GlobalListener implements Listener {
 		else
 			return "You have emerged superior to " + name
 					+ " after a good fight.";
+	}
+	
+	private String getChatFormat(Player p, String msg) {
+		Arena arena = am.getArenaWithPlayer(p);
+		if (arena == null)
+			return null;
+		if (arena.getRedTeam().contains(p))
+			return ChatColor.DARK_RED + "[Red] " + ChatColor.RED + msg;
+		else if (arena.getBlueTeam().contains(p))
+			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE + msg;
+		return null;
 	}
 
 	public KotH getPlugin() {
