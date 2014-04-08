@@ -47,10 +47,11 @@ public class ArenaManager {
 
 		this.enabled = config.getBoolean("global.enabled", true);
 	}
-
-	/**
-	 * Load all arena-related stuff.
-	 */
+	
+	
+	
+	
+	
 	public void loadArenas() {
 		ConfigurationSection section = makeSection(config, "arenas");
 		Set<String> arenaNames = section.getKeys(false);
@@ -156,21 +157,6 @@ public class ArenaManager {
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
 
-		section.set("world", world.getName());
-		section.set("enabled", true);
-
-		section.set("max-players", 16);
-		section.set("min-players", 4);
-
-		section.set("arena-time", 900);
-
-		section.set("hill-clock", 60);
-		section.set("hill-radius", 5);
-		section.set("hill-block", "beacon");
-		section.set("score-to-win", 120);
-
-		plugin.saveConfig();
-
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);
 	}
@@ -187,11 +173,9 @@ public class ArenaManager {
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
 
-	// /////////////////////////////////////////
-	//
-	// GETTERS AND SETTERS
-	//
-	// /////////////////////////////////////////
+	// --------------------------- //
+	// GETTERS
+	// --------------------------- //
 
 	public KotH getPlugin() {
 		return plugin;

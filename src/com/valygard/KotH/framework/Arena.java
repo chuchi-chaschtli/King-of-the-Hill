@@ -73,9 +73,10 @@ public class Arena {
 	// Is the arena ready to be used?
 	private boolean ready;
 
-	/**
-	 * The primary constructor requires the arena name (obviously).
-	 */
+	// --------------------------- //
+	// CONSTRUCTOR
+	// --------------------------- //
+	
 	public Arena(KotH plugin, String arenaName) {
 		// General stuff
 		this.plugin = plugin;
@@ -111,6 +112,11 @@ public class Arena {
 
 		this.ready = false;
 	}
+	
+	
+	// --------------------------- //
+	// NEW METHODS IN REFACTORING
+	// --------------------------- //
 
 	public void addPlayer(Player p) {
 		// Sanity-checks
@@ -151,10 +157,6 @@ public class Arena {
 			startTimer.startTimer();
 	}
 
-	/**
-	 * TODO: Still need to add a way to check if the match ended, and then
-	 * announce the winner of the match.
-	 */
 	public void removePlayer(Player p) {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
@@ -318,11 +320,10 @@ public class Arena {
 			Messenger.announce(this, Msg.ARENA_DRAW);
 	}
 
-	// /////////////////////////////////////////
-	//
-	// GETTERS AND SETTERS
-	//
-	// /////////////////////////////////////////
+
+	// --------------------------- //
+	// GETTERS
+	// --------------------------- //
 
 	public KotH getPlugin() {
 		return plugin;

@@ -1,0 +1,10 @@
+world: ''
+enabled: true
+min-players: 4
+max-players: 16
+secluded-chat: true
+arena-time: 900
+hill-clock: 60
+hill-radius: 5
+hill-block: beacon
+score-to-win: 120

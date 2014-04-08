@@ -55,6 +55,10 @@ public class CommandManager implements CommandExecutor
         
         registerCommands();
     }
+    
+	// --------------------------- //
+	// COMMAND STUFF
+	// --------------------------- //
 	
 	@Override
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String commandLabel, String[] args) {
@@ -178,6 +182,10 @@ public class CommandManager implements CommandExecutor
             if (admin.length() > 0) Messenger.tell(sender, "Admin commands: " + admin.toString());
         }
     }
+    
+	// --------------------------- //
+	// COMMAND REGISTRATION
+	// --------------------------- //
 
     private void registerCommands() {
     	commands = new LinkedHashMap<String, Command>();

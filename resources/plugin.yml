@@ -1,0 +1,44 @@
+name: King of the Hill
+main: com.valygard.KotH
+version: 0.8.75
+website: http://valygard.com
+author: AoH_Ruthless
+description: A King of the Hill minigame.
+
+commands:
+  koth:
+    description: Command for King of the Hill.
+  kingofthehill:
+    description: Command for King of the Hill.
+    
+permissions:
+  koth.user:
+    default: true
+    children:
+      koth.user.join: true
+      koth.user.leave: true
+      koth.user.listarenas: true
+      koth.user.listplayers: true
+      koth.user.info: true
+  
+  
+  koth.setup:
+    default: op
+    children:
+      koth.user: true
+      koth.setup.addarena: true
+      koth.setup.removearena: true
+      koth.setup.config: true
+      koth.setup.sethill: true
+      koth.setup.setwarps: true
+      
+  koth.admin:
+    default: op
+    children:
+      koth.setup: true
+      koth.admin.enable: true
+      koth.admin.disable: true
+      koth.admin.forcestart: true
+      koth.admin.forceend: true
+      koth.admin.breakblocks: true
+      koth.admin.placeblocks: true

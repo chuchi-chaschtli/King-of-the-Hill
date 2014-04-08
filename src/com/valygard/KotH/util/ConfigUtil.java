@@ -41,7 +41,7 @@ public class ConfigUtil {
     private static void process(Plugin plugin, String resource, ConfigurationSection section, boolean addOnlyIfEmpty, boolean removeObsolete) {
         try {
             YamlConfiguration defaults = new YamlConfiguration();
-            defaults.load(plugin.getResource("res/" + resource));
+            defaults.load(plugin.getResource("root/" + resource));
 
             process(defaults, section, addOnlyIfEmpty, removeObsolete);
             plugin.saveConfig();

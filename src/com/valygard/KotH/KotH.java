@@ -6,6 +6,7 @@ package com.valygard.KotH;
 
 import java.io.File;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -128,6 +129,7 @@ public class KotH extends JavaPlugin {
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
+				addDefaults();
 			} catch (Exception e) {
 				e.printStackTrace();
 				Messenger.severe("Could not generate a new config.yml!");
@@ -137,11 +139,35 @@ public class KotH extends JavaPlugin {
 		} else {
 			try {
 				getConfig().load(file);
+				addDefaults();
 			} catch (Exception e) {
 				e.printStackTrace();
 				Messenger.severe("Could not load config.yml!");
 			}
 		}
+	}
+	
+	private void addDefaults() {
+		if (getConfig().getConfigurationSection("global") == null) {
+			getConfig().set("global.enabled", true);
+		}
+		
+		if (getConfig().getConfigurationSection("arenas") == null) {
+			am.createArena("default", Bukkit.getWorlds().get(0));
+		}
+		
+		getConfig().options().header(getHeader());
+		
+		saveConfig();
+	}
+	
+	private String getHeader() {
+		String s = System.getProperty("line.separator");
+		
+		return "King of the Hill v" + getDescription().getVersion() + " - configuration file" + s +
+				"To report bugs, please use the bug tracker:" + s + 
+				"<https://github.com/AoHRuthless/King-of-the-Hill/issues>" + s + s +
+				"Happy Configuring.";
 	}
 	
 	public ArenaManager getArenaManager() {
