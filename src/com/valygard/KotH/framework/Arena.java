@@ -35,444 +35,466 @@ import com.valygard.KotH.time.AutoStartTimer;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class Arena {
 	// General stuff
-		private KotH plugin;
-		private String arenaName;
-		private World world;
+	private KotH plugin;
+	private String arenaName;
+	private World world;
 
-		// Configuration-important
-		private FileConfiguration config;
-		private ConfigurationSection settings, warps;
+	// Configuration-important
+	private FileConfiguration config;
+	private ConfigurationSection settings, warps;
 
-		// Values to keep track of player count
-		private int maxPlayers, minPlayers;
+	// Values to keep track of player count
+	private int maxPlayers, minPlayers;
 
-		// Arena locations
-		private Location red, blue, lobby, spec;
+	// Arena locations
+	private Location red, blue, lobby, spec;
 
-		// Players and teams
-		private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
-		private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers, bluePlayers;
+	// Players and teams
+	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
+	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
+			bluePlayers;
 
-		// Some booleans that are configuration-critical.
-		private boolean running, enabled;
+	// Some booleans that are configuration-critical.
+	private boolean running, enabled;
 
-		// Important timers
-		private AutoStartTimer startTimer;
-		private AutoEndTimer endTimer;
-		
-		// Hill-relevant
-		private HillManager hillManager;
-		private HillUtils	hillUtils;
-		private HillTask	hillTimer;
-		
-		// Is the arena ready to be used?
-		private boolean ready;
+	// Important timers
+	private AutoStartTimer startTimer;
+	private AutoEndTimer endTimer;
 
-		/**
-		 * The primary constructor requires the arena name (obviously).
-		 */
-		public Arena(KotH plugin, String arenaName) {
-			// General stuff
-			this.plugin			= plugin;
-			this.arenaName		= arenaName;
+	// Hill-relevant
+	private HillManager hillManager;
+	private HillUtils hillUtils;
+	private HillTask hillTimer;
 
-			// Settings from config
-			this.config			= plugin.getConfig();
-			this.settings		= config.getConfigurationSection("arenas." +  arenaName + ".settings");
-			this.warps			= config.getConfigurationSection("arenas." + arenaName + ".warps");
-			this.world			= Bukkit.getWorld(settings.getString("world"));
-			this.minPlayers		= settings.getInt("min-players");
-			this.maxPlayers		= settings.getInt("max-players");
+	// Is the arena ready to be used?
+	private boolean ready;
 
-			// The different groups a player can be in.
-			this.arenaPlayers	= new HashSet<Player>();
-			this.lobbyPlayers	= new HashSet<Player>();
-			this.specPlayers	= new HashSet<Player>();
-			this.redPlayers		= new HashSet<Player>();
-			this.bluePlayers    = new HashSet<Player>();
+	/**
+	 * The primary constructor requires the arena name (obviously).
+	 */
+	public Arena(KotH plugin, String arenaName) {
+		// General stuff
+		this.plugin = plugin;
+		this.arenaName = arenaName;
 
-			// Boolean values.
-			this.running		= false;
-			this.enabled		= settings.getBoolean("enabled", true);
-			
-			this.startTimer		= new AutoStartTimer(this, 30);
-			this.endTimer		= new AutoEndTimer(this, settings.getInt("arena-time"));
-			
-			this.hillUtils		= new HillUtils(this);
-			this.hillManager	= new HillManager(this);
-			this.hillTimer		= new HillTask(this);
-			
-			this.ready			= false;
+		// Settings from config
+		this.config = plugin.getConfig();
+		this.settings = config.getConfigurationSection("arenas." + arenaName
+				+ ".settings");
+		this.warps = config.getConfigurationSection("arenas." + arenaName
+				+ ".warps");
+		this.world = Bukkit.getWorld(settings.getString("world"));
+		this.minPlayers = settings.getInt("min-players");
+		this.maxPlayers = settings.getInt("max-players");
+
+		// The different groups a player can be in.
+		this.arenaPlayers = new HashSet<Player>();
+		this.lobbyPlayers = new HashSet<Player>();
+		this.specPlayers = new HashSet<Player>();
+		this.redPlayers = new HashSet<Player>();
+		this.bluePlayers = new HashSet<Player>();
+
+		// Boolean values.
+		this.running = false;
+		this.enabled = settings.getBoolean("enabled", true);
+
+		this.startTimer = new AutoStartTimer(this, 30);
+		this.endTimer = new AutoEndTimer(this, settings.getInt("arena-time"));
+
+		this.hillUtils = new HillUtils(this);
+		this.hillManager = new HillManager(this);
+		this.hillTimer = new HillTask(this);
+
+		this.ready = false;
+	}
+
+	public void addPlayer(Player p) {
+		// Sanity-checks
+		if (!enabled) {
+			Messenger.tell(p, Msg.ARENA_DISABLED);
+			return;
 		}
 
-		public void addPlayer(Player p) {
-			// Sanity-checks
-			if (!enabled) {
-				Messenger.tell(p, Msg.ARENA_DISABLED);
-				return;
-			}
-			
-			if (running) {
-				Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
-				Messenger.tell(p, Msg.JOIN_ARENA_SPECTATOR);
-				specPlayers.add(p);
-				p.teleport(spec);
-				return;
-			}
-			
-			if (lobbyPlayers.size() >= maxPlayers) {
-				Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
-				return;
+		if (running) {
+			Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
+			Messenger.tell(p, Msg.JOIN_ARENA_SPECTATOR);
+			specPlayers.add(p);
+			p.teleport(spec);
+			return;
+		}
+
+		if (lobbyPlayers.size() >= maxPlayers) {
+			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
+			return;
+		}
+
+		data.add(new PlayerData(p, p.getLocation()));
+
+		lobbyPlayers.add(p);
+		p.teleport(lobby);
+
+		p.setFireTicks(0);
+		p.getInventory().clear();
+		p.getInventory().setArmorContents(null);
+		p.setGameMode(GameMode.SURVIVAL);
+		Messenger.tell(p, Msg.JOIN_ARENA, arenaName);
+
+		balanceTeams(p);
+
+		// If the minimum quota is reached, and already not in countdown, start
+		// a countdown.
+		if (lobbyPlayers.size() >= minPlayers)
+			startTimer.startTimer();
+	}
+
+	/**
+	 * TODO: Still need to add a way to check if the match ended, and then
+	 * announce the winner of the match.
+	 */
+	public void removePlayer(Player p) {
+		if (!hasPlayer(p)) {
+			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
+			return;
+		}
+
+		// Restore all of their data; i.e armor, inventory, health, etc.
+		PlayerData pd = getData(p);
+		p.getInventory().clear();
+
+		for (ItemStack i : pd.getContents()) {
+			if (i != null)
+				p.getInventory().addItem(i);
+		}
+
+		// Prepare the player
+		p.getInventory().setArmorContents(pd.getArmorContents());
+		p.teleport(pd.getLocation());
+		p.setGameMode(pd.getMode());
+		p.addPotionEffects(pd.getPotionEffects());
+		pd.restoreData();
+
+		Messenger.tell(p, Msg.LEAVE_ARENA);
+
+		if (arenaPlayers.contains(p))
+			arenaPlayers.remove(p);
+		
+		if (bluePlayers.contains(p))
+			bluePlayers.remove(p);
+		
+		if (redPlayers.contains(p))
+			redPlayers.remove(p);
+		
+		if (lobbyPlayers.contains(p))
+			lobbyPlayers.remove(p);
+		
+		if (specPlayers.contains(p))
+			specPlayers.remove(p);
+	}
+
+	public void balanceTeams(Player p) {
+		if (redPlayers.size() >= bluePlayers.size())
+			bluePlayers.add(p);
+		else
+			redPlayers.add(p);
+	}
+
+	/**
+	 * TODO: Make team-friendly
+	 */
+	public boolean startArena() {
+		// Just some checks
+		if (running || lobbyPlayers.isEmpty()) {
+			return false;
+		}
+
+		// Call our ArenaStartEvent
+		ArenaStartEvent event = new ArenaStartEvent(this);
+		plugin.getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return false;
+		}
+
+		// Has to be in this order, because if we clear lobbyPlayers first, we
+		// cannot add anyone to the game.
+		arenaPlayers.addAll(lobbyPlayers);
+		lobbyPlayers.clear();
+
+		// Then check if there are still players left.
+		if (arenaPlayers.isEmpty()) {
+			return false;
+		}
+
+		// Teleport players, give full health, initialize map
+		for (Player p : arenaPlayers) {
+			// Remove player from spec list to avoid invincibility issues
+			if (specPlayers.contains(p)) {
+				specPlayers.remove(p);
+				System.out.println("[KotH] Player " + p.getName()
+						+ " joined the arena from the spec area!");
+				System.out
+						.println("[KotH] Invincibility glitch attempt stopped!");
 			}
 
-			data.add(new PlayerData(p, p.getLocation()));
-
-			lobbyPlayers.add(p);
-			p.teleport(lobby);
-
-			p.setFireTicks(0);
-			p.getInventory().clear();
-			p.getInventory().setArmorContents(null);
-			p.setGameMode(GameMode.SURVIVAL);
-			Messenger.tell(p, Msg.JOIN_ARENA, arenaName);
-			
 			balanceTeams(p);
+			p.setHealth(p.getMaxHealth());
+			p.setFireTicks(0);
+			p.setAllowFlight(false);
+			p.setFlying(false);
+			p.setFoodLevel(20);
+			p.setExp(0.0F);
+			p.setLevel(0);
+			p.setGameMode(GameMode.SURVIVAL);
+		}
+		// Set running to true.
+		running = true;
 
-			// If the minimum quota is reached, and already not in countdown, start a countdown.
-			if (lobbyPlayers.size() >= minPlayers) startTimer.startTimer();
+		Messenger.announce(this, Msg.ARENA_START);
+		hillManager.begin();
+		hillTimer.runTask();
+
+		endTimer.startTimer();
+		return true;
+	}
+
+	/**
+	 * TODO: Make team-friendly
+	 */
+	public boolean endArena() {
+		// Sanity-checks.
+		if (!running || !arenaPlayers.isEmpty()) {
+			return false;
 		}
 
-		/** TODO: Still need to add a way to check if the match ended,
-		 *  and then announce the winner of the match.
-		 */
-		public void removePlayer(Player p) {
-			if (!hasPlayer(p)) {
-				Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
-				return;
-			}
-
-			// Restore all of their data; i.e armor, inventory, health, etc.
-			PlayerData pd = getData(p);
-			p.getInventory().clear();
-			
-			for (ItemStack i : pd.getContents()) {
-				if (i != null) p.getInventory().addItem(i);
-			}
-			
-			// Prepare the player
-			p.getInventory().setArmorContents(pd.getArmorContents());
-			p.teleport(pd.getLocation());
-			p.setGameMode(pd.getMode());
-			p.addPotionEffects(pd.getPotionEffects());
-			pd.restoreData();
-
-			Messenger.tell(p, Msg.LEAVE_ARENA);
-			
-			if (arenaPlayers.contains(p)) arenaPlayers.remove(p);
-			if (bluePlayers.contains(p)) bluePlayers.remove(p);
-			if (redPlayers.contains(p)) redPlayers.remove(p);
-			if (lobbyPlayers.contains(p)) lobbyPlayers.remove(p);
-			if (specPlayers.contains(p)) specPlayers.remove(p);
+		// Fire the event and check if it's been cancelled.
+		ArenaEndEvent event = new ArenaEndEvent(this);
+		plugin.getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return false;
 		}
 
-		public void balanceTeams(Player p) {
-			if (redPlayers.size() >= bluePlayers.size())
-				bluePlayers.add(p);
-			else
-				redPlayers.add(p);
-		}
+		declareWinner();
 
-		/**
-		 * TODO: Make team-friendly
-		 */
-		public boolean startArena() {
-			// Just some checks
-			if (running || lobbyPlayers.isEmpty()) {
-				return false;
-			}
+		for (Player p : arenaPlayers)
+			removePlayer(p);
 
-			// Call our ArenaStartEvent
-			ArenaStartEvent event = new ArenaStartEvent(this);
-			plugin.getServer().getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				return false;
-			}
+		endTimer.halt();
+		running = false;
 
-			// Has to be in this order, because if we clear lobbyPlayers first, we cannot add anyone to the game.
-			arenaPlayers.addAll(lobbyPlayers);
-			lobbyPlayers.clear();
+		arenaPlayers.clear();
+		redPlayers.clear();
+		bluePlayers.clear();
+		specPlayers.clear();
 
-			// Then check if there are still players left.
-			if (arenaPlayers.isEmpty()) {
-				return false;
-			}
+		return true;
+	}
 
-			// Teleport players, give full health, initialize map
-			for (Player p : arenaPlayers) {
-				// Remove player from spec list to avoid invincibility issues
-				if (specPlayers.contains(p)) {
-					specPlayers.remove(p);
-					System.out.println("[KotH] Player " + p.getName() + " joined the arena from the spec area!");
-					System.out.println("[KotH] Invincibility glitch attempt stopped!");
-				}
+	public void forceStart() {
+		startTimer.halt();
+		startArena();
+	}
 
-				balanceTeams(p);
-				p.setHealth(p.getMaxHealth());
-				p.setFireTicks(0);
-				p.setAllowFlight(false);
-				p.setFlying(false);
-				p.setFoodLevel(20);
-				p.setExp(0.0F);
-				p.setLevel(0);
-				p.setGameMode(GameMode.SURVIVAL);
-			}
-			// Set running to true.
-			running = true;
+	public void forceEnd() {
+		endTimer.halt();
+		endArena();
+	}
 
-			Messenger.announce(this, Msg.ARENA_START);
-			hillManager.begin();
-			hillTimer.runTask();
+	public boolean scoreReached() {
+		int winScore = settings.getInt("score-to-win");
+		return (hillTimer.getBlueScore() >= winScore || hillTimer.getRedScore() >= winScore);
+	}
 
-			endTimer.startTimer();
-			return true;
-		}
+	public void declareWinner() {
+		if (getWinner().equals(redPlayers))
+			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
+					+ "Red team");
+		else if (getWinner().equals(bluePlayers))
+			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
+					+ "Blue team");
+		else
+			Messenger.announce(this, Msg.ARENA_DRAW);
+	}
 
-		/**
-		 * TODO: Make team-friendly
-		 */
-		public boolean endArena() {
-			// Sanity-checks.
-			if (!running || !arenaPlayers.isEmpty()) {
-				return false;
-			}
+	// /////////////////////////////////////////
+	//
+	// GETTERS AND SETTERS
+	//
+	// /////////////////////////////////////////
 
-			// Fire the event and check if it's been cancelled.
-			ArenaEndEvent event = new ArenaEndEvent(this);
-			plugin.getServer().getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				return false;
-			}
-			
-			declareWinner();
-			
-			for (Player p : arenaPlayers)
-				removePlayer(p);
-			
-			endTimer.halt();
-			running = false;
-			
-			arenaPlayers.clear();
-			redPlayers.clear();
-			bluePlayers.clear();
-			specPlayers.clear();
+	public KotH getPlugin() {
+		return plugin;
+	}
 
-			return true;
-		}
-		
-		public void forceStart() {
-			startTimer.halt();
-			startArena();
-		}
-		
-		public void forceEnd() {
-			endTimer.halt();
-			endArena();
-		}
-		
-		public boolean scoreReached() {
-			int winScore = settings.getInt("score-to-win");
-			return (hillTimer.getBlueScore() >= winScore || hillTimer.getRedScore() >= winScore);
-		}
-		
-		public void declareWinner() {
-			if (getWinner().equals(redPlayers))
-				Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED + "Red team");
-			else if (getWinner().equals(bluePlayers))
-				Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE + "Blue team");
-			else
-				Messenger.announce(this, Msg.ARENA_DRAW);
-		}
+	public String getName() {
+		return arenaName;
+	}
 
-		///////////////////////////////////////////
-		//
-		//	  GETTERS AND SETTERS
-		//
-		///////////////////////////////////////////
+	public World getWorld() {
+		return world;
+	}
 
-		public KotH getPlugin() {
-			return plugin;
-		}
+	public ConfigurationSection getSettings() {
+		return settings;
+	}
 
-		public String getName() {
-			return arenaName;
-		}
+	public ConfigurationSection getWarps() {
+		return warps;
+	}
 
-		public World getWorld() {
-			return world;
-		}
+	public Location getLocation(String path) {
+		return parseLocation(warps, path, world);
+	}
 
-		public ConfigurationSection getSettings() {
-			return settings;
-		}
-		
-		public ConfigurationSection getWarps() {
-			return warps;
-		}
-
-		public Location getLocation(String path) {
-			return parseLocation(warps, path, world);
-		}
-
-		public Location getSpawn(Player p) {
-			if (redPlayers.contains(p))
-				return red;
-			if (bluePlayers.contains(p))
-				return blue;
-			return null;
-		}
-
-		public Location getLobby() {
-			lobby = getLocation("lobby");
-			return lobby;
-		}
-
-		public void setLobby(Location lobby) {
-			this.lobby = lobby;
-			warps.set("lobby", lobby);
-			plugin.saveConfig();
-		}
-
-		public Location getSpec() {
-			spec = getLocation("spectators");
-			return spec;
-		}
-
-		public void setSpec(Location spec) {
-			this.spec = spec;
-			warps.set("spectators", spec);
-			plugin.saveConfig();
-		}
-		
-		public Location getRedSpawn() {
-			red = getLocation("redspawn");
+	public Location getSpawn(Player p) {
+		if (redPlayers.contains(p))
 			return red;
-		}
-		
-		public void setRedSpawn(Location red) {
-			this.red = red;
-			warps.set("spectators", red);
-			plugin.saveConfig();
-		}
-		
-		public Location getBlueSpawn() {
-			blue = getLocation("bluespawn");
+		if (bluePlayers.contains(p))
 			return blue;
-		}
-		
-		public void setBlueSpawn(Location blue) {
-			this.blue = blue;
-			warps.set("spectators", blue);
-			plugin.saveConfig();
-		}
+		return null;
+	}
 
-		public Set<Player> getPlayersInArena() {
-			return Collections.unmodifiableSet(arenaPlayers);
-		}
+	public Location getLobby() {
+		lobby = getLocation("lobby");
+		return lobby;
+	}
 
-		public Set<Player> getRedTeam() {
-			return Collections.unmodifiableSet(redPlayers);
-		}
+	public void setLobby(Location lobby) {
+		this.lobby = lobby;
+		warps.set("lobby", lobby);
+		plugin.saveConfig();
+	}
 
-		public Set<Player> getBlueTeam() {
-			return Collections.unmodifiableSet(bluePlayers);
-		}
+	public Location getSpec() {
+		spec = getLocation("spectators");
+		return spec;
+	}
 
-		public Set<Player> getPlayersInLobby() {
-			return Collections.unmodifiableSet(lobbyPlayers);
-		}
+	public void setSpec(Location spec) {
+		this.spec = spec;
+		warps.set("spectators", spec);
+		plugin.saveConfig();
+	}
 
-		public Set<Player> getSpectators() {
-			return Collections.unmodifiableSet(specPlayers);
-		}
+	public Location getRedSpawn() {
+		red = getLocation("redspawn");
+		return red;
+	}
 
-		public boolean isRunning() {
-			return running;
-		}
+	public void setRedSpawn(Location red) {
+		this.red = red;
+		warps.set("spectators", red);
+		plugin.saveConfig();
+	}
 
-		public void setRunning(boolean running) {
-			this.running = running;
-		}
+	public Location getBlueSpawn() {
+		blue = getLocation("bluespawn");
+		return blue;
+	}
 
-		public boolean isEnabled() {
-			return enabled;
-		}
+	public void setBlueSpawn(Location blue) {
+		this.blue = blue;
+		warps.set("spectators", blue);
+		plugin.saveConfig();
+	}
 
-		public void setEnabled(boolean enabled) {
-			this.enabled = enabled;
+	public Set<Player> getPlayersInArena() {
+		return Collections.unmodifiableSet(arenaPlayers);
+	}
+
+	public Set<Player> getRedTeam() {
+		return Collections.unmodifiableSet(redPlayers);
+	}
+
+	public Set<Player> getBlueTeam() {
+		return Collections.unmodifiableSet(bluePlayers);
+	}
+
+	public Set<Player> getPlayersInLobby() {
+		return Collections.unmodifiableSet(lobbyPlayers);
+	}
+
+	public Set<Player> getSpectators() {
+		return Collections.unmodifiableSet(specPlayers);
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public PlayerData getData(Player p) {
+		for (PlayerData pd : data) {
+			if (pd.getPlayer().equals(p))
+				return pd;
 		}
-		
-		public PlayerData getData(Player p) {
-			for (PlayerData pd : data) {
-				if (pd.getPlayer().equals(p)) return pd;
-			}
+		return null;
+	}
+
+	public boolean hasPlayer(Player p) {
+		return getData(p) != null;
+	}
+
+	public AutoStartTimer getStartTimer() {
+		return startTimer;
+	}
+
+	public AutoEndTimer getEndTimer() {
+		return endTimer;
+	}
+
+	public int getLength() {
+		return settings.getInt("arena-time");
+	}
+
+	public HillManager getHillManager() {
+		return hillManager;
+	}
+
+	public HillUtils getHillUtils() {
+		return hillUtils;
+	}
+
+	public HillTask getHillTimer() {
+		return hillTimer;
+	}
+
+	public Set<Player> getWinner() {
+		if (hillTimer.getBlueScore() > hillTimer.getRedScore())
+			return bluePlayers;
+		else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
+			return redPlayers;
+		else
 			return null;
-		}
-		
-		public boolean hasPlayer(Player p) {
-			return getData(p) != null;
-		}
-		
-		public AutoStartTimer getStartTimer() {
-			return startTimer;
-		}
-		
-		public AutoEndTimer getEndTimer() {
-			return endTimer;
-		}
-		
-		public int getLength() {
-			return settings.getInt("arena-time");
-		}
-		
-		public HillManager getHillManager() {
-			return hillManager;
-		}
-		
-		public HillUtils getHillUtils() {
-			return hillUtils;
-		}
-		
-		public HillTask getHillTimer() {
-			return hillTimer;
-		}
-		
-		public Set<Player> getWinner() {
-			if (hillTimer.getBlueScore() > hillTimer.getRedScore())
-				return bluePlayers;
-			else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
-				return redPlayers;
-			else
-				return null;
-		}
-		
-		public boolean isReady() {
-			ready = false;
-			if (red == null || blue == null || spec == null || lobby == null)
-				return ready;
-			
-			if (getLocation("hills") == null)
-				return ready;
-			
-			ready = true;
+	}
+
+	public boolean isReady() {
+		ready = false;
+		if (red == null || blue == null || spec == null || lobby == null)
 			return ready;
-		}
-		
-		public boolean setReady(boolean ready) {
-			this.ready	= ready;
+
+		if (getLocation("hills") == null)
 			return ready;
-		}
+
+		ready = true;
+		return ready;
+	}
+
+	public boolean setReady(boolean ready) {
+		this.ready = ready;
+		return ready;
+	}
 }

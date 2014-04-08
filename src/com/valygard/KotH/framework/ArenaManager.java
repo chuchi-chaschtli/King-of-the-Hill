@@ -23,234 +23,254 @@ import com.valygard.KotH.util.ConfigUtil;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class ArenaManager {
-	//general stuff
-		private KotH plugin;
-		private FileConfiguration config;
+	// general stuff
+	private KotH plugin;
+	private FileConfiguration config;
 
-		//getting arenas
-		private List<Arena> arenas;
-	    
-	    //we have to make sure KotH is even enabled
-	    private boolean enabled;
-	    
-	    /**
-	     * Our constructor.
-	     */
-	    public ArenaManager(KotH plugin) {
-	    	this.plugin		= plugin;
-	    	this.config		= plugin.getConfig();
-	    	
-	    	this.arenas		= new ArrayList<Arena>();
-	    	
-	    	this.enabled	= config.getBoolean("global.enabled", true);
-	    }
-	    
-	    /**
-	     * Load all arena-related stuff.
-	     */
-	    public void loadArenas() {
-	        ConfigurationSection section = makeSection(config, "arenas");
-	        Set<String> arenaNames = section.getKeys(false);
+	// getting arenas
+	private List<Arena> arenas;
 
-	        // If no arenas were found, create a default arena
-	        if (arenaNames == null || arenaNames.isEmpty()) {
-	            createArena(section, "default", plugin.getServer().getWorlds().get(0), false);
-	        }
-	        
-	        arenas = new ArrayList<Arena>();
-	        for (World world : Bukkit.getServer().getWorlds()) {
-	            loadArenasInWorld(world.getName());
-	        }
-	    }
-	    
-	    public void loadArenasInWorld(String worldName) {
-	        Set<String> arenaNames = config.getConfigurationSection("arenas").getKeys(false);
-	        if (arenaNames == null || arenaNames.isEmpty()) {
-	            return;
-	        }
-	        for (String arenaName : arenaNames) {
-	            Arena arena = getArenaWithName(arenaName);
-	            if (arena != null) continue;
-	            
-	            String arenaWorld = config.getString("arenas." + arenaName + ".settings.world", "");
-	            if (!arenaWorld.equals(worldName)) continue;
-	            
-	            loadArena(arenaName);
-	        }
-	    }
-	    
-	    public void unloadArenasInWorld(String worldName) {
-	        Set<String> arenaNames = config.getConfigurationSection("arenas").getKeys(false);
-	        if (arenaNames == null || arenaNames.isEmpty()) {
-	            return;
-	        }
-	        for (String arenaName : arenaNames) {
-	            Arena arena = getArenaWithName(arenaName);
-	            if (arena == null) continue;
-	            
-	            String arenaWorld = arena.getWorld().getName();
-	            if (!arenaWorld.equals(worldName)) continue;
-	            
-	            arena.forceEnd();
-	            arenas.remove(arena);
-	        }
-	    }
-	    
-	    private Arena loadArena(String arenaName) {
-	    	ConfigurationSection section  = makeSection(config, "arenas." + arenaName);
-	        ConfigurationSection settings = makeSection(section, "settings");
-	        String worldName = settings.getString("world", "");
-	        World world;
-	        
-	        if (!worldName.equals("")) {
-	            world = plugin.getServer().getWorld(worldName);
-	            if (world == null) {
-	                Messenger.warning("World '" + worldName + "' for arena '" + arenaName + "' was not found...");
-	                return null;
-	            }
-	        } else {
-	            world = plugin.getServer().getWorlds().get(0);
-	            Messenger.warning("Could not find the world for arena '" + arenaName + "'. Using default world ('" + world.getName() + "')! Check the config-file!");
-	        }
+	// we have to make sure KotH is even enabled
+	private boolean enabled;
 
-	        ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", settings);
+	/**
+	 * Our constructor.
+	 */
+	public ArenaManager(KotH plugin) {
+		this.plugin = plugin;
+		this.config = plugin.getConfig();
 
-	        Arena arena = new Arena(plugin, arenaName);
-	        arenas.add(arena);
-	        plugin.getLogger().info("Loaded arena '" + arenaName + "'");
-	        return arena;
-	    }
+		this.arenas = new ArrayList<Arena>();
 
-		public Arena createArena(String arenaName, World world) {
-			ConfigurationSection s = makeSection(config, "arenas");
-			return createArena(s, arenaName, world, true);
+		this.enabled = config.getBoolean("global.enabled", true);
+	}
+
+	/**
+	 * Load all arena-related stuff.
+	 */
+	public void loadArenas() {
+		ConfigurationSection section = makeSection(config, "arenas");
+		Set<String> arenaNames = section.getKeys(false);
+
+		// If no arenas were found, create a default arena
+		if (arenaNames == null || arenaNames.isEmpty()) {
+			createArena(section, "default",
+					plugin.getServer().getWorlds().get(0), false);
 		}
 
-		/**
-		 * Create and optionally load the arena.
-		 */
-		private Arena createArena(ConfigurationSection arenas, String arenaName, World world, boolean load) {
-			// We can't have two arenas of the same name ...
-			if (arenas.contains(arenaName)) {
-				throw new IllegalArgumentException("This arena already exists.");
+		arenas = new ArrayList<Arena>();
+		for (World world : Bukkit.getServer().getWorlds()) {
+			loadArenasInWorld(world.getName());
+		}
+	}
+
+	public void loadArenasInWorld(String worldName) {
+		Set<String> arenaNames = config.getConfigurationSection("arenas")
+				.getKeys(false);
+		if (arenaNames == null || arenaNames.isEmpty()) {
+			return;
+		}
+		for (String arenaName : arenaNames) {
+			Arena arena = getArenaWithName(arenaName);
+			if (arena != null)
+				continue;
+
+			String arenaWorld = config.getString("arenas." + arenaName
+					+ ".settings.world", "");
+			if (!arenaWorld.equals(worldName))
+				continue;
+
+			loadArena(arenaName);
+		}
+	}
+
+	public void unloadArenasInWorld(String worldName) {
+		Set<String> arenaNames = config.getConfigurationSection("arenas")
+				.getKeys(false);
+		if (arenaNames == null || arenaNames.isEmpty()) {
+			return;
+		}
+		for (String arenaName : arenaNames) {
+			Arena arena = getArenaWithName(arenaName);
+			if (arena == null)
+				continue;
+
+			String arenaWorld = arena.getWorld().getName();
+			if (!arenaWorld.equals(worldName))
+				continue;
+
+			arena.forceEnd();
+			arenas.remove(arena);
+		}
+	}
+
+	private Arena loadArena(String arenaName) {
+		ConfigurationSection section = makeSection(config, "arenas."
+				+ arenaName);
+		ConfigurationSection settings = makeSection(section, "settings");
+		String worldName = settings.getString("world", "");
+		World world;
+
+		if (!worldName.equals("")) {
+			world = plugin.getServer().getWorld(worldName);
+			if (world == null) {
+				Messenger.warning("World '" + worldName + "' for arena '"
+						+ arenaName + "' was not found...");
+				return null;
 			}
-			
-			// Remove obsolete and add new config settings.
-			ConfigurationSection section = makeSection(arenas, arenaName);
-	        ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", makeSection(section, "settings"));
-	        
-	        section.set("world", world.getName());
-	        section.set("enabled", true);
-	        
-	        section.set("max-players", 16);
-	        section.set("min-players", 4);
-	        
-	        section.set("arena-time", 900);
-	        
-	        section.set("hill-clock", 60);
-	        section.set("hill-radius", 5);
-	        section.set("hill-block", "beacon");
-	        section.set("score-to-win", 120);
-	        
-	        plugin.saveConfig();
-
-	        // Load the arena
-	        return (load ? loadArena(arenaName) : null);
-		}
-		
-		public void removeArena(Arena arena) {
-			String name = arena.getName();
-			
-			if (arena.isRunning())
-				arena.forceEnd();
-			
-			config.set("arenas." + name, null);
-			plugin.saveConfig();
-			
-			Messenger.info("The arena '" + name + "' has been removed.");
+		} else {
+			world = plugin.getServer().getWorlds().get(0);
+			Messenger.warning("Could not find the world for arena '"
+					+ arenaName + "'. Using default world ('" + world.getName()
+					+ "')! Check the config-file!");
 		}
 
-		///////////////////////////////////////////
-		//
-		//	  GETTERS AND SETTERS
-		//
-		///////////////////////////////////////////
+		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", settings);
 
-		public KotH getPlugin() {
-			return plugin;
+		Arena arena = new Arena(plugin, arenaName);
+		arenas.add(arena);
+		plugin.getLogger().info("Loaded arena '" + arenaName + "'");
+		return arena;
+	}
+
+	public Arena createArena(String arenaName, World world) {
+		ConfigurationSection s = makeSection(config, "arenas");
+		return createArena(s, arenaName, world, true);
+	}
+
+	/**
+	 * Create and optionally load the arena.
+	 */
+	private Arena createArena(ConfigurationSection arenas, String arenaName,
+			World world, boolean load) {
+		// We can't have two arenas of the same name ...
+		if (arenas.contains(arenaName)) {
+			throw new IllegalArgumentException("This arena already exists.");
 		}
 
-		public List<Arena> getArenas() {
-			return arenas;
+		// Remove obsolete and add new config settings.
+		ConfigurationSection section = makeSection(arenas, arenaName);
+		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
+				makeSection(section, "settings"));
+
+		section.set("world", world.getName());
+		section.set("enabled", true);
+
+		section.set("max-players", 16);
+		section.set("min-players", 4);
+
+		section.set("arena-time", 900);
+
+		section.set("hill-clock", 60);
+		section.set("hill-radius", 5);
+		section.set("hill-block", "beacon");
+		section.set("score-to-win", 120);
+
+		plugin.saveConfig();
+
+		// Load the arena
+		return (load ? loadArena(arenaName) : null);
+	}
+
+	public void removeArena(Arena arena) {
+		String name = arena.getName();
+
+		if (arena.isRunning())
+			arena.forceEnd();
+
+		config.set("arenas." + name, null);
+		plugin.saveConfig();
+
+		Messenger.info("The arena '" + name + "' has been removed.");
+	}
+
+	// /////////////////////////////////////////
+	//
+	// GETTERS AND SETTERS
+	//
+	// /////////////////////////////////////////
+
+	public KotH getPlugin() {
+		return plugin;
+	}
+
+	public List<Arena> getArenas() {
+		return arenas;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean value) {
+		this.enabled = value;
+		config.set("global.enabled", value);
+	}
+
+	public List<Arena> getEnabledArenas(List<Arena> arenas) {
+		List<Arena> result = new ArrayList<Arena>(arenas.size());
+		for (Arena arena : arenas) {
+			if (arena.isEnabled())
+				result.add(arena);
 		}
+		return result;
+	}
 
-		public boolean isEnabled() {
-			return enabled;
+	public List<Arena> getPermittedArenas(Player p) {
+		List<Arena> result = new ArrayList<Arena>(arenas.size());
+		for (Arena arena : arenas) {
+			if (plugin.has(p, "koth.arenas." + arena.getName()))
+				result.add(arena);
 		}
+		return result;
+	}
 
-		public void setEnabled(boolean value) {
-			this.enabled = value;
-			config.set("global.enabled", value);
+	public List<Arena> getEnabledAndPermittedArenas(Player p) {
+		List<Arena> result = new ArrayList<Arena>(arenas.size());
+		for (Arena arena : arenas) {
+			if (arena.isEnabled()
+					&& plugin.has(p, "koth.arenas." + arena.getName()))
+				result.add(arena);
 		}
+		return result;
+	}
 
-		public List<Arena> getEnabledArenas(List<Arena> arenas) {
-			List<Arena> result = new ArrayList<Arena>(arenas.size());
-			for (Arena arena : arenas) {
-				if (arena.isEnabled()) result.add(arena);
-			}
-			return result;
+	public Arena getArenaWithPlayer(Player p) {
+		for (Arena arena : arenas) {
+			if (arena.getPlayersInArena().contains(p))
+				return arena;
 		}
+		return null;
+	}
 
-	    public List<Arena> getPermittedArenas(Player p) {
-	        List<Arena> result = new ArrayList<Arena>(arenas.size());
-	        for (Arena arena : arenas) {
-	            if (plugin.has(p, "koth.arenas." + arena.getName()))
-	                result.add(arena);
-	        }
-	        return result;
-	    }
+	public Arena getArenaWithPlayer(String playerName) {
+		for (Arena arena : arenas) {
+			if (arena.getPlayersInArena().contains(
+					Bukkit.getServer().getPlayer(playerName)))
+				return arena;
+		}
+		return null;
+	}
 
-	    public List<Arena> getEnabledAndPermittedArenas(Player p) {
-	        List<Arena> result = new ArrayList<Arena>(arenas.size());
-	        for (Arena arena : arenas) {
-	            if (arena.isEnabled() && plugin.has(p, "koth.arenas." + arena.getName()))
-	                result.add(arena);
-	        }
-	        return result;
-	    }
-	    
-	    public Arena getArenaWithPlayer(Player p) {
-	       for (Arena arena : arenas) {
-	    	   if (arena.getPlayersInArena().contains(p)) return arena;
-	       }
-	       return null;
-	    }
+	public Arena getArenaWithName(String arenaName) {
+		return getArenaWithName(this.arenas, arenaName);
+	}
 
-	    public Arena getArenaWithPlayer(String playerName) {
-	    	for (Arena arena : arenas) {
-	     	   if (arena.getPlayersInArena().contains(Bukkit.getServer().getPlayer(playerName))) return arena;
-	        }
-	        return null;
-	    }
-	    
-	    public Arena getArenaWithName(String arenaName) {
-	        return getArenaWithName(this.arenas, arenaName);
-	    }
+	public Arena getArenaWithName(Collection<Arena> arenas, String arenaName) {
+		for (Arena arena : arenas)
+			if (arena.getName().equals(arenaName))
+				return arena;
+		return null;
+	}
 
-	    public Arena getArenaWithName(Collection<Arena> arenas, String arenaName) {
-	        for (Arena arena : arenas)
-	            if (arena.getName().equals(arenaName))
-	                return arena;
-	        return null;
-	    }
-
-	    public Arena getArenaWithSpectator(Player p) {
-	        for (Arena arena : arenas) {
-	            if (arena.getSpectators().contains(p)) return arena;
-	        }
-	        return null;
-	    }
+	public Arena getArenaWithSpectator(Player p) {
+		for (Arena arena : arenas) {
+			if (arena.getSpectators().contains(p))
+				return arena;
+		}
+		return null;
+	}
 }
