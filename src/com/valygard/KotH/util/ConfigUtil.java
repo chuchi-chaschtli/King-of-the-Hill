@@ -108,6 +108,7 @@ public class ConfigUtil {
             config.set(path, null);
             return;
         }
+        
         String x = twoPlaces(location.getX());
         String y = twoPlaces(location.getY());
         String z = twoPlaces(location.getZ());

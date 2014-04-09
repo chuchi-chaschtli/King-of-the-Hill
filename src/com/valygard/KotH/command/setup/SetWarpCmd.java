@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotHUtils;
@@ -20,7 +19,6 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
-import com.valygard.KotH.util.ConfigUtil;
 
 @CommandInfo(
 		name = "setwarp", 
@@ -51,25 +49,23 @@ public class SetWarpCmd implements Command {
 		}
 		
 		if (args.length > 1) {
-			ConfigurationSection s = am.getPlugin().getConfig().getConfigurationSection(args[0] + ".warps");
 			switch (args[1]) {
 				case "red":
 				case "redspawn":
-					ConfigUtil.setLocation(s, "redspawn", p.getLocation());
+					arena.setLocation("redspawn", p.getLocation());
 					break;
 				case "blue":
 				case "bluespawn":
-					ConfigUtil.setLocation(s, "bluespawn", p.getLocation());
+					arena.setLocation("bluespawn", p.getLocation());
 					break;
 				case "lobby":
-					ConfigUtil.setLocation(s, "lobby", p.getLocation());
+					arena.setLocation("lobby", p.getLocation());
 					break;
 				case "spec":
 				case "spectator":
-					ConfigUtil.setLocation(s, "spec", p.getLocation());
+					arena.setLocation("spec", p.getLocation());
 					break;
 				default:
-					Messenger.tell(p, "Invalid argument. Use &e/koth help");
 					return false;
 			}
 			getMissingWarps(arena, p);

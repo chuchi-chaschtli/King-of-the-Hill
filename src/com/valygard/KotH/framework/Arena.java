@@ -32,6 +32,7 @@ import com.valygard.KotH.hill.HillTask;
 import com.valygard.KotH.hill.HillUtils;
 import com.valygard.KotH.time.AutoEndTimer;
 import com.valygard.KotH.time.AutoStartTimer;
+import com.valygard.KotH.util.ConfigUtil;
 
 /**
  * @author Anand
@@ -348,6 +349,10 @@ public class Arena {
 	public Location getLocation(String path) {
 		return parseLocation(warps, path, world);
 	}
+	
+	public void setLocation(String path, Location loc) {
+		ConfigUtil.setLocation(warps, path, loc);
+	}
 
 	public Location getSpawn(Player p) {
 		if (redPlayers.contains(p))
@@ -358,8 +363,12 @@ public class Arena {
 	}
 
 	public Location getLobby() {
-		lobby = getLocation("lobby");
-		return lobby;
+		try{
+			lobby = getLocation("lobby");
+			return lobby;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setLobby(Location lobby) {
@@ -369,35 +378,47 @@ public class Arena {
 	}
 
 	public Location getSpec() {
-		spec = getLocation("spectators");
-		return spec;
+		try {
+			spec = getLocation("spec");
+			return spec;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setSpec(Location spec) {
 		this.spec = spec;
-		warps.set("spectators", spec);
+		warps.set("spec", spec);
 		plugin.saveConfig();
 	}
 
 	public Location getRedSpawn() {
-		red = getLocation("redspawn");
-		return red;
+		try {
+			red = getLocation("redspawn");
+			return red;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setRedSpawn(Location red) {
 		this.red = red;
-		warps.set("spectators", red);
+		warps.set("redspawn", red);
 		plugin.saveConfig();
 	}
 
 	public Location getBlueSpawn() {
-		blue = getLocation("bluespawn");
-		return blue;
+		try {
+			blue = getLocation("bluespawn");
+			return blue;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setBlueSpawn(Location blue) {
 		this.blue = blue;
-		warps.set("spectators", blue);
+		warps.set("bluespawn", blue);
 		plugin.saveConfig();
 	}
 

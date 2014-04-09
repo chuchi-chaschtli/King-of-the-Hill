@@ -1,4 +1,4 @@
-world: ''
+world: 'world'
 enabled: true
 min-players: 4
 max-players: 16
