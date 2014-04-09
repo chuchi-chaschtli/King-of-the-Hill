@@ -6,7 +6,6 @@ package com.valygard.KotH;
 
 import java.io.File;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -124,37 +123,14 @@ public class KotH extends JavaPlugin {
     }
 
 	private void loadConfigFile() {
-		File file = new File(getDataFolder(), "config.yml");
-		// If the file doesn't exist generate a new config file.
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-				addDefaults();
-			} catch (Exception e) {
-				e.printStackTrace();
-				Messenger.severe("Could not generate a new config.yml!");
-			}
-
-		// Otherwise load the config file.
-		} else {
-			try {
-				getConfig().load(file);
-				addDefaults();
-			} catch (Exception e) {
-				e.printStackTrace();
-				Messenger.severe("Could not load config.yml!");
-			}
-		}
+		saveDefaultConfig();
+		addDefaults();
 	}
 	
 	private void addDefaults() {
 		if (getConfig().getConfigurationSection("global") == null) {
 			getConfig().set("global.enabled", true);
 			getConfig().set("global.check-for-updates", true);
-		}
-		
-		if (getConfig().getConfigurationSection("arenas") == null) {
-			am.createArena("default", Bukkit.getWorlds().get(0));
 		}
 		
 		getConfig().options().header(getHeader());
