@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.command.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -38,8 +39,12 @@ public class ListArenaCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;
 		List<Arena> arenas = am.getPermittedArenas(p);
-
-        String list = KotHUtils.formatList(arenas, am.getPlugin());
+		List<String> names = new ArrayList<String>();
+		for (Arena arena : arenas) {
+			names.add(arena.getName());
+		}
+ 
+        String list = KotHUtils.formatList(names, am.getPlugin());
         Messenger.tell(sender, Msg.MISC_LIST_ARENAS.format(list));
         
 		return true;
