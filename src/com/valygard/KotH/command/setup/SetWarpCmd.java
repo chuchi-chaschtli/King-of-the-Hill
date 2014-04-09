@@ -22,20 +22,20 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.ConfigUtil;
 
+@CommandInfo(
+		name = "setwarp", 
+		pattern = "set(warp|loc).*|arenasetwarp",
+		desc = "Define a warp for an arena",
+		playerOnly = true
+)
+@CommandPermission("koth.setup.setwarps")
+@CommandUsage("/koth setwarp <arena> <red|blue|lobby|spec>")
 /**
  * @author Anand
  *
  */
 public class SetWarpCmd implements Command {
 
-	@CommandInfo(
-			name = "setwarp", 
-			pattern = "set(warp|loc).*|arenasetwarp",
-			desc = "Define a warp for an arena",
-			playerOnly = true
-	)
-	@CommandPermission("koth.setup.setwarps")
-	@CommandUsage("/koth setwarp <arena> <red|blue|lobby|spec>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;

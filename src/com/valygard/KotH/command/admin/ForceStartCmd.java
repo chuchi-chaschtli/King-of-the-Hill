@@ -15,19 +15,19 @@ import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "forcestart", 
+		pattern = "forces.*",
+		desc = "Force an arena to start."
+)
+@CommandPermission("koth.admin.forcestart")
+@CommandUsage("/koth forcestart <arena>")
 /**
  * @author Anand
  *
  */
 public class ForceStartCmd implements Command {
 	
-	@CommandInfo(
-			name = "forcestart", 
-			pattern = "forces.*",
-			desc = "Force an arena to start."
-	)
-	@CommandPermission("koth.admin.forcestart")
-	@CommandUsage("/koth forcestart <arena>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Arena arena = am.getArenaWithName(args[0]);

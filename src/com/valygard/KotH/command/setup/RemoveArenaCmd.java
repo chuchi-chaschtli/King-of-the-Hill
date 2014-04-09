@@ -14,19 +14,19 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "removearena", 
+		pattern = "rem.*arena|del.*a.*",
+		desc = "Remove an existing arena."
+)
+@CommandPermission("koth.setup.removearena")
+@CommandUsage("/koth removearena <arena>")
 /**
  * @author Anand
  *
  */
 public class RemoveArenaCmd implements Command {
-
-	@CommandInfo(
-			name = "removearena", 
-			pattern = "rem.*arena|del.*a.*",
-			desc = "Remove an existing arena."
-	)
-	@CommandPermission("koth.setup.removearena")
-	@CommandUsage("/koth removearena <arena>")
+	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (am.getArenaWithName(args[0]) == null) {

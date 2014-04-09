@@ -15,20 +15,20 @@ import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "disable", 
+		pattern = "disable|off",
+		desc = "Disable specific arenas or all of KotH.",
+		argsRequired = 0
+)
+@CommandPermission("koth.admin.disable")
+@CommandUsage("/koth disable [arena|all]")
 /**
  * @author Anand
  *
  */
 public class DisableCmd implements Command {
 	
-	@CommandInfo(
-			name = "disable", 
-			pattern = "disable|off",
-			desc = "Disable specific arenas or all of KotH.",
-			argsRequired = 0
-	)
-	@CommandPermission("koth.admin.disable")
-	@CommandUsage("/koth disable [arena|all]")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (args.length == 0) {

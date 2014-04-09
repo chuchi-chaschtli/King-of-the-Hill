@@ -13,19 +13,19 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "config", 
+		pattern = "cfg|config",
+		desc = "Save or reload the config."
+)
+@CommandPermission("koth.setup.config")
+@CommandUsage("/koth config <save|reload>")
 /**
  * @author Anand
  *
  */
 public class ConfigCmd implements Command {
 
-	@CommandInfo(
-			name = "config", 
-			pattern = "cfg|config",
-			desc = "Save or reload the config."
-	)
-	@CommandPermission("koth.setup.config")
-	@CommandUsage("/koth config <save|reload>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (args[0].startsWith("save")) {

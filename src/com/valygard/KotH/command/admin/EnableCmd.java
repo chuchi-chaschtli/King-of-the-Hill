@@ -15,20 +15,20 @@ import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "enable", 
+		pattern = "enable|on",
+		desc = "Enable specific arenas or all of KotH.",
+		argsRequired = 0
+)
+@CommandPermission("koth.admin.enable")
+@CommandUsage("/koth enable [arena|all]")
 /**
  * @author Anand
  *
  */
 public class EnableCmd implements Command {
 
-	@CommandInfo(
-			name = "enable", 
-			pattern = "enable|on",
-			desc = "Enable specific arenas or all of KotH.",
-			argsRequired = 0
-	)
-	@CommandPermission("koth.admin.enable")
-	@CommandUsage("/koth enable [arena|all]")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (args.length == 0) {

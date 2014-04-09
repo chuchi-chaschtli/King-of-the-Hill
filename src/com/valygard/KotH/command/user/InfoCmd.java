@@ -17,19 +17,19 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.TimeUtil;
 
+@CommandInfo(
+		name = "info", 
+		pattern = "info.*|arenainfo",
+		desc = "View some information about a specified arena."
+	)
+	@CommandPermission("koth.user.info")
+	@CommandUsage("/koth info <arena>")
 /**
  * @author Anand
  *
  */
 public class InfoCmd implements Command {
 
-	@CommandInfo(
-			name = "info", 
-			pattern = "info.*|arenainfo",
-			desc = "View some information about a specified arena."
-		)
-		@CommandPermission("koth.user.info")
-		@CommandUsage("/koth info <arena>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Arena arena = am.getArenaWithName(args[0]);

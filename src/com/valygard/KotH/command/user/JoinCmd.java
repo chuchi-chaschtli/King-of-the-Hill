@@ -15,13 +15,7 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
-/**
- * @author Anand
- *
- */
-public class JoinCmd implements Command {
-
-	@CommandInfo(
+@CommandInfo(
 		name = "join", 
 		pattern = "join.*|j.*n",
 		desc = "Join an arena.",
@@ -29,6 +23,12 @@ public class JoinCmd implements Command {
 	)
 	@CommandPermission("koth.user.join")
 	@CommandUsage("/koth join <arena>")
+/**
+ * @author Anand
+ *
+ */
+public class JoinCmd implements Command {
+
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (!am.getArenas().contains(args[0])) {

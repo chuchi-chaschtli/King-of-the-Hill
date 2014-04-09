@@ -16,20 +16,20 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "addarena", 
+		pattern = "addarena|createa.*",
+		desc = "Create a new arena.",
+		playerOnly = true
+)
+@CommandPermission("koth.setup.addarena")
+@CommandUsage("/koth addarena <arena>")
 /**
  * @author Anand
  *
  */
 public class CreateArenaCmd implements Command {
-
-	@CommandInfo(
-			name = "addarena", 
-			pattern = "addarena|createa.*",
-			desc = "Create a new arena.",
-			playerOnly = true
-	)
-	@CommandPermission("koth.setup.addarena")
-	@CommandUsage("/koth addarena <arena>")
+	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (am.getArenaWithName(args[0]) != null) {

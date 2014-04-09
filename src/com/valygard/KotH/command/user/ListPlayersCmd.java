@@ -17,19 +17,19 @@ import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "players", 
+		pattern = "players.*|listp.*|p.*list",
+		desc = "View all players in an arena."
+	)
+@CommandPermission("koth.user.listplayers")
+@CommandUsage("/koth players <arena>")
 /**
  * @author Anand
  *
  */
 public class ListPlayersCmd implements Command {
 	
-	@CommandInfo(
-			name = "players", 
-			pattern = "players.*|listp.*|p.*list",
-			desc = "View all players in an arena."
-		)
-	@CommandPermission("koth.user.listplayers")
-	@CommandUsage("/koth players <arena>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Arena arena = am.getArenaWithName(args[0]);

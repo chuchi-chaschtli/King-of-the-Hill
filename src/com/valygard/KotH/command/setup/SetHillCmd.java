@@ -18,20 +18,20 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.ConfigUtil;
 
+@CommandInfo(
+		name = "sethill", 
+		pattern = "(add|set)hill.*",
+		desc = "Set a new hill for an arena on your current location.",
+		playerOnly = true
+)
+@CommandPermission("koth.setup.sethill")
+@CommandUsage("/koth sethill <arena>")
 /**
  * @author Anand
  *
  */
 public class SetHillCmd implements Command {
 
-	@CommandInfo(
-			name = "sethill", 
-			pattern = "(add|set)hill.*",
-			desc = "Set a new hill for an arena on your current location.",
-			playerOnly = true
-	)
-	@CommandPermission("koth.setup.sethill")
-	@CommandUsage("/koth sethill <arena>")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Arena arena = am.getArenaWithName(args[0]);

@@ -15,21 +15,21 @@ import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
+@CommandInfo(
+		name = "leave", 
+		pattern = "leave.*|quit.*",
+		desc = "Leave an arena.",
+		playerOnly = true,
+		argsRequired = 0
+)
+@CommandPermission("koth.user.leave")
+@CommandUsage("/koth leave")
 /**
  * @author Anand
  *
  */
 public class LeaveCmd implements Command {
 
-	@CommandInfo(
-			name = "leave", 
-			pattern = "leave.*|quit.*",
-			desc = "Leave an arena.",
-			playerOnly = true,
-			argsRequired = 0
-	)
-	@CommandPermission("koth.user.leave")
-	@CommandUsage("/koth leave")
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (am.getArenaWithPlayer((Player) sender) == null) {
