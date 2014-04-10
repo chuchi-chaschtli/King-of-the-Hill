@@ -5,6 +5,7 @@
 package com.valygard.KotH.listener;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +16,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -65,6 +67,7 @@ public class GlobalListener implements Listener {
 		if (arena == null)
 			return;
 
+		p.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
 		if (arena.getRedTeam().contains(p))
 			e.setRespawnLocation(arena.getRedSpawn());
 		else if (arena.getBlueTeam().contains(p))
