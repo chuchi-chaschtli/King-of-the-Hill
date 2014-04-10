@@ -144,7 +144,9 @@ public class Arena {
 		lobbyPlayers.add(p);
 		p.teleport(lobby);
 
+		p.setHealth(p.getMaxHealth());
 		p.setFireTicks(0);
+		p.setFoodLevel(20);
 		p.getInventory().clear();
 		p.getInventory().setArmorContents(null);
 		p.setGameMode(GameMode.SURVIVAL);
@@ -504,6 +506,12 @@ public class Arena {
 	}
 
 	public boolean isReady() {
+		ready = false;
+		
+		if (red == null || blue == null || spec == null || lobby == null || warps.getConfigurationSection("hills") == null)
+			return ready;
+		
+		ready = true;
 		return ready;
 	}
 

@@ -36,6 +36,7 @@ public enum Msg {
 	HILLS_ENTERED("You have entered the hill."),
 	HILLS_LEFT("You have abandoned the hill."),
 	HILLS_SWITCHED("The hill has moved positions!"),
+	JOIN_ALREADY_IN_ARENA("You are already in the arena."),
 	JOIN_ARENA("You have joined &e%."),
 	JOIN_ARENA_IS_FULL("Sorry, &e%&r is full."),
 	JOIN_ARENA_IS_RUNNING("This arena is already in progress."),

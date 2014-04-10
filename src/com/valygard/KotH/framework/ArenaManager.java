@@ -52,11 +52,7 @@ public class ArenaManager {
 
 		this.enabled = config.getBoolean("global.enabled", true);
 	}
-	
-	
-	
-	
-	
+
 	public void loadArenas() {
 		ConfigurationSection section = makeSection(config, "arenas");
 		Set<String> arenaNames = section.getKeys(false);
@@ -71,6 +67,9 @@ public class ArenaManager {
 		for (World world : Bukkit.getServer().getWorlds()) {
 			loadArenasInWorld(world.getName());
 		}
+		
+		for (Arena arena : arenas)
+			getMissingWarps(arena);
 	}
 
 	public void loadArenasInWorld(String worldName) {
@@ -161,10 +160,10 @@ public class ArenaManager {
 		ConfigurationSection section = makeSection(arenas, arenaName);
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
-		
+
 		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
 				makeSection(section, "warps"));
-		
+
 		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE);
 
 		// Load the arena
@@ -183,22 +182,23 @@ public class ArenaManager {
 		unregisterPermission("koth.arenas." + name);
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
-	
-	private Permission registerPermission(String permString, PermissionDefault value) {
-        PluginManager pm = plugin.getServer().getPluginManager();
 
-        Permission perm = pm.getPermission(permString);
-        if (perm == null) {
-            perm = new Permission(permString);
-            perm.setDefault(value);
-            pm.addPermission(perm);
-        }
-        return perm;
-    }
+	private Permission registerPermission(String permString,
+			PermissionDefault value) {
+		PluginManager pm = plugin.getServer().getPluginManager();
 
-    private void unregisterPermission(String s) {
-        plugin.getServer().getPluginManager().removePermission(s);
-    }
+		Permission perm = pm.getPermission(permString);
+		if (perm == null) {
+			perm = new Permission(permString);
+			perm.setDefault(value);
+			pm.addPermission(perm);
+		}
+		return perm;
+	}
+
+	private void unregisterPermission(String s) {
+		plugin.getServer().getPluginManager().removePermission(s);
+	}
 
 	// --------------------------- //
 	// GETTERS
@@ -249,9 +249,11 @@ public class ArenaManager {
 		return result;
 	}
 
-	public Arena getArenaWithPlayer(Player p) {
+	public Arena getArenaWithPlayer(Player player) {
 		for (Arena arena : arenas) {
-			if (arena.getPlayersInArena().contains(p))
+			if (arena.getPlayersInArena().contains(player)
+					|| arena.getPlayersInLobby().contains(player)
+					|| arena.getSpectators().contains(player))
 				return arena;
 		}
 		return null;
@@ -259,8 +261,10 @@ public class ArenaManager {
 
 	public Arena getArenaWithPlayer(String playerName) {
 		for (Arena arena : arenas) {
-			if (arena.getPlayersInArena().contains(
-					Bukkit.getServer().getPlayer(playerName)))
+			Player player = Bukkit.getServer().getPlayer(playerName);
+			if (arena.getPlayersInArena().contains(player)
+					|| arena.getPlayersInLobby().contains(player)
+					|| arena.getSpectators().contains(player))
 				return arena;
 		}
 		return null;
@@ -284,24 +288,24 @@ public class ArenaManager {
 		}
 		return null;
 	}
-	
+
 	public void getMissingWarps(Arena arena, Player p) {
 		List<String> missing = new ArrayList<String>();
 		if (arena.getRedSpawn() == null)
 			missing.add("redspawn, ");
-		
+
 		if (arena.getBlueSpawn() == null)
 			missing.add("bluespawn, ");
-		
+
 		if (arena.getLobby() == null)
 			missing.add("lobby, ");
-		
+
 		if (arena.getSpec() == null)
 			missing.add("spectator, ");
-		
+
 		if (arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills, ");
-		
+
 		if (missing.size() > 0) {
 			String formatted = KotHUtils.formatList(missing, arena.getPlugin());
 			Messenger.tell(p, "Missing Warps: " + formatted);
@@ -309,6 +313,31 @@ public class ArenaManager {
 			arena.setReady(false);
 		} else {
 			Messenger.tell(p, Msg.ARENA_READY);
+			arena.setReady(true);
+		}
+	}
+	
+	public void getMissingWarps(Arena arena) {
+		List<String> missing = new ArrayList<String>();
+		if (arena.getRedSpawn() == null)
+			missing.add("redspawn, ");
+
+		if (arena.getBlueSpawn() == null)
+			missing.add("bluespawn, ");
+
+		if (arena.getLobby() == null)
+			missing.add("lobby, ");
+
+		if (arena.getSpec() == null)
+			missing.add("spectator, ");
+
+		if (arena.getWarps().getConfigurationSection("hills") == null)
+			missing.add("hills, ");
+
+		if (missing.size() > 0) {
+			// Although it should already be false, never hurts to be cautious.
+			arena.setReady(false);
+		} else {
 			arena.setReady(true);
 		}
 	}

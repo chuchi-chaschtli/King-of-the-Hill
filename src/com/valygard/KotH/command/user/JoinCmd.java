@@ -38,18 +38,23 @@ public class JoinCmd implements Command {
 		}
 		
 		Arena arena = am.getArenaWithName(args[0]);
+		Player p = (Player) sender;
 		
 		if (!arena.isReady()) {
-			Messenger.tell(sender, Msg.ARENA_NOT_READY);
+			Messenger.tell(p, Msg.ARENA_NOT_READY);
 			return false;
 		}
 		
-		if (!sender.hasPermission("koth.arenas." + arena.getName())) {
-			Messenger.tell(sender, Msg.ARENA_NO_PERMISSION);
+		if (arena.hasPlayer(p)) {
+			Messenger.tell(p, Msg.JOIN_ALREADY_IN_ARENA);
+		}
+		
+		if (!p.hasPermission("koth.arenas." + arena.getName())) {
+			Messenger.tell(p, Msg.ARENA_NO_PERMISSION);
 			return false;
 		}
 		
-		arena.addPlayer((Player) sender);
+		arena.addPlayer(p);
 		
 		return true;
 	}
