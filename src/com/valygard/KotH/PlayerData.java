@@ -27,14 +27,20 @@ public class PlayerData {
 	private Collection<PotionEffect> potions;
 
 
-	//Our constructor.
-	public PlayerData(Player player, Location loc) {
+	/**
+	 * Constructor to initialize all the variables.
+	 */
+	public PlayerData(Player player) {
 		this.player 		= player;
 		this.contents 		= player.getInventory().getContents();
 		this.armorContents	= player.getInventory().getArmorContents();
-		this.loc 			= loc;
+		this.loc 			= player.getLocation();
 		this.mode 			= player.getGameMode();
 		this.potions 		= player.getActivePotionEffects();
+		this.food			= player.getFoodLevel();
+		this.health			= player.getHealth();
+		this.level			= player.getLevel();
+		this.exp			= player.getExp();
 	}
 
 	/**
@@ -42,9 +48,20 @@ public class PlayerData {
 	 * exits the arena, as per the stored data.
 	 */
 	public void restoreData() {
+		player.setHealth(health);
 		player.setFoodLevel(food);
 		player.setLevel(level);
 		player.setExp(exp);
+		player.teleport(loc);
+		
+		for (ItemStack i : contents) {
+			if (i != null)
+				player.getInventory().addItem(i);
+		}
+
+		player.getInventory().setArmorContents(armorContents);
+		player.setGameMode(mode);
+		player.addPotionEffects(potions);
 	}
 
 	public Player getPlayer() {

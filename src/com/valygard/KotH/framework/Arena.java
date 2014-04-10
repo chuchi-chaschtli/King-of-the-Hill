@@ -19,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -139,7 +138,7 @@ public class Arena {
 			return;
 		}
 
-		data.add(new PlayerData(p, p.getLocation()));
+		data.add(new PlayerData(p));
 
 		lobbyPlayers.add(p);
 		p.teleport(lobby);
@@ -166,20 +165,10 @@ public class Arena {
 			return;
 		}
 
+		p.getInventory().clear();
+		
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData pd = getData(p);
-		p.getInventory().clear();
-
-		for (ItemStack i : pd.getContents()) {
-			if (i != null)
-				p.getInventory().addItem(i);
-		}
-
-		// Prepare the player
-		p.getInventory().setArmorContents(pd.getArmorContents());
-		p.teleport(pd.getLocation());
-		p.setGameMode(pd.getMode());
-		p.addPotionEffects(pd.getPotionEffects());
 		pd.restoreData();
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
