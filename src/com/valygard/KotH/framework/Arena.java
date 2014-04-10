@@ -504,14 +504,6 @@ public class Arena {
 	}
 
 	public boolean isReady() {
-		ready = false;
-		if (red == null || blue == null || spec == null || lobby == null)
-			return ready;
-
-		if (getLocation("hills") == null)
-			return ready;
-
-		ready = true;
 		return ready;
 	}
 

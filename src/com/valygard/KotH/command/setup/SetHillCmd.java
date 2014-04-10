@@ -74,6 +74,7 @@ public class SetHillCmd implements Command {
 			}
 		}
 		am.getPlugin().saveConfig();
+		am.getMissingWarps(arena, p);
 		
 		return true;
 	}

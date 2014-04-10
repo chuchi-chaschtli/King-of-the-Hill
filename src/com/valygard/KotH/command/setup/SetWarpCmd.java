@@ -4,13 +4,9 @@
  */
 package com.valygard.KotH.command.setup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.command.Command;
@@ -45,7 +41,7 @@ public class SetWarpCmd implements Command {
 		}
 		// if a location isn't specified, tell the player what's missing.
 		if (args.length == 1) {
-			getMissingWarps(arena, p);
+			am.getMissingWarps(arena, p);
 		}
 		
 		if (args.length > 1) {
@@ -68,38 +64,9 @@ public class SetWarpCmd implements Command {
 				default:
 					return false;
 			}
-			getMissingWarps(arena, p);
+			am.getMissingWarps(arena, p);
 			am.getPlugin().saveConfig();
 		}
 		return true;
 	}
-	
-	private void getMissingWarps(Arena arena, Player p) {
-		List<String> missing = new ArrayList<String>();
-		if (arena.getRedSpawn() == null)
-			missing.add("redspawn, ");
-		
-		if (arena.getBlueSpawn() == null)
-			missing.add("bluespawn, ");
-		
-		if (arena.getLobby() == null)
-			missing.add("lobby, ");
-		
-		if (arena.getSpec() == null)
-			missing.add("spectator, ");
-		
-		if (arena.getWarps().getConfigurationSection("hills") == null)
-			missing.add("hills, ");
-		
-		if (missing.size() > 0) {
-			String formatted = KotHUtils.formatList(missing, arena.getPlugin());
-			Messenger.tell(p, "Missing Warps: " + formatted);
-			// Although it should already be false, never hurts to be cautious.
-			arena.setReady(false);
-		} else {
-			Messenger.tell(p, Msg.ARENA_READY);
-			arena.setReady(true);
-		}
-	}
-
 }
