@@ -7,7 +7,6 @@ package com.valygard.KotH.command.user;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.command.Command;
@@ -38,16 +37,12 @@ public class ListPlayersCmd implements Command {
 			Messenger.tell(sender, Msg.ARENA_NULL);
 			return false;
 		}
-
-        String redTeam = KotHUtils.formatList(arena.getRedTeam(), am.getPlugin());
-        String blueTeam = KotHUtils.formatList(arena.getBlueTeam(), am.getPlugin());
-        
         Messenger.tell(sender, ChatColor.YELLOW + String.valueOf(arena.getPlayersInArena().size()) + ChatColor.RESET + " players in the arena.");
         
         // Send a blank message to make it look pretty :)
         sender.sendMessage("    "); 
-        Messenger.tell(sender, ChatColor.RED + String.valueOf(arena.getRedTeam().size()) + "players on the Red Team:" + ChatColor.RESET + redTeam);
-        Messenger.tell(sender, ChatColor.BLUE + String.valueOf(arena.getBlueTeam().size()) + "players on the Blue Team:" + ChatColor.RESET + blueTeam);
+        Messenger.tell(sender, ChatColor.RED + String.valueOf(arena.getRedTeam().size()) + " players on the Red Team.");
+        Messenger.tell(sender, ChatColor.BLUE + String.valueOf(arena.getBlueTeam().size()) + " players on the Blue Team.");
 		return true;
 	}
 

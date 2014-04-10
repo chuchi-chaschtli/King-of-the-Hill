@@ -31,6 +31,7 @@ public enum Msg {
     CMD_NO_PERMISSION("You do not have access to this command."), 
     CMD_NOT_ENOUGH_ARGS("You did not specify enough arguments."),
     CMD_NOT_FROM_CONSOLE("Only players may use this command."),
+    HILLS_ADDED("You have added a hill at your location."),
 	HILLS_ONE_LEFT("There is &b1 hill&r remaining!"),
 	HILLS_ENTERED("You have entered the hill."),
 	HILLS_LEFT("You have abandoned the hill."),

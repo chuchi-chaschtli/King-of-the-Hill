@@ -13,6 +13,7 @@ import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.util.CommandInfo;
 import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
+import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
@@ -31,22 +32,24 @@ public class JoinCmd implements Command {
 
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		if (!am.getArenas().contains(args[0])) {
+		if (am.getArenaWithName(args[0]) == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);
 			return false;
 		}
 		
-		if (!am.getArenaWithName(args[0]).isReady()) {
+		Arena arena = am.getArenaWithName(args[0]);
+		
+		if (!arena.isReady()) {
 			Messenger.tell(sender, Msg.ARENA_NOT_READY);
 			return false;
 		}
 		
-		if (!sender.hasPermission("koth.arenas." + args[0])) {
+		if (!sender.hasPermission("koth.arenas." + arena.getName())) {
 			Messenger.tell(sender, Msg.ARENA_NO_PERMISSION);
 			return false;
 		}
 		
-		am.getArenaWithName(args[0]).addPlayer((Player) sender);
+		arena.addPlayer((Player) sender);
 		
 		return true;
 	}

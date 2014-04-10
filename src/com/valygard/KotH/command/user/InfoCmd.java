@@ -33,11 +33,12 @@ public class InfoCmd implements Command {
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Arena arena = am.getArenaWithName(args[0]);
+		
 		if (arena == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);
 			return false;
 		}
-		Messenger.tell(sender, "Information for " + ChatColor.YELLOW + arena + ":");
+		Messenger.tell(sender, "Information for " + ChatColor.YELLOW + arena.getName() + ":");
 		
 		sender.sendMessage(arena.isEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled");
 		sender.sendMessage(arena.isRunning() ? ChatColor.RED + "Running" : ChatColor.GREEN + "Not Running");
