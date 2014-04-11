@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -104,6 +105,28 @@ public class GlobalListener implements Listener {
 				return;
 
 			Messenger.tell(p, Msg.HILLS_LEFT);
+		}
+	}
+	
+	@EventHandler
+	public void onFriendlyFire(EntityDamageByEntityEvent e) {
+		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+			Player p = (Player) e.getEntity();
+			Player d = (Player) e.getDamager();
+			
+			Arena arena = am.getArenaWithPlayer(p);
+			
+			if (arena == null || !arena.hasPlayer(d))
+				return;
+			
+			if (arena.getSettings().getBoolean("friendly-fire"))
+				return;
+			
+			// One way of checking if they have the same team is by checking if they have the same spawn.
+			if (arena.getSpawn(p).equals(arena.getSpawn(d))) {
+				e.setCancelled(true);
+				Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
+			}
 		}
 	}
 
