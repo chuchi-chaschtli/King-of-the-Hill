@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 0.8.89
+version: 0.8.97
 website: http://valygard.com
 author: AoH_Ruthless
 description: A King of the Hill minigame.
@@ -21,6 +21,7 @@ permissions:
       koth.user.listarenas: true
       koth.user.listplayers: true
       koth.user.info: true
+      koth.user.spectate: true
   koth.user.join:
     default: false
     description: Join an arena.
@@ -36,6 +37,9 @@ permissions:
   koth.user.info:
     default: false
     description: Get the scoop on an arena.
+  koth.user.spectate:
+    default: false
+    description: Spectate an arena.
 
 # ---------- Setup ---------- #
   koth.setup:

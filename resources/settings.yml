@@ -11,3 +11,4 @@ score-to-win: 120
 unbreakable-weapons: true
 unbreakable-armor: true
 friendly-fire: false
+spec-on-leave: true

@@ -187,8 +187,12 @@ public class Arena {
 		if (lobbyPlayers.contains(p))
 			lobbyPlayers.remove(p);
 		
-		if (specPlayers.contains(p))
+		if (specPlayers.contains(p)) {
 			specPlayers.remove(p);
+		} else {
+			if (settings.getBoolean("spec-on-leave"))
+				setSpectator(p);
+		}
 	}
 
 	public void balanceTeams(Player p) {
@@ -297,6 +301,12 @@ public class Arena {
 	public void forceEnd() {
 		endTimer.halt();
 		endArena();
+	}
+	
+	public void setSpectator(Player p) {
+		p.teleport(spec);
+		specPlayers.add(p);
+		Messenger.tell(p, Msg.SPEC_JOIN);
 	}
 
 	public boolean scoreReached() {
