@@ -8,7 +8,9 @@ import static com.valygard.KotH.util.ConfigUtil.makeSection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -16,15 +18,20 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 
+import com.valygard.KotH.ArenaClass;
+import com.valygard.KotH.ArenaClass.ArmorType;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.util.ConfigUtil;
+import com.valygard.KotH.util.ItemParser;
 
 /**
  * @author Anand
@@ -37,22 +44,34 @@ public class ArenaManager {
 
 	// getting arenas
 	private List<Arena> arenas;
+	
+	// Arena Classes
+	private Map<String, ArenaClass> classes;
 
 	// we have to make sure KotH is even enabled
 	private boolean enabled;
 
 	/**
-	 * Our constructor.
+	 * Constructor
 	 */
 	public ArenaManager(KotH plugin) {
 		this.plugin = plugin;
 		this.config = plugin.getConfig();
 
 		this.arenas = new ArrayList<Arena>();
+		
+		this.classes = new HashMap<String, ArenaClass>();
 
 		this.enabled = config.getBoolean("global.enabled", true);
 	}
 
+	// --------------------------- //
+	// Initialization
+	// --------------------------- //
+	
+	/**
+	 * Load all arenas.
+	 */
 	public void loadArenas() {
 		ConfigurationSection section = makeSection(config, "arenas");
 		Set<String> arenaNames = section.getKeys(false);
@@ -72,6 +91,9 @@ public class ArenaManager {
 			getMissingWarps(arena);
 	}
 
+	/**
+	 * Load all arenas in a specific world.
+	 */
 	public void loadArenasInWorld(String worldName) {
 		Set<String> arenaNames = config.getConfigurationSection("arenas")
 				.getKeys(false);
@@ -92,6 +114,9 @@ public class ArenaManager {
 		}
 	}
 
+	/**
+	 * Unload all arenas in a specified world.
+	 */
 	public void unloadArenasInWorld(String worldName) {
 		Set<String> arenaNames = config.getConfigurationSection("arenas")
 				.getKeys(false);
@@ -112,6 +137,9 @@ public class ArenaManager {
 		}
 	}
 
+	/**
+	 * Load an individual arena and return it.
+	 */
 	private Arena loadArena(String arenaName) {
 		ConfigurationSection section = makeSection(config, "arenas."
 				+ arenaName);
@@ -141,6 +169,9 @@ public class ArenaManager {
 		return arena;
 	}
 
+	/**
+	 * Create a new arena.
+	 */
 	public Arena createArena(String arenaName, World world) {
 		ConfigurationSection s = makeSection(config, "arenas");
 		return createArena(s, arenaName, world, true);
@@ -170,6 +201,9 @@ public class ArenaManager {
 		return (load ? loadArena(arenaName) : null);
 	}
 
+	/**
+	 * End an arena (if running) and nullify it.
+	 */
 	public void removeArena(Arena arena) {
 		String name = arena.getName();
 
@@ -182,6 +216,139 @@ public class ArenaManager {
 		unregisterPermission("koth.arenas." + name);
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
+	
+	/**
+     * Load all class-related stuff.
+     */
+    public void loadClasses() {
+        ConfigurationSection section = makeSection(plugin.getConfig(), "classes");
+        ConfigUtil.addIfEmpty(plugin, "classes.yml", section);
+
+
+        // Establish the map.
+        classes = new HashMap<String, ArenaClass>();
+        Set<String> classNames = section.getKeys(false);
+
+        // Load each individual class.
+        for (String className : classNames) {
+            loadClass(className);
+        }
+    }
+
+    /**
+     * Helper method for loading a single class.
+     */
+    private ArenaClass loadClass(String classname) {
+        ConfigurationSection section = config.getConfigurationSection("classes." + classname);
+        String lowercase = classname.toLowerCase();
+
+        // If the section doesn't exist, the class doesn't either.
+        if (section == null) {
+            Messenger.severe("Failed to load class '" + classname + "'.");
+            return null;
+        }
+        
+        // Check if weapons and armor for this class should be unbreakable
+        boolean weps = section.getBoolean("indestructible-weapons", true);
+        boolean arms = section.getBoolean("indestructible-armor", true);
+
+        // Create an ArenaClass with the config-file name.
+        ArenaClass arenaClass = new ArenaClass(classname, weps, arms);
+
+        // Parse the items-node
+        List<String> items = section.getStringList("items");
+        if (items == null || items.isEmpty()) {
+            String str = section.getString("items", "");
+            List<ItemStack> stacks = ItemParser.parseItems(str);
+            arenaClass.setItems(stacks);
+        } else {
+            List<ItemStack> stacks = new ArrayList<ItemStack>();
+            for (String item : items) {
+                ItemStack stack = ItemParser.parseItem(item);
+                if (stack != null) {
+                    stacks.add(stack);
+                }
+            }
+            arenaClass.setItems(stacks);
+        }
+
+        // And the legacy armor-node
+        String armor = section.getString("armor", "");
+        if (!armor.equals("")) {
+            List<ItemStack> stacks = ItemParser.parseItems(armor);
+            arenaClass.setArmor(stacks);
+        }
+
+        // Get armor strings
+        String head  = section.getString("helmet", null);
+        String chest = section.getString("chestplate", null);
+        String legs  = section.getString("leggings", null);
+        String feet  = section.getString("boots", null);
+
+        // Parse to ItemStacks
+        ItemStack helmet     = ItemParser.parseItem(head);
+        ItemStack chestplate = ItemParser.parseItem(chest);
+        ItemStack leggings   = ItemParser.parseItem(legs);
+        ItemStack boots      = ItemParser.parseItem(feet);
+
+        // Set in ArenaClass
+        arenaClass.setHelmet(helmet);
+        arenaClass.setChestplate(chestplate);
+        arenaClass.setLeggings(leggings);
+        arenaClass.setBoots(boots);
+
+        // Register the permission.
+        registerPermission("koth.classes." + lowercase, PermissionDefault.TRUE).addParent("koth.classes", true);
+
+        // Finally add the class to the classes map.
+        classes.put(lowercase, arenaClass);
+        return arenaClass;
+    }
+    
+    public ArenaClass createClassNode(String classname, PlayerInventory inv, boolean safe) {
+        String path = "classes." + classname;
+        if (safe && config.getConfigurationSection(path) != null) {
+            return null;
+        }
+
+        // Create the node.
+        config.set(path, "");
+
+        // Grab the section, create if missing
+        ConfigurationSection section = config.getConfigurationSection(path);
+        if (section == null) section = config.createSection(path);
+
+        // Take the current items and armor.
+        section.set("items", ItemParser.parseString(inv.getContents()));
+        section.set("armor", ItemParser.parseString(inv.getArmorContents()));
+
+        // If the helmet isn't a real helmet, set it explicitly.
+        ItemStack helmet = inv.getHelmet();
+        if (helmet != null && ArmorType.getType(helmet) != ArmorType.HELMET) {
+            section.set("helmet", ItemParser.parseString(helmet));
+        }
+
+        // Save changes.
+        plugin.saveConfig();
+
+        // Load the class
+        return loadClass(classname);
+    }
+
+    public void removeClassNode(String classname) {
+        String lowercase = classname.toLowerCase();
+        if (!classes.containsKey(lowercase))
+            throw new IllegalArgumentException("Class does not exist!");
+
+        // Remove the class from the config-file and save it.
+        config.set("classes." + classname, null);
+        plugin.saveConfig();
+
+        // Remove the class from the map.
+        classes.remove(lowercase);
+
+        unregisterPermission("koth.classes." + lowercase);
+    }
 
 	private Permission registerPermission(String permString,
 			PermissionDefault value) {

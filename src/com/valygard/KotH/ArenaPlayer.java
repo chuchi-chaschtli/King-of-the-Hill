@@ -1,5 +1,5 @@
 /**
- * PlayerData.java is part of King of the Hill.
+ * ArenaPlayer.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
 package com.valygard.KotH;
@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffect;
  * @author Anand
  *
  */
-public class PlayerData {
+public class ArenaPlayer {
 	private Player player;
 	private ItemStack[] contents, armorContents;
 	private Location loc = null;
@@ -30,7 +30,7 @@ public class PlayerData {
 	/**
 	 * Constructor to initialize all the variables.
 	 */
-	public PlayerData(Player player) {
+	public ArenaPlayer(Player player) {
 		this.player 		= player;
 		this.contents 		= player.getInventory().getContents();
 		this.armorContents	= player.getInventory().getArmorContents();
