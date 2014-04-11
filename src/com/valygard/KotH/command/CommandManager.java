@@ -33,6 +33,7 @@ import com.valygard.KotH.command.user.JoinCmd;
 import com.valygard.KotH.command.user.LeaveCmd;
 import com.valygard.KotH.command.user.ListArenaCmd;
 import com.valygard.KotH.command.user.ListPlayersCmd;
+import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.util.CommandInfo;
 import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
@@ -196,6 +197,7 @@ public class CommandManager implements CommandExecutor
     	register(InfoCmd.class);
     	register(ListArenaCmd.class);
     	register(ListPlayersCmd.class);
+    	register(SpecCmd.class);
     	
     	// Setup Commands
     	register(CreateArenaCmd.class);
