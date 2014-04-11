@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -106,6 +107,22 @@ public class GlobalListener implements Listener {
 
 			Messenger.tell(p, Msg.HILLS_LEFT);
 		}
+	}
+	
+	@EventHandler
+	public void onFoodChange(FoodLevelChangeEvent e) {
+		Player p = (Player) e.getEntity();
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null)
+			return;
+		
+		if (arena.getSettings().getBoolean("food-change"))
+			return;
+		
+		p.setFoodLevel(20);
+		p.setSaturation(20);
+		p.setExhaustion(0F);
 	}
 	
 	@EventHandler

@@ -12,3 +12,4 @@ unbreakable-weapons: true
 unbreakable-armor: true
 friendly-fire: false
 spec-on-leave: true
+food-change: false
