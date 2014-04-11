@@ -5,7 +5,6 @@
 package com.valygard.KotH.listener;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +17,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -59,6 +57,10 @@ public class GlobalListener implements Listener {
 			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
 					+ ChatColor.RESET + " has killed you.");
 		}
+		
+		if (am.getArenaWithPlayer(p).getSettings().getBoolean("one-life")) {
+			am.getArenaWithPlayer(p).removePlayer(p);
+		}
 	}
 
 	@EventHandler
@@ -69,7 +71,6 @@ public class GlobalListener implements Listener {
 		if (arena == null)
 			return;
 
-		p.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
 		if (arena.getRedTeam().contains(p))
 			e.setRespawnLocation(arena.getRedSpawn());
 		else if (arena.getBlueTeam().contains(p))

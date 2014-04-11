@@ -15,12 +15,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.ArenaPlayer;
 import com.valygard.KotH.KotH;
@@ -248,7 +246,6 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
-			p.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
 		}
 		// Set running to true.
 		running = true;
