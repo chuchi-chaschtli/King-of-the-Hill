@@ -25,10 +25,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.ArenaClass;
-import com.valygard.KotH.ArenaPlayer;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.PlayerData;
 import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
@@ -61,7 +61,7 @@ public class Arena {
 	private Location red, blue, lobby, spec;
 
 	// Players and teams
-	private ArrayList<ArenaPlayer> data = new ArrayList<ArenaPlayer>();
+	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
 	private Set<Player> undecided;
@@ -150,7 +150,7 @@ public class Arena {
 			return;
 		}
 		
-		data.add(new ArenaPlayer(p));
+		data.add(new PlayerData(p));
 		
 		if (running) {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
@@ -197,7 +197,7 @@ public class Arena {
 		p.getInventory().clear();
 		
 		// Restore all of their data; i.e armor, inventory, health, etc.
-		ArenaPlayer data = getData(p);
+		PlayerData data = getData(p);
 		invManager.clearInventory(p);
 		data.restoreData();
 
@@ -534,8 +534,8 @@ public class Arena {
 		this.enabled = enabled;
 	}
 
-	public ArenaPlayer getData(Player p) {
-		for (ArenaPlayer pd : data) {
+	public PlayerData getData(Player p) {
+		for (PlayerData pd : data) {
 			if (pd.getPlayer().equals(p))
 				return pd;
 		}
