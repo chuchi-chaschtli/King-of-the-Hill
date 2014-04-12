@@ -6,6 +6,7 @@ package com.valygard.KotH.listener;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,8 +53,9 @@ public class GlobalListener implements Listener {
 	@EventHandler
 	public void onArenaDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
+		Arena arena = am.getArenaWithPlayer(p);
 
-		if (am.getArenaWithPlayer(p) == null)
+		if (arena == null)
 			return;
 
 		if (p.getKiller() instanceof Player) {
@@ -63,9 +65,14 @@ public class GlobalListener implements Listener {
 					+ ChatColor.RESET + " has killed you.");
 		}
 		
-		if (am.getArenaWithPlayer(p).getSettings().getBoolean("one-life")) {
-			am.getArenaWithPlayer(p).removePlayer(p);
+		if (arena.getSettings().getBoolean("one-life")) {
+			arena.removePlayer(p);
 		}
+		
+		e.getDrops().clear();
+		e.setDeathMessage(null);
+		if (!arena.getSettings().getBoolean("drop-xp"))
+			e.setDroppedExp(0);
 	}
 
 	@EventHandler
@@ -95,6 +102,9 @@ public class GlobalListener implements Listener {
 		Arena arena = am.getArenaWithPlayer(p);
 
 		if (arena == null)
+			return;
+		
+		if (!arena.isRunning() || arena.getSpectators().contains(p) || arena.getPlayersInLobby().contains(p) || p.isDead())
 			return;
 
 		HillManager manager = arena.getHillManager();
@@ -239,17 +249,22 @@ public class GlobalListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 
-		if (!e.getMaterial().equals(Material.SIGN)
-				&& !e.getMaterial().equals(Material.SIGN_POST)
-				&& !e.getMaterial().equals(Material.WALL_SIGN))
+		Block b = e.getClickedBlock();
+		if (b == null)
+			return;
+		
+		if (!b.getType().equals(Material.SIGN)
+				&& !b.getType().equals(Material.SIGN_POST)
+				&& !b.getType().equals(Material.WALL_SIGN))
 			return;
 
-		Sign s = (Sign) e.getClickedBlock();
+		Sign s = (Sign) b.getState();
 		
 		switch (e.getAction()) {
 			case RIGHT_CLICK_BLOCK:
 			case LEFT_CLICK_BLOCK:
-				if (am.getClasses().get(s.getLine(0)) == null)
+				String formatted = ChatColor.stripColor(s.getLine(0)).replace(" ", "");
+				if (am.getClasses().get(formatted) == null)
 					break;
 				
 				Arena arena = am.getArenaWithPlayer(p);
@@ -257,10 +272,10 @@ public class GlobalListener implements Listener {
 				if (arena == null)
 					break;
 				
-				if (!plugin.has(p, "koth.classes." + s.getLine(0).toLowerCase()))
+				if (!plugin.has(p, "koth.classes." + formatted))
 					break;
 				
-				arena.pickClass(p, s.getLine(0));
+				arena.pickClass(p, formatted);
 				break;
 			default:
 				break;
