@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 0.9.14
+version: 0.9.20
 website: http://valygard.com
 author: AoH_Ruthless
 description: A King of the Hill minigame.
@@ -51,6 +51,8 @@ permissions:
       koth.setup.config: true
       koth.setup.sethill: true
       koth.setup.setwarps: true
+      koth.setup.addclass: true
+      koth.setup.removeclass: true
   koth.setup.addarena:
     default: false
     description: Add a new arena.
@@ -66,6 +68,12 @@ permissions:
   koth.setup.setwarps:
     default: false
     description: Set an important arena warp.
+  koth.setup.addclass:
+    default: false
+    description: Add a new class.
+  koth.setup.removeclass:
+    default: false
+    description: Remove an existing class.
       
 # ---------- Admin ---------- #
   koth.admin:

@@ -313,9 +313,9 @@ public class ArenaManager {
         return arenaClass;
     }
     
-    public ArenaClass createClassNode(String classname, PlayerInventory inv, boolean safe) {
+    public ArenaClass createClassNode(String classname, PlayerInventory inv, boolean overwrite) {
         String path = "classes." + classname;
-        if (safe && config.getConfigurationSection(path) != null) {
+        if (!overwrite && config.getConfigurationSection(path) != null) {
             return null;
         }
 
@@ -385,6 +385,10 @@ public class ArenaManager {
 
 	public List<Arena> getArenas() {
 		return arenas;
+	}
+	
+	public Map<String, ArenaClass> getClasses() {
+		return classes;
 	}
 
 	public boolean isEnabled() {
