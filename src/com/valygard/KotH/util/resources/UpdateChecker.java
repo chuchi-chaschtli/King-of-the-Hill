@@ -38,7 +38,7 @@ static Updater updater;
                     }
 
                     else if (!current.equalsIgnoreCase(latest)) {
-                        String msg1 = ChatColor.YELLOW + "King of the Hill v" + ChatColor.RESET + latest + " is now downloadable.";
+                        String msg1 = ChatColor.YELLOW + "King of the Hill v" + latest + ChatColor.RESET + " is now downloadable.";
                         String msg2 = "This server is currently running " + ChatColor.YELLOW + "v" + current;
                         message(plugin, player, msg1, msg2);
                     }

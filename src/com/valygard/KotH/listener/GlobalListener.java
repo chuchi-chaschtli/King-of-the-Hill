@@ -23,7 +23,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
+import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
@@ -142,7 +145,7 @@ public class GlobalListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onFriendlyFire(EntityDamageByEntityEvent e) {
+	public void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			Player d = (Player) e.getDamager();
@@ -151,6 +154,12 @@ public class GlobalListener implements Listener {
 			
 			if (arena == null || !arena.hasPlayer(d))
 				return;
+			
+			if (arena.getSettings().getBoolean("indestructible-weapons"))
+				repairWeapon(d);
+			
+			if (arena.getSettings().getBoolean("indestructible-armor"))
+				repairArmor(p);
 			
 			if (arena.getSettings().getBoolean("friendly-fire"))
 				return;
@@ -309,6 +318,41 @@ public class GlobalListener implements Listener {
 			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE + msg;
 		return null;
 	}
+	
+	private void repairWeapon(Player p) {
+		Arena arena = am.getArenaWithPlayer(p);
+		ArenaClass ac = arena.getData(p).getArenaClass();
+		if (ac != null && ac.containsUnbreakableWeapons()) {
+			ItemStack weapon = p.getItemInHand();
+			if (ArenaClass.isWeapon(weapon)) {
+				weapon.setDurability((short) 0);
+			}
+		}
+	}
+
+    private void repairArmor(Player p) {
+		Arena arena = am.getArenaWithPlayer(p);
+		ArenaClass ac = arena.getData(p).getArenaClass();
+        if (ac != null && ac.containsUnbreakableArmor()) {
+            PlayerInventory inv = p.getInventory();
+            
+            ItemStack stack = inv.getHelmet();
+            if (stack != null) 
+            	stack.setDurability((short) 0);
+            
+            stack = inv.getChestplate();
+            if (stack != null) 
+            	stack.setDurability((short) 0);
+            
+            stack = inv.getLeggings();
+            if (stack != null)
+            	stack.setDurability((short) 0);
+            
+            stack = inv.getBoots();
+            if (stack != null) 
+            	stack.setDurability((short) 0);
+        }
+    }
 
 	public KotH getPlugin() {
 		return plugin;

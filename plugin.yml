@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 0.9.23
+version: 0.9.35
 website: http://valygard.com
 author: AoH_Ruthless
 description: A King of the Hill minigame.
@@ -108,3 +108,6 @@ permissions:
   koth.admin.update:
     default: false
     description: Allow players to be notified of updates.
+  koth.admin.signs:
+    default: false
+    description: Create class signs

@@ -30,6 +30,9 @@ public class PlayerData {
 	private float exp;
 	private GameMode mode = null;
 	private Collection<PotionEffect> potions;
+	
+	// Although it isn't necessary data, this is the fitting place for the player's class.
+	private ArenaClass arenaClass;
 
 
 	/**
@@ -178,4 +181,12 @@ public class PlayerData {
 	public void setMode(GameMode mode) {
 		this.mode = mode;
 	}
+	
+    public ArenaClass getArenaClass() {
+        return arenaClass;
+    }
+
+    public void setArenaClass(ArenaClass arenaClass) {
+        this.arenaClass = arenaClass;
+    }
 }

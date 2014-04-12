@@ -8,10 +8,10 @@ hill-clock: 60
 hill-radius: 5
 hill-block: beacon
 score-to-win: 120
-unbreakable-weapons: true
-unbreakable-armor: true
+indestructible-weapons: true
+indestructible-armor: true
+drop-xp: false
 friendly-fire: false
-spec-on-leave: true
 food-change: false
 one-life: false
 change-class-in-arena: false
