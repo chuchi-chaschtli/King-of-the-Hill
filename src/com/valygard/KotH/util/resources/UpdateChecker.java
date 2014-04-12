@@ -5,6 +5,7 @@
 package com.valygard.KotH.util.resources;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotH;
@@ -37,8 +38,8 @@ static Updater updater;
                     }
 
                     else if (!current.equalsIgnoreCase(latest)) {
-                        String msg1 = "King of the Hill v" + latest + " is now downloadable.";
-                        String msg2 = "This server is currently running v" + current;
+                        String msg1 = ChatColor.YELLOW + "King of the Hill v" + ChatColor.RESET + latest + " is now downloadable.";
+                        String msg2 = "This server is currently running " + ChatColor.YELLOW + "v" + current;
                         message(plugin, player, msg1, msg2);
                     }
                 }
