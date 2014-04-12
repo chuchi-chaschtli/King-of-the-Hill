@@ -4,8 +4,6 @@
  */
 package com.valygard.KotH;
 
-import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -23,8 +21,8 @@ import com.valygard.KotH.framework.Arena;
 public class ScoreboardManager {
 	private Arena arena;
     private Scoreboard scoreboard;
-    private Objective obj;
-    private Score redScore, blueScore;
+    private Objective stats;
+    private Score red, blue, timeLeft;
     
     /**
      * Create a new scoreboard for the given arena.
@@ -32,50 +30,61 @@ public class ScoreboardManager {
      */
     public ScoreboardManager(Arena arena) {
         this.arena = arena;
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         
-        this.obj	= scoreboard.registerNewObjective("Score", "dummy");
-        
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        
-        this.redScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
-        this.blueScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
+		stats = scoreboard.registerNewObjective("Team Score", "dummy");
+		
+		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
+		
+		red = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
+		blue = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
+		timeLeft = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.YELLOW + "Time left -"));
+    }
+    
+	/**
+	 * Unregister the scoreboard for a player by removing it from the sidebar
+	 * and setting them to the server scoreboard (null).
+	 * 
+	 * @param p the player
+	 */
+    public void removePlayer(Player p) {
+    	if (p.getScoreboard().equals(scoreboard))
+    		scoreboard.getObjective(DisplaySlot.SIDEBAR).unregister();
+    	p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+    }
+    
+	/**
+	 * Add a point to either the red or blue team. If the parameter is true, it
+	 * will give the point to the red team. If false, it will give the point to
+	 * the blue team.
+	 * 
+	 * @param red whether or not the team is red.
+	 */
+    public void addPoint(boolean red) {
+    	if (red == true)
+    		this.red.setScore(this.red.getScore() + 1);
+    	else
+    		this.blue.setScore(this.blue.getScore() + 1);
     }
     
     /**
-     * Start the scoreboard by immediately initializing and reseting to 0.
+     * Initialize the scoreboard by resetting the objective and
+     * setting all scores to 0.
+     * 
+     * @param p the player
      */
-    public void start() {
-    	redScore.setScore(8);
-    	blueScore.setScore(8);
-    	redScore.setScore(0);
-    	blueScore.setScore(0);
+    public void initialize(final Player p) {
+    	p.setScoreboard(scoreboard);
+		red.setScore(8);
+		blue.setScore(8);
+		timeLeft.setScore(8);
+		
+		red.setScore(0);
+		blue.setScore(0);
+		timeLeft.setScore(arena.getSettings().getInt("arena-time"));
     }
     
-    /**
-     * Add a point to the team in the hill.
-     * @param entry the team
-     */
-    public void addPoint(Set<Player> entry) {
-    	if (entry.equals(arena.getRedTeam())) 
-    		redScore.setScore(redScore.getScore() + 1);
-    	if (entry.equals(arena.getBlueTeam()))
-    		blueScore.setScore(blueScore.getScore() + 1);
-    }
-    
-    /**
-     * Initialize the scoreboard by resetting the kills objective and
-     * setting all player scores to 0.
-     */
-    public void initialize() {
-        /* Initialization involves first unregistering the score counter if
-         * it was already registered, and then setting it back up.
-         * It is necessary to delay the reset of the team scores, and the
-         * reset is necessary because of non-zero crappiness. */
-        Bukkit.getScheduler().scheduleSyncDelayedTask(arena.getPlugin(), new Runnable() {
-            public void run() {
-            	start();
-            }
-        }, 1);
+    public void setTimeleft(int time) {
+    	timeLeft.setScore(time);
     }
 }

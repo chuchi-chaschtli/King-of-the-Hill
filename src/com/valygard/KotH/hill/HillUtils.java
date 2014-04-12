@@ -1,5 +1,5 @@
 /**
- * HillUtil.java is part of King of the Hill.
+ * HillUtils.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
 package com.valygard.KotH.hill;
@@ -49,13 +49,13 @@ public class HillUtils {
 		// We subtract 1 because hills.get(0) will look like
 		// "arena.warps.hills.1" in config..
 		if (hills.contains(current - 1))
-			return arena.getLocation(section.getString(String.valueOf(current - 1)));
+			return arena.getHillLocation(String.valueOf(current - 1));
 
 		// If there are 6 hills, and we are on the 8th rotation, we will use
 		// hills.get(8 - 6 - 1 (=1, or arena.warps.hills.2"));
 		else {
 			int size = hills.size();
-			return arena.getLocation(section.getString(String.valueOf(current - size - 1)));
+			return arena.getHillLocation(String.valueOf(current > size ? current - size - 1 : current));
 		}
 	}
 
@@ -70,13 +70,13 @@ public class HillUtils {
 			return null;
 
 		if (hills.contains(current))
-			return arena.getLocation(section.getString(String.valueOf(current)));
+			return arena.getHillLocation(String.valueOf(current));
 
 		// If there are 6 hills, and we are on the 8th rotation, we will use
 		// hills.get(8 - 6 (=2, or arena.warps.hills.3"));
 		else {
 			int size = hills.size();
-			return arena.getLocation(section.getString(String.valueOf(current - size)));
+			return arena.getHillLocation(String.valueOf(current > size + 1 ? current - size : current));
 		}
 	}
 	
@@ -91,11 +91,11 @@ public class HillUtils {
 			return null;
 
 		if (hills.contains(current - 2))
-			return arena.getLocation(section.getString(String.valueOf(current)));
+			return arena.getHillLocation(String.valueOf(current));
 		
 		else {
 			int size = hills.size();
-			return arena.getLocation(section.getString(String.valueOf(current - size - 2)));
+			return arena.getHillLocation(String.valueOf(current > size - 1 ? current - size - 2 : current));
 		}
 	}
 	

@@ -180,8 +180,6 @@ public class Arena {
 		p.setGameMode(GameMode.SURVIVAL);
 		Messenger.tell(p, Msg.JOIN_ARENA, arenaName);
 
-		balanceTeams(p);
-
 		// If the minimum quota is reached, and already not in countdown, start
 		// a countdown.
 		if (lobbyPlayers.size() >= minPlayers)
@@ -202,6 +200,7 @@ public class Arena {
 		data.restoreData();
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
+		scoreboard.removePlayer(p);
 
 		if (arenaPlayers.contains(p))
 			arenaPlayers.remove(p);
@@ -220,6 +219,17 @@ public class Arena {
 		
 		if (specPlayers.contains(p))
 			specPlayers.remove(p);
+		
+		if (redPlayers.size() <= 0 || bluePlayers.size() <= 0) {
+			endArena();
+		}
+	}
+	
+	public void kickPlayer(Player p) {
+		removePlayer(p);
+		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
+		Messenger.announce(this, p.getName()
+				+ " has been caught cheating!");
 	}
 
 	public void balanceTeams(Player p) {
@@ -231,7 +241,7 @@ public class Arena {
 
 	public boolean startArena() {
 		// Just some checks
-		if (running || lobbyPlayers.isEmpty()) {
+		if (running || lobbyPlayers.isEmpty() || lobbyPlayers.size() < minPlayers) {
 			return false;
 		}
 
@@ -267,8 +277,7 @@ public class Arena {
 				giveRandomClass(p);
 				undecided.remove(p);
 			}
-
-			balanceTeams(p);
+			
 			p.setHealth(p.getMaxHealth());
 			p.setFireTicks(0);
 			p.setAllowFlight(false);
@@ -277,18 +286,26 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
+			
+			if (redPlayers.contains(p))
+				p.teleport(red);
+			else if (bluePlayers.contains(p))
+				p.teleport(blue);
+			else
+				kickPlayer(p);
+			
+			balanceTeams(p);
+			// Initialize scoreboard
+	        scoreboard.initialize(p);
 		}
-		// Initialize scoreboard
-        scoreboard.initialize();
         
 		// Set running to true.
 		running = true;
 
 		Messenger.announce(this, Msg.ARENA_START);
-		hillManager.begin();
-		hillTimer.runTask();
-
 		endTimer.startTimer();
+		hillTimer.runTask();
+		hillManager.begin();
 		return true;
 	}
 
@@ -420,6 +437,10 @@ public class Arena {
 
 	public Location getLocation(String path) {
 		return parseLocation(warps, path, world);
+	}
+	
+	public Location getHillLocation(String path) {
+		return parseLocation(warps.getConfigurationSection("hills"), path, world);
 	}
 	
 	public void setLocation(String path, Location loc) {

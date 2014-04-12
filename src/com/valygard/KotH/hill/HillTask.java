@@ -39,6 +39,8 @@ public class HillTask {
 				if (utils.isSwitchTime())
 					manager.changeHills();
 				
+				arena.getScoreboard().setTimeleft(arena.getEndTimer().getRemaining());
+				
 				// Call scoring event
 				HillScoreEvent event = new HillScoreEvent(arena);
 				arena.getPlugin().getServer().getPluginManager().callEvent(event);
@@ -47,6 +49,9 @@ public class HillTask {
 				
 				// Update scores
 				Set<Player> dominant = manager.getDominantTeam();
+				if (dominant == null) 
+					return;
+				
 				if (dominant.equals(arena.getRedTeam())) {
 					manager.setHillBoundary();
 					setRedScore(redScore + 1);
@@ -58,7 +63,7 @@ public class HillTask {
 				}
 				
 				// Tidy up if the score is reached.
-				if (arena.scoreReached()) {
+				if (arena.scoreReached() || !arena.isRunning() || arena.getBlueTeam().size() <= 0 || arena.getRedTeam().size() <= 0) {
 					cancel();
 					manager.setStatus(utils.getHillRotations());
 					arena.forceEnd();
@@ -77,11 +82,11 @@ public class HillTask {
 	
 	public void setRedScore(int newScore) {
 		redScore = newScore;
-		arena.getScoreboard().addPoint(arena.getRedTeam());
+		arena.getScoreboard().addPoint(true);
 	}
 	
 	public void setBlueScore(int newScore) {
 		blueScore = newScore;
-		arena.getScoreboard().addPoint(arena.getBlueTeam());
+		arena.getScoreboard().addPoint(false);
 	}
 }

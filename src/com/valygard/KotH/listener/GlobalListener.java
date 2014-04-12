@@ -92,10 +92,7 @@ public class GlobalListener implements Listener {
 			e.setRespawnLocation(arena.getBlueSpawn());
 		// Cheater cheater pumpkin eater
 		else {
-			arena.removePlayer(p);
-			p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
-			Messenger.announce(arena, p.getName()
-					+ " has been caught cheating!");
+			arena.kickPlayer(p);
 		}
 	}
 
