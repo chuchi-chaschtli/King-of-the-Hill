@@ -45,22 +45,19 @@ public class HillUtils {
 		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft();
+		
+		if (hills.contains(current))
+			return arena.getHillLocation(String.valueOf(current));
 
-		// We subtract 1 because hills.get(0) will look like
-		// "arena.warps.hills.1" in config..
-		if (hills.contains(current - 1))
-			return arena.getHillLocation(String.valueOf(current - 1));
-
-		// If there are 6 hills, and we are on the 8th rotation, we will use
-		// hills.get(8 - 6 - 1 (=1, or arena.warps.hills.2"));
+		// If there are 6 hills, and we are on the 7th rotation, we will use
+		// hills.get(7 - 6 (= 1, or arena.warps.hills.1, and loop through again.));
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size ? current - size - 1 : current));
+			return arena.getHillLocation(String.valueOf(current > size ? getRemainder(current, size) : current));
 		}
 	}
 
-	// An astute eye will note that all that is changed is our removal of the
-	// -1, and we check if there are any rotations left.
+	// An astute eye will note that not much is changed.
 	public Location getNextHill() {
 		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
@@ -69,14 +66,12 @@ public class HillUtils {
 		if (isLastHill())
 			return null;
 
-		if (hills.contains(current))
-			return arena.getHillLocation(String.valueOf(current));
+		if (hills.contains(current + 1))
+			return arena.getHillLocation(String.valueOf(current + 1));
 
-		// If there are 6 hills, and we are on the 8th rotation, we will use
-		// hills.get(8 - 6 (=2, or arena.warps.hills.3"));
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size + 1 ? current - size : current));
+			return arena.getHillLocation(String.valueOf(current > size + 1 ? getRemainder(current, size) + 1: current));
 		}
 	}
 	
@@ -90,12 +85,12 @@ public class HillUtils {
 		if (isFirstHill())
 			return null;
 
-		if (hills.contains(current - 2))
+		if (hills.contains(current - 1))
 			return arena.getHillLocation(String.valueOf(current));
 		
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size - 1 ? current - size - 2 : current));
+			return arena.getHillLocation(String.valueOf(current > size - 1 ? getRemainder(current, size) - 1 : current));
 		}
 	}
 	
@@ -115,5 +110,10 @@ public class HillUtils {
 		return (arena.getLength()
 				- (getRotationsLeft() * arena.getSettings()
 						.getInt("hill-clock")) == arena.getEndTimer().getRemaining());
+	}
+	
+	public int getRemainder(int dividend, int divisor) {
+		int quotient = dividend / divisor;
+		return dividend - (quotient * divisor);
 	}
 }
