@@ -45,8 +45,8 @@ public class KotH extends JavaPlugin {
 		// Register our listeners
 		registerListeners();
 		
-		// Load all arenas
-		am.loadArenas();
+		// Load all arenas and classes
+		am.initialize();
 	}
 	
 	public void onDisable() {

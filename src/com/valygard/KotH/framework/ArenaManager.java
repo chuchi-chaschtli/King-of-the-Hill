@@ -70,6 +70,14 @@ public class ArenaManager {
 	// --------------------------- //
 	
 	/**
+	 * Initialize the class by loading arenas and classes.
+	 */
+	public void initialize() {
+		loadArenas();
+		loadClasses();
+	}
+	
+	/**
 	 * Load all arenas.
 	 */
 	public void loadArenas() {
