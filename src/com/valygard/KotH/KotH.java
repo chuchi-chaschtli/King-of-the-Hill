@@ -152,7 +152,7 @@ public class KotH extends JavaPlugin {
 	}
 	
 	// UpdateChecker
-	public File getFile() {
+	public File getPluginFile() {
 		return getFile();
 	}
 }

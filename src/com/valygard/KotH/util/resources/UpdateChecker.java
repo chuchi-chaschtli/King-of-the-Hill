@@ -21,7 +21,7 @@ static Updater updater;
     
     public static void checkForUpdates(final KotH plugin, final Player player) {
         if (updater == null) {
-            updater = new Updater(plugin, 71402, plugin.getFile(), UpdateType.NO_DOWNLOAD, false);
+            updater = new Updater(plugin, 71402, plugin.getPluginFile(), UpdateType.NO_DOWNLOAD, false);
         }
         
         final Updater cache = updater;

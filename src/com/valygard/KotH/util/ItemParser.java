@@ -179,7 +179,7 @@ public class ItemParser {
     }
     
     private static String getType(String item) {
-        if (!item.matches("(-)?[a-zA-Z]*")) {
+        if (!item.matches("[w[^d]]*")) {
         	Messenger.warning("Material Type must be a string!");
             return null;
         }
@@ -220,7 +220,7 @@ public class ItemParser {
     
     private static void addEnchantment(ItemStack stack, String ench) {
         String[] parts = ench.split(":");
-        if (parts.length != 2 || !(parts[0].matches("(-)?[a-zA-Z]*") && parts[1].matches("(-)?[^a-zA-Z]*"))) {
+        if (parts.length != 2 || !(parts[0].matches("[w[^d]]*") && parts[1].matches("[w[^d]]*"))) {
             return;
         }
         

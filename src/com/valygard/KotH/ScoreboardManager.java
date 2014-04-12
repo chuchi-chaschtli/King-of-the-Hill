@@ -38,8 +38,8 @@ public class ScoreboardManager {
         
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         
-        this.redScore = obj.getScore(Bukkit.getPlayer(ChatColor.DARK_RED + "[Red Team]"));
-        this.blueScore = obj.getScore(Bukkit.getPlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
+        this.redScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
+        this.blueScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
     }
     
     /**
