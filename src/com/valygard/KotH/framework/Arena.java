@@ -24,6 +24,7 @@ import com.valygard.KotH.ArenaPlayer;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
 import com.valygard.KotH.hill.HillManager;
@@ -72,6 +73,9 @@ public class Arena {
 
 	// Is the arena ready to be used?
 	private boolean ready;
+	
+	// Scoreboard
+	private ScoreboardManager scoreboard;
 
 	// --------------------------- //
 	// CONSTRUCTOR
@@ -111,6 +115,8 @@ public class Arena {
 		this.hillTimer = new HillTask(this);
 
 		this.ready = false;
+		
+		this.scoreboard = new ScoreboardManager(this);
 	}
 	
 	
@@ -247,6 +253,9 @@ public class Arena {
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
 		}
+		// Initialize scoreboard
+        scoreboard.initialize();
+        
 		// Set running to true.
 		running = true;
 
@@ -517,5 +526,9 @@ public class Arena {
 	public boolean setReady(boolean ready) {
 		this.ready = ready;
 		return ready;
+	}
+	
+	public ScoreboardManager getScoreboard() {
+		return scoreboard;
 	}
 }

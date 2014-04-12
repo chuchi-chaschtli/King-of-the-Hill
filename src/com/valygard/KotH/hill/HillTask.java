@@ -77,9 +77,11 @@ public class HillTask {
 	
 	public void setRedScore(int newScore) {
 		redScore = newScore;
+		arena.getScoreboard().addPoint(arena.getRedTeam());
 	}
 	
 	public void setBlueScore(int newScore) {
 		blueScore = newScore;
+		arena.getScoreboard().addPoint(arena.getBlueTeam());
 	}
 }
