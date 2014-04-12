@@ -14,3 +14,4 @@ friendly-fire: false
 spec-on-leave: true
 food-change: false
 one-life: false
+change-class-in-arena: false
