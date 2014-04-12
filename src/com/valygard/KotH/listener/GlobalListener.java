@@ -152,7 +152,7 @@ public class GlobalListener implements Listener {
 			
 			Arena arena = am.getArenaWithPlayer(p);
 			
-			if (arena == null || !arena.hasPlayer(d))
+			if (arena == null || !arena.getPlayersInArena().contains(d))
 				return;
 			
 			if (arena.getSettings().getBoolean("indestructible-weapons"))
@@ -215,6 +215,9 @@ public class GlobalListener implements Listener {
 			return;
 		
 		if (!arena.getSettings().getBoolean("secluded-chat"))
+			return;
+		
+		if (!arena.getPlayersInArena().contains(p))
 			return;
 		
 		// Eliminate default message
