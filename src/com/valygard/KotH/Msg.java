@@ -26,6 +26,7 @@ public enum Msg {
 	ARENA_START("The arena has begun!"),
 	ARENA_VICTOR("% &rhas won the arena!"),
 	CLASS_ADDED("You have add a new class with your inventory."),
+	CLASS_CHOSEN("You have chosen the &e%&r class."),
 	CLASS_NULL("The class specified does not exist!"),
 	CLASS_REMOVED("You have removed &e%&r."),
 	CMD_HELP("Use &e/koth help&r to view a list of commands."),

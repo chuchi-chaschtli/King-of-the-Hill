@@ -35,7 +35,7 @@ public class RemoveClassCmd implements Command {
 		}
 		
 		am.removeClassNode(args[0]);
-		Messenger.tell(sender, Msg.CLASS_REMOVED);
+		Messenger.tell(sender, Msg.CLASS_REMOVED, args[0].toLowerCase());
 		return true;
 	}
 

@@ -82,6 +82,8 @@ public class ArenaClass {
 		inv.setChestplate(chestplate != null ? chestplate : null);
 		inv.setLeggings(leggings != null ? leggings : null);
 		inv.setBoots(boots != null ? boots : null);
+		
+		Messenger.tell(p, Msg.CLASS_CHOSEN, lowercaseName);
 	}
 	
     /**

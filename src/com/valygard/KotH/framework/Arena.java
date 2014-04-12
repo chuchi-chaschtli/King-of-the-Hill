@@ -6,9 +6,14 @@ package com.valygard.KotH.framework;
 
 import static com.valygard.KotH.util.ConfigUtil.parseLocation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -20,6 +25,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.ArenaPlayer;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -33,6 +39,7 @@ import com.valygard.KotH.hill.HillUtils;
 import com.valygard.KotH.time.AutoEndTimer;
 import com.valygard.KotH.time.AutoStartTimer;
 import com.valygard.KotH.util.ConfigUtil;
+import com.valygard.KotH.util.inventory.InventoryManager;
 
 /**
  * @author Anand
@@ -58,6 +65,7 @@ public class Arena {
 	private ArrayList<ArenaPlayer> data = new ArrayList<ArenaPlayer>();
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
+	private Set<Player> undecided;
 
 	// Some booleans that are configuration-critical.
 	private boolean running, enabled;
@@ -76,6 +84,13 @@ public class Arena {
 	
 	// Scoreboard
 	private ScoreboardManager scoreboard;
+	
+	// Classes
+	private Map<String, ArenaClass> classes;
+	private Map<Player, ArenaClass> playerclass;
+	
+	// InventoryManager
+	private InventoryManager invManager;
 
 	// --------------------------- //
 	// CONSTRUCTOR
@@ -102,6 +117,8 @@ public class Arena {
 		this.specPlayers = new HashSet<Player>();
 		this.redPlayers = new HashSet<Player>();
 		this.bluePlayers = new HashSet<Player>();
+		
+		this.undecided	= new HashSet<Player>();
 
 		// Boolean values.
 		this.running = false;
@@ -117,6 +134,10 @@ public class Arena {
 		this.ready = false;
 		
 		this.scoreboard = new ScoreboardManager(this);
+		
+		this.classes	= plugin.getArenaManager().getClasses();
+		
+		this.invManager = new InventoryManager(this);
 	}
 	
 	
@@ -143,10 +164,18 @@ public class Arena {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
 			return;
 		}
-
+		
+		try {
+			invManager.storeInventory(p);
+		} catch (IOException e) {
+			Messenger.warning("Could not store inventory of Player '" + p.getName() + "' (UUID: " + p.getUniqueId() + ")");
+			e.printStackTrace();
+		}
 		data.add(new ArenaPlayer(p));
+		invManager.clearInventory(p);
 
 		lobbyPlayers.add(p);
+		undecided.add(p);
 		p.teleport(lobby);
 
 		p.setHealth(p.getMaxHealth());
@@ -174,6 +203,7 @@ public class Arena {
 		p.getInventory().clear();
 		
 		// Restore all of their data; i.e armor, inventory, health, etc.
+		invManager.clearInventory(p);
 		ArenaPlayer data = getData(p);
 		data.restoreData();
 
@@ -190,6 +220,9 @@ public class Arena {
 		
 		if (lobbyPlayers.contains(p))
 			lobbyPlayers.remove(p);
+		
+		if (undecided.contains(p))
+			undecided.remove(p);
 		
 		if (specPlayers.contains(p)) {
 			specPlayers.remove(p);
@@ -242,6 +275,9 @@ public class Arena {
 				System.out
 						.println("[KotH] Invincibility glitch attempt stopped!");
 			}
+			
+			if (playerclass.get(p) == null)
+				giveRandomClass(p);
 
 			balanceTeams(p);
 			p.setHealth(p.getMaxHealth());
@@ -329,6 +365,51 @@ public class Arena {
 					+ "Blue team");
 		else
 			Messenger.announce(this, Msg.ARENA_DRAW);
+	}
+	
+	public boolean pickClass(Player p, String classname) {
+		classname = classname.toLowerCase();
+		ArenaClass arenaClass = classes.get(classname);
+		
+		if (!settings.getBoolean("change-class-in-arena") && (arenaPlayers.contains(p) || specPlayers.contains(p))) {
+			Messenger.tell(p, "You cannot choose your class in the arena.");
+			return false;
+		}
+		
+		boolean canPick = ((arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p)) && plugin.has(p, "koth.classes." + classname));
+		
+		if (arenaClass == null || !canPick) {
+			return false;
+		}
+		
+		invManager.clearInventory(p);
+		arenaClass.giveItems(p);
+		
+		// Add the player to the hashmap
+		if (undecided.contains(p))
+			undecided.remove(p);
+		else
+			playerclass.remove(p);
+		
+		playerclass.put(p, arenaClass);
+		return true;
+	}
+	
+	public void giveRandomClass(Player p) {
+		Random random = new Random();		
+		List<String> classes = new LinkedList<String>(this.classes.keySet());
+		
+		String className = classes.remove(random.nextInt(classes.size()));
+        while (!plugin.has(p, "koth.classes." + className)) {
+            if (classes.isEmpty()) {
+                Messenger.info("Player '" + p.getName() + "' does not have access to any classes!");
+                removePlayer(p);
+                return;
+            }
+            className = classes.remove(random.nextInt(classes.size()));
+        }
+        
+        pickClass(p, className);
 	}
 
 
@@ -451,6 +532,10 @@ public class Arena {
 	public Set<Player> getSpectators() {
 		return Collections.unmodifiableSet(specPlayers);
 	}
+	
+	public Set<Player> getUndecided() {
+		return Collections.unmodifiableSet(undecided);
+	}
 
 	public boolean isRunning() {
 		return running;
@@ -530,5 +615,13 @@ public class Arena {
 	
 	public ScoreboardManager getScoreboard() {
 		return scoreboard;
+	}
+	
+	public Map<String, ArenaClass> getClasses() {
+		return classes;
+	}
+	
+	public Map<Player, ArenaClass> getPlayerClass() {
+		return playerclass;
 	}
 }
