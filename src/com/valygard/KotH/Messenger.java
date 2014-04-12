@@ -33,7 +33,7 @@ public class Messenger {
         }
 
         // Otherwise, send the message with the [KotH] tag.
-        p.sendMessage(ChatColor.GRAY + "[KotH] " + ChatColor.RESET + msg);
+        p.sendMessage(ChatColor.DARK_GRAY + "[KotH] " + ChatColor.RESET + msg);
         return true;
     }
 

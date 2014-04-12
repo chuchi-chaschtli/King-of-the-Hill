@@ -392,6 +392,7 @@ public class Arena {
 			playerclass.remove(p);
 		
 		playerclass.put(p, arenaClass);
+		Messenger.tell(p, Msg.CLASS_CHOSEN, classname);
 		return true;
 	}
 	

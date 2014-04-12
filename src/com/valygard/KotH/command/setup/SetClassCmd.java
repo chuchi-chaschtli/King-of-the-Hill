@@ -7,6 +7,8 @@ package com.valygard.KotH.command.setup;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.Messenger;
+import com.valygard.KotH.Msg;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.util.CommandInfo;
 import com.valygard.KotH.command.util.CommandPermission;
@@ -36,6 +38,10 @@ public class SetClassCmd implements Command {
 		boolean overwrite = override.startsWith("-o");
 		
 		am.createClassNode(newClass, p.getInventory(), overwrite);
+		if (overwrite)
+			Messenger.tell(p, Msg.CLASS_EDITED, newClass.toLowerCase());
+		else
+			Messenger.tell(p, Msg.CLASS_ADDED, newClass.toLowerCase());
 		return true;
 	}
 
