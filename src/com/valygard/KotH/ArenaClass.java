@@ -78,11 +78,18 @@ public class ArenaClass {
 			}
 		}
 		
-		inv.setHelmet(helmet != null ? helmet : null);
-		inv.setChestplate(chestplate != null ? chestplate : null);
-		inv.setLeggings(leggings != null ? leggings : null);
-		inv.setBoots(boots != null ? boots : null);
+		if (helmet != null) 
+			inv.setHelmet(helmet);
 		
+        if (chestplate != null) 
+        	inv.setChestplate(chestplate);
+        
+        if (leggings != null) 
+        	inv.setLeggings(leggings);
+        
+        if (boots != null) 
+        	inv.setBoots(boots);
+        
 		Messenger.tell(p, Msg.CLASS_CHOSEN, lowercaseName);
 	}
 	

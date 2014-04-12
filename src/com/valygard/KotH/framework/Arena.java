@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -85,10 +84,6 @@ public class Arena {
 	// Scoreboard
 	private ScoreboardManager scoreboard;
 	
-	// Classes
-	private Map<String, ArenaClass> classes;
-	private Map<Player, ArenaClass> playerclass;
-	
 	// InventoryManager
 	private InventoryManager invManager;
 
@@ -135,8 +130,6 @@ public class Arena {
 		
 		this.scoreboard = new ScoreboardManager(this);
 		
-		this.classes	= plugin.getArenaManager().getClasses();
-		
 		this.invManager = new InventoryManager(this);
 	}
 	
@@ -152,16 +145,18 @@ public class Arena {
 			return;
 		}
 
+		if (lobbyPlayers.size() >= maxPlayers) {
+			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
+			return;
+		}
+		
+		data.add(new ArenaPlayer(p));
+		
 		if (running) {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
 			Messenger.tell(p, Msg.JOIN_ARENA_SPECTATOR);
 			specPlayers.add(p);
 			p.teleport(spec);
-			return;
-		}
-
-		if (lobbyPlayers.size() >= maxPlayers) {
-			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
 			return;
 		}
 		
@@ -171,7 +166,6 @@ public class Arena {
 			Messenger.warning("Could not store inventory of Player '" + p.getName() + "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
-		data.add(new ArenaPlayer(p));
 		invManager.clearInventory(p);
 
 		lobbyPlayers.add(p);
@@ -203,8 +197,8 @@ public class Arena {
 		p.getInventory().clear();
 		
 		// Restore all of their data; i.e armor, inventory, health, etc.
-		invManager.clearInventory(p);
 		ArenaPlayer data = getData(p);
+		invManager.clearInventory(p);
 		data.restoreData();
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
@@ -224,12 +218,8 @@ public class Arena {
 		if (undecided.contains(p))
 			undecided.remove(p);
 		
-		if (specPlayers.contains(p)) {
+		if (specPlayers.contains(p))
 			specPlayers.remove(p);
-		} else {
-			if (settings.getBoolean("spec-on-leave"))
-				setSpectator(p);
-		}
 	}
 
 	public void balanceTeams(Player p) {
@@ -239,9 +229,6 @@ public class Arena {
 			redPlayers.add(p);
 	}
 
-	/**
-	 * TODO: Make team-friendly
-	 */
 	public boolean startArena() {
 		// Just some checks
 		if (running || lobbyPlayers.isEmpty()) {
@@ -276,8 +263,10 @@ public class Arena {
 						.println("[KotH] Invincibility glitch attempt stopped!");
 			}
 			
-			if (playerclass.get(p) == null)
+			if (undecided.contains(p)) {
 				giveRandomClass(p);
+				undecided.remove(p);
+			}
 
 			balanceTeams(p);
 			p.setHealth(p.getMaxHealth());
@@ -303,9 +292,6 @@ public class Arena {
 		return true;
 	}
 
-	/**
-	 * TODO: Make team-friendly
-	 */
 	public boolean endArena() {
 		// Sanity-checks.
 		if (!running || !arenaPlayers.isEmpty()) {
@@ -367,38 +353,32 @@ public class Arena {
 			Messenger.announce(this, Msg.ARENA_DRAW);
 	}
 	
-	public boolean pickClass(Player p, String classname) {
-		classname = classname.toLowerCase();
-		ArenaClass arenaClass = classes.get(classname);
-		
-		if (!settings.getBoolean("change-class-in-arena") && (arenaPlayers.contains(p) || specPlayers.contains(p))) {
-			Messenger.tell(p, "You cannot choose your class in the arena.");
-			return false;
+	public void pickClass(Player p, String classname) {
+		ArenaClass arenaClass = plugin.getArenaManager().getClasses().get(classname);
+		if (arenaClass == null) {
+			return;
 		}
 		
-		boolean canPick = ((arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p)) && plugin.has(p, "koth.classes." + classname));
+		if (!settings.getBoolean("change-class-in-arena") && arenaPlayers.contains(p)) {
+			return;
+		}
 		
-		if (arenaClass == null || !canPick) {
-			return false;
+		boolean canPick = (arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p));
+		
+		if (!canPick) {
+			return;
 		}
 		
 		invManager.clearInventory(p);
 		arenaClass.giveItems(p);
 		
-		// Add the player to the hashmap
 		if (undecided.contains(p))
 			undecided.remove(p);
-		else
-			playerclass.remove(p);
-		
-		playerclass.put(p, arenaClass);
-		Messenger.tell(p, Msg.CLASS_CHOSEN, classname);
-		return true;
 	}
 	
 	public void giveRandomClass(Player p) {
 		Random random = new Random();		
-		List<String> classes = new LinkedList<String>(this.classes.keySet());
+		List<String> classes = new LinkedList<String>(plugin.getArenaManager().getClasses().keySet());
 		
 		String className = classes.remove(random.nextInt(classes.size()));
         while (!plugin.has(p, "koth.classes." + className)) {
@@ -616,13 +596,5 @@ public class Arena {
 	
 	public ScoreboardManager getScoreboard() {
 		return scoreboard;
-	}
-	
-	public Map<String, ArenaClass> getClasses() {
-		return classes;
-	}
-	
-	public Map<Player, ArenaClass> getPlayerClass() {
-		return playerclass;
 	}
 }

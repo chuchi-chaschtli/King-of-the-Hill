@@ -314,7 +314,7 @@ public class ArenaManager {
     }
     
     public ArenaClass createClassNode(String classname, PlayerInventory inv, boolean overwrite) {
-        String path = "classes." + classname;
+        String path = "classes." + classname.toLowerCase();
         if (!overwrite && config.getConfigurationSection(path) != null) {
             return null;
         }

@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.material.Colorable;
 
 import com.valygard.KotH.Messenger;
 
@@ -188,16 +187,14 @@ public class ItemParser {
         return m.toString();
     }
     
-    private static short getData(String data, String name) {
-        // Wool and ink are special
+    @SuppressWarnings("deprecation")
+	private static short getData(String data, String name) {
+        // Wool is special
         if (name.equalsIgnoreCase("wool")) {
-            ItemStack wool = new ItemStack(Material.WOOL);
-            ((Colorable) wool).setColor(DyeColor.valueOf(data));
-            return wool.getDurability();
-        } else if (name.equalsIgnoreCase("ink-sack")) {
-            ItemStack ink = new ItemStack(Material.INK_SACK);
-            ((Colorable) ink).setColor(DyeColor.valueOf(data));
-            return ink.getDurability();
+        	DyeColor dye = getEnumFromString(DyeColor.class, data);
+            if (dye == null) 
+            	dye = DyeColor.getByWoolData(Byte.parseByte(data));
+            return dye.getWoolData();
         }
         return (data.matches("(-)?[0-9]+") ? Short.parseShort(data) : 0);
     }
@@ -239,5 +236,15 @@ public class ItemParser {
         } else {
             stack.addUnsafeEnchantment(e, lvl);
         }
+    }
+    
+    public static <T extends Enum<T>> T getEnumFromString(Class<T> c, String string) {
+        if (c != null && string != null) {
+            try {
+                return Enum.valueOf(c, string.trim().toUpperCase());
+            }
+            catch(IllegalArgumentException ex) {}
+        }
+        return null;
     }
 }
