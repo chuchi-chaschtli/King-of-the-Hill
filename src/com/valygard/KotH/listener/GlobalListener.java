@@ -5,15 +5,20 @@
 package com.valygard.KotH.listener;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -215,6 +220,51 @@ public class GlobalListener implements Listener {
 			return;
 		
 		UpdateChecker.checkForUpdates(plugin, p);
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onSignChange(SignChangeEvent e) {
+		if (am.getClasses().get(e.getLine(0)) == null) {
+			return;
+		}
+		Player p = e.getPlayer();
+		
+		if (!plugin.has(p, "koth.admin.signs"))
+			return;
+		
+		Messenger.tell(e.getPlayer(), Msg.CLASS_SIGN_CREATED);
+	}
+	
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent e) {
+		Player p = e.getPlayer();
+
+		if (!e.getMaterial().equals(Material.SIGN)
+				&& !e.getMaterial().equals(Material.SIGN_POST)
+				&& !e.getMaterial().equals(Material.WALL_SIGN))
+			return;
+
+		Sign s = (Sign) e.getClickedBlock();
+		
+		switch (e.getAction()) {
+			case RIGHT_CLICK_BLOCK:
+			case LEFT_CLICK_BLOCK:
+				if (am.getClasses().get(s.getLine(0)) == null)
+					break;
+				
+				Arena arena = am.getArenaWithPlayer(p);
+				
+				if (arena == null)
+					break;
+				
+				if (!plugin.has(p, "koth.classes." + s.getLine(0).toLowerCase()))
+					break;
+				
+				arena.pickClass(p, s.getLine(0));
+				break;
+			default:
+				break;
+		}
 	}
 
 	// --------------------------- //
