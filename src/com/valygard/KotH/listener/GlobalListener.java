@@ -222,7 +222,6 @@ public class GlobalListener implements Listener {
 		
 		// Eliminate default message
 		e.setCancelled(true);
-		e.setMessage(null);
 		
 		for (Player player : arena.getPlayersInArena()) {
 			player.sendMessage(getChatFormat(p, e.getMessage()));
@@ -316,9 +315,9 @@ public class GlobalListener implements Listener {
 		if (arena == null)
 			return null;
 		if (arena.getRedTeam().contains(p))
-			return ChatColor.DARK_RED + "[Red] " + ChatColor.RED + msg;
+			return ChatColor.DARK_RED + "[Red] " + ChatColor.RED + p.getName() + ": " + msg;
 		else if (arena.getBlueTeam().contains(p))
-			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE + msg;
+			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE + p.getName() + ": "+ msg;
 		return null;
 	}
 	
