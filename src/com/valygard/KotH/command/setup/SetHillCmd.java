@@ -44,8 +44,10 @@ public class SetHillCmd implements Command {
 		
 		ConfigurationSection warps = arena.getWarps();
 		
-		if (warps == null) 
-			am.getConfig().createSection("arenas." + args[0] + ".warps");
+		if (warps == null) {
+			warps = am.getConfig().createSection("arenas." + args[0] + ".warps");
+			am.getPlugin().saveConfig();
+		}
 		
 		ConfigurationSection s = warps.getConfigurationSection("hills");
 		

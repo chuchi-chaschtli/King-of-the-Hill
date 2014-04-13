@@ -201,6 +201,9 @@ public class ArenaManager {
 		ConfigurationSection section = makeSection(arenas, arenaName);
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
+		
+		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
+				makeSection(section, "warps"));
 
 		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE).addParent("koth.arenas", true);
 
