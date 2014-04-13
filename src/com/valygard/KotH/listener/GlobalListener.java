@@ -69,7 +69,7 @@ public class GlobalListener implements Listener {
 		}
 		
 		if (arena.getSettings().getBoolean("one-life")) {
-			arena.removePlayer(p);
+			arena.removePlayer(p, false);
 		}
 		
 		e.getDrops().clear();
@@ -85,15 +85,18 @@ public class GlobalListener implements Listener {
 
 		if (arena == null)
 			return;
+		
+		// Cheater cheater pumpkin eater
+		if (!arena.getRedTeam().contains(p) && !arena.getBlueTeam().contains(p)) {
+			arena.kickPlayer(p);
+		}
 
 		if (arena.getRedTeam().contains(p))
 			e.setRespawnLocation(arena.getRedSpawn());
 		else if (arena.getBlueTeam().contains(p))
 			e.setRespawnLocation(arena.getBlueSpawn());
-		// Cheater cheater pumpkin eater
-		else {
-			arena.kickPlayer(p);
-		}
+		ArenaClass ac = arena.getData(p).getArenaClass();
+		ac.giveItems(p);
 	}
 
 	@EventHandler

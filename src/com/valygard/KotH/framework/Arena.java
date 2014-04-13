@@ -186,7 +186,7 @@ public class Arena {
 			startTimer.startTimer();
 	}
 
-	public void removePlayer(Player p) {
+	public void removePlayer(Player p, boolean end) {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
@@ -199,9 +199,11 @@ public class Arena {
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
-
-		if (arenaPlayers.contains(p))
-			arenaPlayers.remove(p);
+		
+		if (!end) {
+			if (arenaPlayers.contains(p))
+				arenaPlayers.remove(p);
+		}
 		
 		if (bluePlayers.contains(p))
 			bluePlayers.remove(p);
@@ -224,7 +226,7 @@ public class Arena {
 	}
 	
 	public void kickPlayer(Player p) {
-		removePlayer(p);
+		removePlayer(p, false);
 		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
 		Messenger.announce(this, p.getName()
 				+ " has been caught cheating!");
@@ -325,7 +327,7 @@ public class Arena {
 		declareWinner();
 
 		for (Player p : arenaPlayers)
-			removePlayer(p);
+			removePlayer(p, true);
 
 		endTimer.halt();
 		running = false;
@@ -359,14 +361,14 @@ public class Arena {
 	}
 
 	public void declareWinner() {
-		if (getWinner().equals(redPlayers))
+		if (getWinner() == null)
+			Messenger.announce(this, Msg.ARENA_DRAW);
+		else if (getWinner().equals(redPlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
 		else if (getWinner().equals(bluePlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
-		else if (getWinner() == null)
-			Messenger.announce(this, Msg.ARENA_DRAW);
 	}
 	
 	public void pickClass(Player p, String classname) {
@@ -400,7 +402,7 @@ public class Arena {
         while (!plugin.has(p, "koth.classes." + className)) {
             if (classes.isEmpty()) {
                 Messenger.info("Player '" + p.getName() + "' does not have access to any classes!");
-                removePlayer(p);
+                removePlayer(p, false);
                 return;
             }
             className = classes.remove(random.nextInt(classes.size()));

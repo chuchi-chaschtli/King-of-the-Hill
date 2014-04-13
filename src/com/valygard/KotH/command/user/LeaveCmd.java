@@ -37,7 +37,7 @@ public class LeaveCmd implements Command {
 			return false;
 		}
 		
-		am.getArenaWithPlayer((Player) sender).removePlayer((Player) sender); 
+		am.getArenaWithPlayer((Player) sender).removePlayer((Player) sender, false); 
 		return true;
 	}
 
