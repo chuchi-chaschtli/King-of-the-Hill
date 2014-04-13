@@ -52,14 +52,14 @@ public class HillManager {
 	}
 
 	public void begin() {
-		Location hill = utils.getCurrentHill();
+//		Location hill = utils.getCurrentHill();
 		
-		oldType = (hill.getBlock() == null ? Material.AIR : hill.getBlock().getType());
-		hill.getBlock().setType(hillType);
+//		oldType = getBlockType(hill.getBlock());
+//		hill.getBlock().setType(hillType);
 
 		status = 1;
 		
-		setHillBoundary();
+//		setHillBoundary();
 	}
 
 	public void changeHills() {
@@ -80,16 +80,15 @@ public class HillManager {
 			begin();
 			return;
 		}
-		Messenger.info("1");
+		
 		if (!utils.isSwitchTime()) {
 			return;
 		}
-		Messenger.info("2");
-		// Restore the block type.
-		utils.getCurrentHill().getBlock().setType(oldType);
-		utils.getNextHill().getBlock().setType(hillType);
+		
+//		revertBlock(utils.getCurrentHill());
+//		utils.getNextHill().getBlock().setType(hillType);
 		Messenger.info("3");
-		resetHillBoundary();
+//		resetHillBoundary();
 
 		Messenger.announce(arena, Msg.HILLS_SWITCHED);
 
@@ -100,7 +99,7 @@ public class HillManager {
 		// Now, finally, change the status.
 		status++;
 		// We do this last so it sets boundary of the new hill.
-		setHillBoundary();
+//		setHillBoundary();
 	}
 
 	// Hills have a radius, marked by colored wool. The wool color matches the
@@ -232,5 +231,23 @@ public class HillManager {
 			block.add(b);
 		}
         return block;
+	}
+ 	
+	public Material getBlockType(Location loc) {
+		return getBlockType(loc.getWorld().getBlockAt(loc));
+	}
+	
+	public Material getBlockType(Block block) {
+		return (block == null ? Material.AIR : block.getType());
+	}
+	
+	public void revertBlock(Location loc) {
+		Material m = oldType;
+		Block b = loc.getWorld().getBlockAt(loc);
+		if (m.equals(null) || m.equals(Material.AIR)) {
+			b.setType(Material.AIR);
+		} else {
+			b.setType(oldType);
+		}
 	}
 }
