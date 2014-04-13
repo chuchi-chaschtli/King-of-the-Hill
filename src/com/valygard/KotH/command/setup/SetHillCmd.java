@@ -42,7 +42,12 @@ public class SetHillCmd implements Command {
 			return false;
 		}
 		
-		ConfigurationSection s = arena.getWarps().getConfigurationSection("hills");
+		ConfigurationSection warps = arena.getWarps();
+		
+		if (warps == null) 
+			am.getConfig().createSection("arenas." + args[0] + ".warps");
+		
+		ConfigurationSection s = warps.getConfigurationSection("hills");
 		
 		if (s == null) {
 			arena.getWarps().createSection("hills");

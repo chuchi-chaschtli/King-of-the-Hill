@@ -214,16 +214,35 @@ public class ArenaManager {
 	public void removeArena(String name) {
 		Arena arena = getArenaWithName(name);
 
-		
 		if (arena != null && arena.isRunning())
 			arena.forceEnd();
 
+		arenas.remove(arena);
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
 		unregisterPermission("koth.arenas." + name);
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
+	
+	/**
+	 * Reload an arena.
+	 */
+    public boolean reloadArena(String name) {
+        Arena arena = getArenaWithName(name);
+        
+        if (arena == null) 
+        	return false;
+
+        arena.forceEnd();
+        arenas.remove(arena);
+
+        plugin.reloadConfig();
+        config = plugin.getConfig();
+
+        loadArena(name);
+        return true;
+    }
 	
 	/**
      * Load all class-related stuff.
@@ -518,7 +537,7 @@ public class ArenaManager {
 		if (arena.getSpec() == null)
 			missing.add("spectator, ");
 
-		if (arena.getWarps().getConfigurationSection("hills") == null)
+		if (arena.getWarps() == null || arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills, ");
 
 		if (missing.size() > 0) {

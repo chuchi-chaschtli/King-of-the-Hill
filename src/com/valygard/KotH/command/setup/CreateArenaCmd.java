@@ -45,7 +45,6 @@ public class CreateArenaCmd implements Command {
 		}
 		
 		am.createArena(args[0], world);
-		am.loadArena(args[0]);
 		Messenger.tell(sender, Msg.ARENA_ADDED, args[0]);
 		return true;
 	}
