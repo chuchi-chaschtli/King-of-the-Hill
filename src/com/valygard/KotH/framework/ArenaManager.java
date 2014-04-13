@@ -73,8 +73,8 @@ public class ArenaManager {
 	 * Initialize the class by loading arenas and classes.
 	 */
 	public void initialize() {
-		loadArenas();
 		loadClasses();
+		loadArenas();
 	}
 	
 	/**
@@ -170,6 +170,7 @@ public class ArenaManager {
 		}
 
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", settings);
+		settings.set("world", world);
 
 		Arena arena = new Arena(plugin, arenaName);
 		arenas.add(arena);

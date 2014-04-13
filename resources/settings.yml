@@ -1,4 +1,4 @@
-world: 'world'
+world: ''
 enabled: true
 min-players: 4
 max-players: 16
@@ -6,8 +6,8 @@ secluded-chat: true
 arena-time: 900
 hill-clock: 60
 hill-radius: 5
-hill-block: beacon
-score-to-win: 120
+hill-block: bedrock
+score-to-win: 150
 indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false
