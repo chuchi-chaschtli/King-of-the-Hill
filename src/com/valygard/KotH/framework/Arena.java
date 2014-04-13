@@ -190,13 +190,11 @@ public class Arena {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
-		}
-
-		p.getInventory().clear();
+		}		
+		invManager.clearInventory(p);
 		
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
-		invManager.clearInventory(p);
 		data.restoreData();
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
@@ -346,7 +344,6 @@ public class Arena {
 	}
 
 	public void forceEnd() {
-		endTimer.halt();
 		endArena();
 	}
 	
@@ -368,7 +365,7 @@ public class Arena {
 		else if (getWinner().equals(bluePlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
-		else
+		else if (getWinner() == null)
 			Messenger.announce(this, Msg.ARENA_DRAW);
 	}
 	

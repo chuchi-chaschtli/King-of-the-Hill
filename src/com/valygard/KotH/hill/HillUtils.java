@@ -26,11 +26,11 @@ public class HillUtils {
 
 	// Gets the total arena time and divides it by the hill clock to retrieve
 	// the amount of hills
-	public int getHillRotations() {
+	public final int getHillRotations() {
 		int rotations = (int) Math.floor(arena.getLength()
 				/ arena.getSettings().getInt("hill-clock"));
 		
-		return rotations;
+		return rotations - 1;
 	}
 
 	public int getRotationsLeft() {
@@ -44,7 +44,7 @@ public class HillUtils {
 	public Location getCurrentHill() {
 		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft();
+		int current = getHillRotations() - getRotationsLeft() + 1;
 		
 		if (hills.contains(current))
 			return arena.getHillLocation(String.valueOf(current));
@@ -61,7 +61,7 @@ public class HillUtils {
 	public Location getNextHill() {
 		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft();
+		int current = getHillRotations() - getRotationsLeft() + 1;
 
 		if (isLastHill())
 			return null;
@@ -79,7 +79,7 @@ public class HillUtils {
 	public Location getPreviousHill() {
 		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft();
+		int current = getHillRotations() - getRotationsLeft() - 1;
 		
 		// There was no previous hill...
 		if (isFirstHill())
@@ -107,7 +107,6 @@ public class HillUtils {
 		if (isLastHill())
 			return false;
 		
-		return (arena.getLength() - (getRotationsLeft() * arena.getSettings().getInt("hill-clock")) 
-				== arena.getSettings().getInt("hill-clock"));
+		return (getRotationsLeft() * arena.getSettings().getInt("hill-clock") == arena.getEndTimer().getRemaining());
 	}
 }

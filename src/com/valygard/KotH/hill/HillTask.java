@@ -32,37 +32,42 @@ public class HillTask {
 		this.manager	= arena.getHillManager();
 		this.utils		= arena.getHillUtils();
 	}
-	
+
 	public void runTask() {
 		Bukkit.getServer().getScheduler().runTaskTimer(arena.getPlugin(), new BukkitRunnable() {
 			public void run() {
 				manager.changeHills();
-				
+
 				arena.getScoreboard().setTimeleft(arena.getEndTimer().getRemaining());
-				
+
 				// Call scoring event
 				HillScoreEvent event = new HillScoreEvent(arena);
 				arena.getPlugin().getServer().getPluginManager().callEvent(event);
 				if (event.isCancelled())
 					return;
-				
+
 				// Update scores
 				Set<Player> dominant = manager.getDominantTeam();
 				if (dominant == null) 
 					return;
-				
+
 				if (dominant.equals(arena.getRedTeam())) {
 					manager.setHillBoundary();
 					setRedScore(redScore + 1);
 				}
-				
+
 				else if (dominant.equals(arena.getBlueTeam())) {
 					manager.setHillBoundary();
 					setBlueScore(blueScore + 1);
 				}
-				
+
 				// Tidy up
-				if (arena.scoreReached() || !arena.isRunning() || arena.getScoreboard().getTimeLeft().getScore() <= 0 || arena.getBlueTeam().size() <= 0 || arena.getRedTeam().size() <= 0) {
+				if (arena.scoreReached()
+						|| !arena.isRunning()
+						|| !arena.getEndTimer().isRunning()
+						|| arena.getScoreboard().getTimeLeft().getScore() <= 0
+						|| arena.getBlueTeam().size() <= 0
+						|| arena.getRedTeam().size() <= 0) {
 					cancel();
 					manager.setStatus(utils.getHillRotations());
 					arena.forceEnd();

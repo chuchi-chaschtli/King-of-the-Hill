@@ -100,7 +100,7 @@ public class AutoEndTimer {
 			 * score to win is reached or there are no
 			 * more players in the arena.
 			 */
-			if (arena.getPlayersInArena().isEmpty() || arena.scoreReached()) {
+			if (arena.getPlayersInArena().isEmpty() || arena.scoreReached() || arena.getBlueTeam().isEmpty() || arena.getRedTeam().isEmpty()) {
 				arena.forceEnd();
 				halt();
 				return;
