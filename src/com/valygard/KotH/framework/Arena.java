@@ -311,7 +311,7 @@ public class Arena {
 
 	public boolean endArena() {
 		// Sanity-checks.
-		if (!running || !arenaPlayers.isEmpty()) {
+		if (!running || !enabled) {
 			return false;
 		}
 
