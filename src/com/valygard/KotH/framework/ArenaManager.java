@@ -501,19 +501,19 @@ public class ArenaManager {
 	public void getMissingWarps(Arena arena, Player p) {
 		List<String> missing = new ArrayList<String>();
 		if (arena.getRedSpawn() == null)
-			missing.add("redspawn, ");
+			missing.add("redspawn,");
 
 		if (arena.getBlueSpawn() == null)
-			missing.add("bluespawn, ");
+			missing.add("bluespawn,");
 
 		if (arena.getLobby() == null)
-			missing.add("lobby, ");
+			missing.add("lobby,");
 
 		if (arena.getSpec() == null)
-			missing.add("spectator, ");
+			missing.add("spectator,");
 
 		if (arena.getWarps().getConfigurationSection("hills") == null)
-			missing.add("hills, ");
+			missing.add("hills,");
 
 		if (missing.size() > 0) {
 			String formatted = KotHUtils.formatList(missing, arena.getPlugin());
@@ -529,19 +529,19 @@ public class ArenaManager {
 	public void getMissingWarps(Arena arena) {
 		List<String> missing = new ArrayList<String>();
 		if (arena.getRedSpawn() == null)
-			missing.add("redspawn, ");
+			missing.add("redspawn,");
 
 		if (arena.getBlueSpawn() == null)
-			missing.add("bluespawn, ");
+			missing.add("bluespawn,");
 
 		if (arena.getLobby() == null)
-			missing.add("lobby, ");
+			missing.add("lobby,");
 
 		if (arena.getSpec() == null)
-			missing.add("spectator, ");
+			missing.add("spectator,");
 
 		if (arena.getWarps() == null || arena.getWarps().getConfigurationSection("hills") == null)
-			missing.add("hills, ");
+			missing.add("hills,");
 
 		if (missing.size() > 0) {
 			// Although it should already be false, never hurts to be cautious.

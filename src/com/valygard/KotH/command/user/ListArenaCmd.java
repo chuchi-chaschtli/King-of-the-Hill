@@ -7,6 +7,7 @@ package com.valygard.KotH.command.user;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -41,7 +42,7 @@ public class ListArenaCmd implements Command {
 		List<Arena> arenas = am.getPermittedArenas(p);
 		List<String> names = new ArrayList<String>();
 		for (Arena arena : arenas) {
-			names.add(arena.getName());
+			names.add((arena.isReady() ? ChatColor.DARK_GREEN : ChatColor.GRAY) + arena.getName() + ChatColor.RESET + ",");
 		}
  
         String list = KotHUtils.formatList(names, am.getPlugin());
