@@ -48,8 +48,6 @@ public class ScoreboardManager {
 	 * @param p the player
 	 */
     public void removePlayer(Player p) {
-    	if (p.getScoreboard().equals(scoreboard))
-    		scoreboard.getObjective(DisplaySlot.SIDEBAR).unregister();
     	p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
     }
     
@@ -84,6 +82,18 @@ public class ScoreboardManager {
 		timeLeft.setScore(arena.getSettings().getInt("arena-time"));
     }
     
+    /**
+     * Get the time left of the game in seconds.
+     * @return
+     */
+    public Score getTimeLeft() {
+    	return timeLeft;
+    }
+    
+    /**
+     * Set the time remaining
+     * @param time in seconds.
+     */
     public void setTimeleft(int time) {
     	timeLeft.setScore(time);
     }

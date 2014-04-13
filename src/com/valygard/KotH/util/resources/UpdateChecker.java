@@ -79,6 +79,10 @@ static Updater updater;
             int latest  = getPart(latestParts,  i);
             int current = getPart(currentParts, i);
             
+            if (current > latest) {
+                return false;
+            }
+            
             if (latest > current) {
                 return true;
             }

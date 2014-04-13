@@ -44,7 +44,7 @@ public class HillManager {
 		this.utils = arena.getHillUtils();
 
 		this.hillType = Material.matchMaterial(arena.getSettings().getString(
-				"hill-block"));
+				"hill-block").toUpperCase());
 		
 		this.hillBoundary = new HashMap<Location, Material>();
 
@@ -52,16 +52,10 @@ public class HillManager {
 	}
 
 	public void begin() {
-		if (!arena.isRunning() || !arena.isEnabled())
-			return;
+		Location hill = utils.getCurrentHill();
 		
-		if (!utils.isFirstHill())
-			return;
-
-		Block b = utils.getCurrentHill().getBlock();
-
-		oldType = b.getType();
-		b.setType(hillType);
+		oldType = (hill.getBlock() == null ? Material.AIR : hill.getBlock().getType());
+		hill.getBlock().setType(hillType);
 
 		status = 1;
 		
@@ -82,10 +76,19 @@ public class HillManager {
 			return;
 		}
 		
+		if (utils.isFirstHill() && !utils.isSwitchTime()) {
+			begin();
+			return;
+		}
+		Messenger.info("1");
+		if (!utils.isSwitchTime()) {
+			return;
+		}
+		Messenger.info("2");
 		// Restore the block type.
 		utils.getCurrentHill().getBlock().setType(oldType);
 		utils.getNextHill().getBlock().setType(hillType);
-		
+		Messenger.info("3");
 		resetHillBoundary();
 
 		Messenger.announce(arena, Msg.HILLS_SWITCHED);

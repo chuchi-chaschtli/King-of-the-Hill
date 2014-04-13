@@ -29,9 +29,8 @@ public class HillUtils {
 	public int getHillRotations() {
 		int rotations = (int) Math.floor(arena.getLength()
 				/ arena.getSettings().getInt("hill-clock"));
-
-		// We don't want to swtich at 0 time left, we want to end arena.
-		return rotations - 1;
+		
+		return rotations;
 	}
 
 	public int getRotationsLeft() {
@@ -108,8 +107,7 @@ public class HillUtils {
 		if (isLastHill())
 			return false;
 		
-		return (arena.getLength()
-				- (getRotationsLeft() * arena.getSettings()
-						.getInt("hill-clock")) == arena.getEndTimer().getRemaining());
+		return (arena.getLength() - (getRotationsLeft() * arena.getSettings().getInt("hill-clock")) 
+				== arena.getSettings().getInt("hill-clock"));
 	}
 }

@@ -275,7 +275,6 @@ public class Arena {
 			
 			if (undecided.contains(p)) {
 				giveRandomClass(p);
-				undecided.remove(p);
 			}
 			
 			p.setHealth(p.getMaxHealth());
@@ -287,6 +286,8 @@ public class Arena {
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
 			
+			balanceTeams(p);
+			
 			if (redPlayers.contains(p))
 				p.teleport(red);
 			else if (bluePlayers.contains(p))
@@ -294,18 +295,19 @@ public class Arena {
 			else
 				kickPlayer(p);
 			
-			balanceTeams(p);
 			// Initialize scoreboard
 	        scoreboard.initialize(p);
 		}
         
 		// Set running to true.
 		running = true;
+		
+		// Clear undecided to avoid ConcurrentModificationException.
+		undecided.clear();
 
 		Messenger.announce(this, Msg.ARENA_START);
 		endTimer.startTimer();
 		hillTimer.runTask();
-		hillManager.begin();
 		return true;
 	}
 
