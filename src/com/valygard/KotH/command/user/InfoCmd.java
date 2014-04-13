@@ -6,6 +6,7 @@ package com.valygard.KotH.command.user;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
@@ -40,9 +41,19 @@ public class InfoCmd implements Command {
 		}
 		Messenger.tell(sender, "Information for " + ChatColor.YELLOW + arena.getName() + ":");
 		
-		sender.sendMessage(arena.isEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled");
-		sender.sendMessage(arena.isRunning() ? ChatColor.RED + "Running" : ChatColor.GREEN + "Not Running");
-		sender.sendMessage(arena.isReady() ? ChatColor.GREEN + "Ready to Play" : ChatColor.RED + "Unready");
+		if (!arena.isRunning()) {
+			sender.sendMessage(arena.isEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled");
+			sender.sendMessage(arena.isRunning() ? ChatColor.RED + "The arena has started." : ChatColor.GREEN + "The arena is joinable!");
+			sender.sendMessage(arena.isReady() ? ChatColor.GREEN + "Ready" : ChatColor.RED + "Unready");
+			
+			if (sender instanceof Player) {
+				Player p = (Player) sender;
+
+				sender.sendMessage(am.getPermittedArenas(p).contains(arena) ? ChatColor.YELLOW
+						+ "You have permission to join this arena."
+						: ChatColor.RED + "You do not have permission to join this arena.");
+			}
+		}
 		
 		if (arena.isRunning()) {
 			sender.sendMessage(ChatColor.RED + "Red Team Score: " + arena.getHillTimer().getRedScore());
@@ -51,5 +62,4 @@ public class InfoCmd implements Command {
 		}
 		return true;
 	}
-
 }

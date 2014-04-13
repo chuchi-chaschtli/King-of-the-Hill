@@ -39,10 +39,17 @@ public class ListPlayersCmd implements Command {
 		}
         Messenger.tell(sender, ChatColor.YELLOW + String.valueOf(arena.getPlayersInArena().size()) + ChatColor.RESET + " players in the arena.");
         
-        // Send a blank message to make it look pretty :)
-        sender.sendMessage("    "); 
-        Messenger.tell(sender, ChatColor.RED + String.valueOf(arena.getRedTeam().size()) + " players on the Red Team.");
-        Messenger.tell(sender, ChatColor.BLUE + String.valueOf(arena.getBlueTeam().size()) + " players on the Blue Team.");
+        // Send a blank message to make it look pretty :) 
+        if (arena.getPlayersInArena().size() > 0) {
+        	sender.sendMessage("    ");
+        	Messenger.tell(sender, ChatColor.RED + String.valueOf(arena.getRedTeam().size()) + " players on the Red Team.");
+        	Messenger.tell(sender, ChatColor.BLUE + String.valueOf(arena.getBlueTeam().size()) + " players on the Blue Team.");
+        }
+        
+        if (arena.getPlayersInLobby().size() > 0) {
+        	sender.sendMessage("    ");
+        	Messenger.tell(sender, ChatColor.YELLOW + String.valueOf(arena.getPlayersInLobby().size()) + " players in the lobby.");
+        }
 		return true;
 	}
 
