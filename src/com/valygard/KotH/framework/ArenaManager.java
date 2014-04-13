@@ -148,7 +148,7 @@ public class ArenaManager {
 	/**
 	 * Load an individual arena and return it.
 	 */
-	private Arena loadArena(String arenaName) {
+	public Arena loadArena(String arenaName) {
 		ConfigurationSection section = makeSection(config, "arenas."
 				+ arenaName);
 		ConfigurationSection settings = makeSection(section, "settings");
@@ -193,6 +193,7 @@ public class ArenaManager {
 			World world, boolean load) {
 		// We can't have two arenas of the same name ...
 		if (arenas.contains(arenaName)) {
+			loadArena(arenaName);
 			throw new IllegalArgumentException("This arena already exists.");
 		}
 
@@ -201,7 +202,7 @@ public class ArenaManager {
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
 
-		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE);
+		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE).addParent("koth.arenas", true);
 
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);

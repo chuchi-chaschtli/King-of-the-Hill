@@ -32,7 +32,7 @@ public class CreateArenaCmd implements Command {
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		if (am.getArenasInConfig().contains(args[0])) {
+		if (am.getArenaWithName(args[0]) != null) {
 			Messenger.tell(sender, Msg.ARENA_EXISTS);
 			return false;
 		}
@@ -45,6 +45,7 @@ public class CreateArenaCmd implements Command {
 		}
 		
 		am.createArena(args[0], world);
+		am.loadArena(args[0]);
 		Messenger.tell(sender, Msg.ARENA_ADDED, args[0]);
 		return true;
 	}

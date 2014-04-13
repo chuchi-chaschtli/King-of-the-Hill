@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 0.9.43
+version: 0.9.44
 website: http://valygard.com
 author: AoH_Ruthless
 description: A King of the Hill minigame.
@@ -46,6 +46,8 @@ permissions:
     default: op
     children:
       koth.user: true
+      koth.classes: true
+      koth.arenas: true
       koth.setup.addarena: true
       koth.setup.removearena: true
       koth.setup.config: true
