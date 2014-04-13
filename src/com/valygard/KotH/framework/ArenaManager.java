@@ -210,10 +210,11 @@ public class ArenaManager {
 	/**
 	 * End an arena (if running) and nullify it.
 	 */
-	public void removeArena(Arena arena) {
-		String name = arena.getName();
+	public void removeArena(String name) {
+		Arena arena = getArenaWithName(name);
 
-		if (arena.isRunning())
+		
+		if (arena != null && arena.isRunning())
 			arena.forceEnd();
 
 		config.set("arenas." + name, null);
@@ -464,6 +465,14 @@ public class ArenaManager {
 				return arena;
 		}
 		return null;
+	}
+	
+	public FileConfiguration getConfig() {
+		return config;
+	}
+	
+	public ConfigurationSection getArenasInConfig() {
+		return config.getConfigurationSection("arenas");
 	}
 
 	public void getMissingWarps(Arena arena, Player p) {

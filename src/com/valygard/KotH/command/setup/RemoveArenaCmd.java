@@ -29,11 +29,11 @@ public class RemoveArenaCmd implements Command {
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		if (am.getArenaWithName(args[0]) == null) {
+		if (!am.getArenasInConfig().contains(args[0])) {
 			Messenger.tell(sender, Msg.ARENA_NULL);
 			return false;
 		}
-		am.removeArena(am.getArenaWithName(args[0]));
+		am.removeArena(args[0]);
 		Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
 		return true;
 	}
