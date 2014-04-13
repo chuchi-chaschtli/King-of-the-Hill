@@ -47,6 +47,7 @@ public class JoinCmd implements Command {
 		
 		if (arena.hasPlayer(p)) {
 			Messenger.tell(p, Msg.JOIN_ALREADY_IN_ARENA);
+			return false;
 		}
 		
 		if (!p.hasPermission("koth.arenas." + arena.getName())) {
