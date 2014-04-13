@@ -34,6 +34,7 @@ public class RemoveArenaCmd implements Command {
 			return false;
 		}
 		am.removeArena(am.getArenaWithName(args[0]));
+		Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
 		return true;
 	}
 	

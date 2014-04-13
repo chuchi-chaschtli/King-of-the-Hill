@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.command.setup;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,8 +20,7 @@ import com.valygard.KotH.framework.ArenaManager;
 @CommandInfo(
 		name = "addarena", 
 		pattern = "addarena|createa.*",
-		desc = "Create a new arena.",
-		playerOnly = true
+		desc = "Create a new arena."
 )
 @CommandPermission("koth.setup.addarena")
 @CommandUsage("/koth addarena <arena>")
@@ -36,10 +36,16 @@ public class CreateArenaCmd implements Command {
 			Messenger.tell(sender, Msg.ARENA_EXISTS);
 			return false;
 		}
-		Player p = (Player) sender;
-		World world = p.getWorld();
+		
+		World world;
+		if (sender instanceof Player) {
+			world = ((Player) sender).getWorld();
+		} else {
+			world = Bukkit.getServer().getWorlds().get(0);
+		}
 		
 		am.createArena(args[0], world);
+		Messenger.tell(sender, Msg.ARENA_ADDED, args[0]);
 		return true;
 	}
 
