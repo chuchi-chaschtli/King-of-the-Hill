@@ -37,7 +37,7 @@ static Updater updater;
                         message(plugin, player, msg);
                     }
 
-                    else if (!current.equalsIgnoreCase(latest)) {
+                    else if (isUpdateReady(latest, current)) {
                         String msg1 = ChatColor.YELLOW + "King of the Hill v" + latest + ChatColor.RESET + " is now downloadable.";
                         String msg2 = "This server is currently running " + ChatColor.YELLOW + "v" + current;
                         message(plugin, player, msg1, msg2);
@@ -66,7 +66,31 @@ static Updater updater;
                     }
                 }
             }
-        }, (player == null) ? 0 : 75); // Let the inferior plugins message during login spam..
+        }, (player == null) ? 0 : 45); // Let the inferior plugins message during login spam..
+    }
+    
+    private static boolean isUpdateReady(String latestVersion, String currentVersion) {
+        // Split into major.minor.. etc format
+        String[] latestParts  = latestVersion.split("\\.");
+        String[] currentParts = currentVersion.split("\\.");
+        int parts = Math.max(latestParts.length, currentParts.length);
+        
+        for (int i = 0; i < parts; i++) {
+            int latest  = getPart(latestParts,  i);
+            int current = getPart(currentParts, i);
+            
+            if (latest > current) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int getPart(String[] parts, int i) {
+        if (i >= parts.length || !parts[i].matches("[0-9]+")) {
+            return 0;
+        }
+        return Integer.parseInt(parts[i]);
     }
 
     public static void shutdown() {
