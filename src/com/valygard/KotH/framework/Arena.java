@@ -407,7 +407,6 @@ public class Arena {
             }
             className = classes.remove(random.nextInt(classes.size()));
         }
-        
         pickClass(p, className);
 	}
 

@@ -170,7 +170,7 @@ public class ArenaManager {
 		}
 
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml", settings);
-		settings.set("world", world);
+		settings.set("world", world.getName());
 
 		Arena arena = new Arena(plugin, arenaName);
 		arenas.add(arena);
@@ -200,9 +200,6 @@ public class ArenaManager {
 		ConfigurationSection section = makeSection(arenas, arenaName);
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
-
-		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
-				makeSection(section, "warps"));
 
 		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE);
 

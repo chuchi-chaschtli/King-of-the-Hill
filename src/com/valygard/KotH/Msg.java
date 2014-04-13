@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  *
  */
 public enum Msg {
+	ARENA_ADDED("You have added a new arena &e'%'."),
 	ARENA_AUTO_END("The arena will end in &e%!"),
 	ARENA_AUTO_START("The arena will begin in &e%&r seconds!"),
 	ARENA_DISABLED("This arena has been disabled."),
@@ -23,6 +24,7 @@ public enum Msg {
 	ARENA_NOT_READY("This arena is not ready."),
 	ARENA_NULL("The arena specified does not exist."),
 	ARENA_READY("The arena is ready to be used!"),
+	ARENA_REMOVED("You have removed &e'%'."),
 	ARENA_START("The arena has begun!"),
 	ARENA_VICTOR("% &rhas won the arena!"),
 	CLASS_ADDED("You have created &e%&r with your inventory."),
