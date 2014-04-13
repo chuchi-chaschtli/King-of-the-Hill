@@ -99,8 +99,6 @@ public class AutoEndTimer {
 			 * End the arena and halt the timer if the 
 			 * score to win is reached or there are no
 			 * more players in the arena.
-			 * 
-			 * FIXME: Add scoreReached();
 			 */
 			if (arena.getPlayersInArena().isEmpty() || arena.scoreReached()) {
 				arena.forceEnd();

@@ -15,3 +15,4 @@ friendly-fire: false
 food-change: false
 one-life: false
 change-class-in-arena: false
+circular-hill: true

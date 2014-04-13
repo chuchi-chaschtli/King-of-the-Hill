@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.util.MathUtil;
 
 /**
  * @author Anand
@@ -53,7 +54,7 @@ public class HillUtils {
 		// hills.get(7 - 6 (= 1, or arena.warps.hills.1, and loop through again.));
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size ? getRemainder(current, size) : current));
+			return arena.getHillLocation(String.valueOf(current > size ? MathUtil.getRemainder(current, size) : current));
 		}
 	}
 
@@ -71,7 +72,7 @@ public class HillUtils {
 
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size + 1 ? getRemainder(current, size) + 1: current));
+			return arena.getHillLocation(String.valueOf(current > size + 1 ? MathUtil.getRemainder(current, size) + 1: current));
 		}
 	}
 	
@@ -90,7 +91,7 @@ public class HillUtils {
 		
 		else {
 			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size - 1 ? getRemainder(current, size) - 1 : current));
+			return arena.getHillLocation(String.valueOf(current > size - 1 ? MathUtil.getRemainder(current, size) - 1 : current));
 		}
 	}
 	
@@ -110,10 +111,5 @@ public class HillUtils {
 		return (arena.getLength()
 				- (getRotationsLeft() * arena.getSettings()
 						.getInt("hill-clock")) == arena.getEndTimer().getRemaining());
-	}
-	
-	public int getRemainder(int dividend, int divisor) {
-		int quotient = dividend / divisor;
-		return dividend - (quotient * divisor);
 	}
 }

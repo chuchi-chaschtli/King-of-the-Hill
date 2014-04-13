@@ -20,6 +20,7 @@ import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.event.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.util.LocationUtil;
 
 /**
  * @author Anand
@@ -219,44 +220,14 @@ public class HillManager {
 	
 	public Set<Block> getHillBoundary() {
 		Set<Block> block = new HashSet<Block>();
+		
 		Location l = utils.getCurrentHill();
 		int radius = arena.getSettings().getInt("hill-radius");
 		
-		// Slightly modified version of WorldEdit cylinder code:
-		// <https://github.com/sk89q/worldedit/blob/master/src/main/java/com/sk89q/worldedit/EditSession.java> (Line 1249)
-		final double invRadius = 1 / radius;
-		
-        double nextXn = 0;
-        forX: for (int x = 0; x <= radius; x++) {
-        	final double xn = nextXn;
-        	nextXn = (x + 1) * invRadius;
-        	
-        	double nextZn = 0;
-        	forZ: for (int z = 0; z <= radius; z++) {
-        		final double zn = nextZn;
-        		nextZn = (z + 1) * invRadius;
-
-        		double distanceSq = (xn * xn)+ (zn * zn);
-        		if (distanceSq > 1) {
-        			if (z == 0)
-        				break forX;
-        			break forZ;
-        		}
-
-        		if ((nextXn * nextXn)+ (zn * zn) <= 1 && (xn * xn)+ (nextZn * nextZn) <= 1)
-        			continue;
-        		
-        		Block a = l.getWorld().getBlockAt(x, l.getBlockY(), z);
-        		Block b = l.getWorld().getBlockAt(-x, l.getBlockY(), z);
-        		Block c = l.getWorld().getBlockAt(-x, l.getBlockY(), -z);
-        		Block d = l.getWorld().getBlockAt(x, l.getBlockY(), -z);
-        		
-        		block.add(a);
-        		block.add(b);
-        		block.add(c);
-        		block.add(d);
-        	}
-        }
+		block.clear();
+		for (Block b : arena.getSettings().getBoolean("circular-hill") ? LocationUtil.getCircularBoundary(l, radius) : LocationUtil.getSquareBoundary(l, radius)) {
+			block.add(b);
+		}
         return block;
 	}
 }
