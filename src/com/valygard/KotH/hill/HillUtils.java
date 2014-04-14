@@ -22,6 +22,11 @@ public class HillUtils {
 
 	private Arena arena;
 
+	/**
+	 * Constructor. Requires an arena to get the hills of.
+	 * 
+	 * @param arena the arena.
+	 */
 	public HillUtils(Arena arena) {
 		this.arena = arena;
 	}
@@ -33,7 +38,7 @@ public class HillUtils {
 	 * configuration section is. If there is only 1 hill, there will obviously
 	 * be no rotations.
 	 * 
-	 * @return
+	 * @return an integer; the total # of rotations
 	 */
 	public final int getHillRotations() {
 		int rotations = (int) Math.floor(arena.getLength()
@@ -48,7 +53,7 @@ public class HillUtils {
 	 * truncated value of the time remaining divided by the # of seconds
 	 * per-hill.
 	 * 
-	 * @return
+	 * @return an integer; the # of rotations left
 	 */
 	public int getRotationsLeft() {
 		int timeLeft = arena.getEndTimer().getRemaining();
@@ -61,7 +66,7 @@ public class HillUtils {
 	/**
 	 * A method to get the location of the current hill.
 	 * 
-	 * @return
+	 * @return the location of the current hill
 	 */
 	public Location getCurrentHill() {
 		ConfigurationSection section = arena.getWarps()
@@ -81,7 +86,7 @@ public class HillUtils {
 	 * For future reference, we want to get the location of the next hill (in
 	 * relation to the current hill).
 	 * 
-	 * @return
+	 * @return the location of the next hill
 	 */
 	public Location getNextHill() {
 		ConfigurationSection section = arena.getWarps()
@@ -105,7 +110,7 @@ public class HillUtils {
 	 * In case something goes awry, we want to be able to backtrack and get the
 	 * hill before the current one.
 	 * 
-	 * @return
+	 * @return the location of the previous hill
 	 */
 	public Location getPreviousHill() {
 		ConfigurationSection section = arena.getWarps()
@@ -130,7 +135,7 @@ public class HillUtils {
 	 * Is this the first hill? If the amount of hills left happens to equal the
 	 * total number of rotations, then yes, it is.
 	 * 
-	 * @return
+	 * @return true / false
 	 */
 	public boolean isFirstHill() {
 		return (getRotationsLeft() == getHillRotations());
@@ -138,7 +143,7 @@ public class HillUtils {
 
 	/**
 	 * If there are no more rotations, we know we are on the last hill.
-	 * @return
+	 * @return true / false
 	 */
 	public boolean isLastHill() {
 		return (getRotationsLeft() <= 0);
@@ -150,7 +155,7 @@ public class HillUtils {
 	 * previous one. We will actually change the hills in the HillManager class,
 	 * utilizing this method.
 	 * 
-	 * @return
+	 * @return true / false
 	 */
 	public boolean isSwitchTime() {
 		if (isLastHill())
