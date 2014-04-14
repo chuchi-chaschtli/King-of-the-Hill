@@ -87,7 +87,7 @@ public class HillManager {
 		
 //		revertBlock(utils.getCurrentHill());
 //		utils.getNextHill().getBlock().setType(hillType);
-		Messenger.info("3");
+		
 //		resetHillBoundary();
 
 		Messenger.announce(arena, Msg.HILLS_SWITCHED);
