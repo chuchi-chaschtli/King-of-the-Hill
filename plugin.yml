@@ -88,6 +88,8 @@ permissions:
       koth.admin.forceend: true
       koth.admin.breakblocks: true
       koth.admin.placeblocks: true
+      koth.admin.teleport: true
+      koth.admin.dropitems: true
       koth.admin.update: true
   koth.admin.enable:
     default: false
@@ -113,3 +115,9 @@ permissions:
   koth.admin.signs:
     default: false
     description: Create class signs
+  koth.admin.dropitems:
+    default: false
+    description: Be able to drop items whilst in the arena.
+  koth.admin.teleport:
+    default: false
+    description: Teleport while in the arena.

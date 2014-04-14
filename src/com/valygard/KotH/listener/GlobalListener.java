@@ -16,13 +16,17 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -50,55 +54,46 @@ public class GlobalListener implements Listener {
 	}
 	
 	// --------------------------- //
-	// EVENTS
+	// Player Events
 	// --------------------------- //
-
+	
 	@EventHandler
-	public void onArenaDeath(PlayerDeathEvent e) {
-		Player p = e.getEntity();
-		Arena arena = am.getArenaWithPlayer(p);
-
-		if (arena == null)
-			return;
-
-		if (p.getKiller() instanceof Player) {
-			Player killer = p.getKiller();
-			Messenger.tell(killer, getKillMessage(killer, p));
-			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
-					+ ChatColor.RESET + " has killed you.");
-		}
-		
-		if (arena.getSettings().getBoolean("one-life")) {
-			arena.removePlayer(p, false);
-		}
-		
-		e.getDrops().clear();
-		e.setDeathMessage(null);
-		if (!arena.getSettings().getBoolean("drop-xp"))
-			e.setDroppedExp(0);
-	}
-
-	@EventHandler
-	public void onArenaRespawn(PlayerRespawnEvent e) {
+	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		Arena arena = am.getArenaWithPlayer(p);
 
-		if (arena == null)
+		Block b = e.getClickedBlock();
+		if (b == null)
 			return;
 		
-		// Cheater cheater pumpkin eater
-		if (!arena.getRedTeam().contains(p) && !arena.getBlueTeam().contains(p)) {
-			arena.kickPlayer(p);
+		if (!b.getType().equals(Material.SIGN)
+				&& !b.getType().equals(Material.SIGN_POST)
+				&& !b.getType().equals(Material.WALL_SIGN))
+			return;
+
+		Sign s = (Sign) b.getState();
+		
+		switch (e.getAction()) {
+			case RIGHT_CLICK_BLOCK:
+			case LEFT_CLICK_BLOCK:
+				String formatted = ChatColor.stripColor(s.getLine(0)).replace(" ", "");
+				if (am.getClasses().get(formatted) == null)
+					break;
+				
+				Arena arena = am.getArenaWithPlayer(p);
+				
+				if (arena == null)
+					break;
+				
+				if (!plugin.has(p, "koth.classes." + formatted))
+					break;
+				
+				arena.pickClass(p, formatted);
+				break;
+			default:
+				break;
 		}
-
-		if (arena.getRedTeam().contains(p))
-			e.setRespawnLocation(arena.getRedSpawn());
-		else if (arena.getBlueTeam().contains(p))
-			e.setRespawnLocation(arena.getBlueSpawn());
-		ArenaClass ac = arena.getData(p).getArenaClass();
-		ac.giveItems(p);
 	}
-
+	
 	@EventHandler
 	public void onHillEntryOrExit(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
@@ -145,68 +140,6 @@ public class GlobalListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onEntityDamage(EntityDamageByEntityEvent e) {
-		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
-			Player p = (Player) e.getEntity();
-			Player d = (Player) e.getDamager();
-			
-			Arena arena = am.getArenaWithPlayer(p);
-			
-			if (arena == null || !arena.getPlayersInArena().contains(d))
-				return;
-			
-			if (arena.getSettings().getBoolean("indestructible-weapons"))
-				repairWeapon(d);
-			
-			if (arena.getSettings().getBoolean("indestructible-armor"))
-				repairArmor(p);
-			
-			if (arena.getSettings().getBoolean("friendly-fire"))
-				return;
-			
-			// One way of checking if they have the same team is by checking if they have the same spawn.
-			if (arena.getSpawn(p).equals(arena.getSpawn(d))) {
-				e.setCancelled(true);
-				Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
-			}
-		}
-	}
-
-	@EventHandler
-	public void onBlockBreak(BlockBreakEvent e) {
-		Player p = e.getPlayer();
-
-		if (p.hasPermission("koth.admin.breakblocks"))
-			return;
-
-		for (Arena arena : am.getArenas()) {
-			if (!arena.getPlayersInArena().contains(p)
-					&& !arena.getPlayersInLobby().contains(p)
-					&& !arena.getSpectators().contains(p))
-				continue;
-			
-			e.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent e) {
-		Player p = e.getPlayer();
-		
-		if (p.hasPermission("koth.admin.placeblocks"))
-			return;
-		
-		for (Arena arena : am.getArenas()) {
-			if (!arena.getPlayersInArena().contains(p)
-					&& !arena.getPlayersInLobby().contains(p)
-					&& !arena.getSpectators().contains(p))
-				continue;
-			
-			e.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
 	public void onAsyncChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 		
@@ -243,6 +176,125 @@ public class GlobalListener implements Listener {
 		UpdateChecker.checkForUpdates(plugin, p);
 	}
 	
+	// --------------------------- //
+	// Arena-Managed Events
+	// --------------------------- //
+	
+	@EventHandler
+	public void onItemDrop(PlayerDropItemEvent e) {
+		Player p = e.getPlayer();
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null || !p.hasPermission("koth.admin.dropitems")) 
+			return;
+		
+		if (arena.getSettings().getBoolean("drop-items"))
+			return;
+		
+		e.setCancelled(true);
+		Messenger.tell(p, Msg.MISC_ARENA_ITEM_DROP_DISABLED);
+	}
+	
+	@EventHandler
+	public void onRegainHealth(EntityRegainHealthEvent e) {
+		if (e.getEntity() instanceof Player) {
+			Player p = (Player) e.getEntity();
+			Arena arena = am.getArenaWithPlayer(p);
+			
+			if (arena == null) 
+				return;
+			
+			if (arena.getSettings().getBoolean("regen-health"))
+				return;
+			
+			e.setCancelled(true);
+		}
+	}
+	
+	// --------------------------- //
+	// Combat Events
+	// --------------------------- //
+	
+	@EventHandler
+	public void onArenaDeath(PlayerDeathEvent e) {
+		Player p = e.getEntity();
+		Arena arena = am.getArenaWithPlayer(p);
+
+		if (arena == null)
+			return;
+
+		if (p.getKiller() instanceof Player) {
+			Player killer = p.getKiller();
+			Messenger.tell(killer, getKillMessage(killer, p));
+			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
+					+ ChatColor.RESET + " has killed you.");
+		}
+		
+		if (arena.getSettings().getBoolean("one-life")) {
+			arena.removePlayer(p, false);
+		}
+		
+		e.getDrops().clear();
+		e.setDeathMessage(null);
+		if (!arena.getSettings().getBoolean("drop-xp"))
+			e.setDroppedExp(0);
+	}
+	
+	@EventHandler
+	public void onArenaRespawn(PlayerRespawnEvent e) {
+		Player p = e.getPlayer();
+		Arena arena = am.getArenaWithPlayer(p);
+
+		if (arena == null)
+			return;
+		
+		// Cheater cheater pumpkin eater
+		if (!arena.getRedTeam().contains(p) && !arena.getBlueTeam().contains(p)) {
+			arena.kickPlayer(p);
+		}
+
+		if (arena.getRedTeam().contains(p))
+			e.setRespawnLocation(arena.getRedSpawn());
+		else if (arena.getBlueTeam().contains(p))
+			e.setRespawnLocation(arena.getBlueSpawn());
+		
+		ArenaClass ac = arena.getData(p).getArenaClass();
+		if (ac != null) ac.giveItems(p);
+		else arena.giveRandomClass(p);
+	}
+
+	@EventHandler
+	public void onEntityDamage(EntityDamageByEntityEvent e) {
+		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+			Player p = (Player) e.getEntity();
+			Player d = (Player) e.getDamager();
+			
+			Arena arena = am.getArenaWithPlayer(p);
+			
+			if (arena == null || !arena.getPlayersInArena().contains(d))
+				return;
+			
+			if (arena.getSettings().getBoolean("indestructible-weapons"))
+				repairWeapon(d);
+			
+			if (arena.getSettings().getBoolean("indestructible-armor"))
+				repairArmor(p);
+			
+			if (arena.getSettings().getBoolean("friendly-fire"))
+				return;
+			
+			// One way of checking if they have the same team is by checking if they have the same spawn.
+			if (arena.getSpawn(p).equals(arena.getSpawn(d))) {
+				e.setCancelled(true);
+				Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
+			}
+		}
+	}
+	
+	// --------------------------- //
+	// Block Events
+	// --------------------------- //
+	
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onSignChange(SignChangeEvent e) {
 		if (am.getClasses().get(e.getLine(0)) == null) {
@@ -257,44 +309,55 @@ public class GlobalListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent e) {
+	public void onBlockBreak(BlockBreakEvent e) {
 		Player p = e.getPlayer();
 
-		Block b = e.getClickedBlock();
-		if (b == null)
-			return;
-		
-		if (!b.getType().equals(Material.SIGN)
-				&& !b.getType().equals(Material.SIGN_POST)
-				&& !b.getType().equals(Material.WALL_SIGN))
+		if (p.hasPermission("koth.admin.breakblocks"))
 			return;
 
-		Sign s = (Sign) b.getState();
-		
-		switch (e.getAction()) {
-			case RIGHT_CLICK_BLOCK:
-			case LEFT_CLICK_BLOCK:
-				String formatted = ChatColor.stripColor(s.getLine(0)).replace(" ", "");
-				if (am.getClasses().get(formatted) == null)
-					break;
-				
-				Arena arena = am.getArenaWithPlayer(p);
-				
-				if (arena == null)
-					break;
-				
-				if (!plugin.has(p, "koth.classes." + formatted))
-					break;
-				
-				arena.pickClass(p, formatted);
-				break;
-			default:
-				break;
+		for (Arena arena : am.getArenas()) {
+			if (!arena.getPlayersInArena().contains(p)
+					&& !arena.getPlayersInLobby().contains(p)
+					&& !arena.getSpectators().contains(p))
+				continue;
+			
+			e.setCancelled(true);
 		}
 	}
-
+	
+	@EventHandler
+	public void onBlockPlace(BlockPlaceEvent e) {
+		Player p = e.getPlayer();
+		
+		if (p.hasPermission("koth.admin.placeblocks"))
+			return;
+		
+		for (Arena arena : am.getArenas()) {
+			if (!arena.getPlayersInArena().contains(p)
+					&& !arena.getPlayersInLobby().contains(p)
+					&& !arena.getSpectators().contains(p))
+				continue;
+			
+			e.setCancelled(true);
+		}
+	}
+	
 	// --------------------------- //
-	// MISC.
+	// World Events
+	// --------------------------- //
+	
+	@EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        am.loadArenasInWorld(event.getWorld().getName());
+    }
+    
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        am.unloadArenasInWorld(event.getWorld().getName());
+    }
+	
+	// --------------------------- //
+	// Getters and Misc.
 	// --------------------------- //
 	
 	private String getKillMessage(Player killer, Player killed) {

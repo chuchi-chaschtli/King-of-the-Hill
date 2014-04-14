@@ -64,7 +64,6 @@ public class Arena {
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
-	private Set<Player> undecided;
 
 	// Some booleans that are configuration-critical.
 	private boolean running, enabled;
@@ -97,40 +96,38 @@ public class Arena {
 		this.arenaName = arenaName;
 
 		// Settings from config
-		this.config = plugin.getConfig();
-		this.settings = config.getConfigurationSection("arenas." + arenaName
-				+ ".settings");
-		this.warps = config.getConfigurationSection("arenas." + arenaName
-				+ ".warps");
-		this.world = Bukkit.getWorld(settings.getString("world"));
-		this.minPlayers = settings.getInt("min-players");
-		this.maxPlayers = settings.getInt("max-players");
+		this.config 		= plugin.getConfig();
+		this.settings 		= config.getConfigurationSection("arenas." 
+				+ arenaName + ".settings");
+		this.warps 			= config.getConfigurationSection("arenas." + arenaName + ".warps");
+		
+		this.world 			= Bukkit.getWorld(settings.getString("world"));
+		
+		this.minPlayers 	= settings.getInt("min-players");
+		this.maxPlayers 	= settings.getInt("max-players");
 
 		// The different groups a player can be in.
-		this.arenaPlayers = new HashSet<Player>();
-		this.lobbyPlayers = new HashSet<Player>();
-		this.specPlayers = new HashSet<Player>();
-		this.redPlayers = new HashSet<Player>();
-		this.bluePlayers = new HashSet<Player>();
-		
-		this.undecided	= new HashSet<Player>();
+		this.arenaPlayers 	= new HashSet<Player>();
+		this.lobbyPlayers 	= new HashSet<Player>();
+		this.specPlayers 	= new HashSet<Player>();
+		this.redPlayers 	= new HashSet<Player>();
+		this.bluePlayers 	= new HashSet<Player>();
 
 		// Boolean values.
-		this.running = false;
-		this.enabled = settings.getBoolean("enabled", true);
+		this.running 		= false;
+		this.enabled 		= settings.getBoolean("enabled", true);
 
-		this.startTimer = new AutoStartTimer(this, 30);
-		this.endTimer = new AutoEndTimer(this, settings.getInt("arena-time"));
+		this.startTimer 	= new AutoStartTimer(this, 30);
+		this.endTimer 		= new AutoEndTimer(this, settings.getInt("arena-time"));
 
-		this.hillUtils = new HillUtils(this);
-		this.hillManager = new HillManager(this);
-		this.hillTimer = new HillTask(this);
+		this.hillUtils 		= new HillUtils(this);
+		this.hillManager 	= new HillManager(this);
+		this.hillTimer 		= new HillTask(this);
 
-		this.ready = false;
+		this.ready 			= false;
 		
-		this.scoreboard = new ScoreboardManager(this);
-		
-		this.invManager = new InventoryManager(this);
+		this.scoreboard 	= new ScoreboardManager(this);
+		this.invManager 	= new InventoryManager(this);
 	}
 	
 	
@@ -163,13 +160,13 @@ public class Arena {
 		try {
 			invManager.storeInventory(p);
 		} catch (IOException e) {
-			Messenger.warning("Could not store inventory of Player '" + p.getName() + "' (UUID: " + p.getUniqueId() + ")");
+			Messenger.warning("Could not store inventory of Player '"
+					+ p.getName() + "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
 		invManager.clearInventory(p);
 
 		lobbyPlayers.add(p);
-		undecided.add(p);
 		p.teleport(lobby);
 
 		p.setHealth(p.getMaxHealth());
@@ -192,10 +189,6 @@ public class Arena {
 			return;
 		}		
 		invManager.clearInventory(p);
-		
-		// Restore all of their data; i.e armor, inventory, health, etc.
-		PlayerData data = getData(p);
-		data.restoreData();
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
@@ -210,26 +203,27 @@ public class Arena {
 		
 		if (redPlayers.contains(p))
 			redPlayers.remove(p);
-		
+
 		if (lobbyPlayers.contains(p))
 			lobbyPlayers.remove(p);
-		
-		if (undecided.contains(p))
-			undecided.remove(p);
-		
+
 		if (specPlayers.contains(p))
 			specPlayers.remove(p);
-		
+
 		if (redPlayers.size() <= 0 || bluePlayers.size() <= 0) {
-			endArena();
+			if (!end)
+				endArena();
 		}
+
+		// Restore all of their data; i.e armor, inventory, health, etc.
+		PlayerData data = getData(p);
+		data.restoreData();
 	}
-	
+
 	public void kickPlayer(Player p) {
 		removePlayer(p, false);
 		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
-		Messenger.announce(this, p.getName()
-				+ " has been caught cheating!");
+		Messenger.announce(this, p.getName() + " has been caught cheating!");
 	}
 
 	public void balanceTeams(Player p) {
@@ -251,6 +245,13 @@ public class Arena {
 		if (event.isCancelled()) {
 			return false;
 		}
+		
+		// Assign class before adding player to arenaPlayers to bypass change-class-in-arena node.
+		for (Player p : lobbyPlayers) {
+			if (getClass(p) == null) {
+				giveRandomClass(p);
+			}
+		}
 
 		// Has to be in this order, because if we clear lobbyPlayers first, we
 		// cannot add anyone to the game.
@@ -261,22 +262,21 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
+		
+		// Start timers first to avoid errors
+		endTimer.startTimer();
+		hillTimer.runTask();
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
 			// Remove player from spec list to avoid invincibility issues
 			if (specPlayers.contains(p)) {
 				specPlayers.remove(p);
-				System.out.println("[KotH] Player " + p.getName()
+				Messenger.info("Player " + p.getName()
 						+ " joined the arena from the spec area!");
-				System.out
-						.println("[KotH] Invincibility glitch attempt stopped!");
+				Messenger.info("Invincibility glitch attempt stopped!");
 			}
-			
-			if (undecided.contains(p)) {
-				giveRandomClass(p);
-			}
-			
+
 			p.setHealth(p.getMaxHealth());
 			p.setFireTicks(0);
 			p.setAllowFlight(false);
@@ -285,29 +285,24 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
-			
+
 			balanceTeams(p);
-			
+
 			if (redPlayers.contains(p))
 				p.teleport(red);
 			else if (bluePlayers.contains(p))
 				p.teleport(blue);
 			else
 				kickPlayer(p);
-			
+
 			// Initialize scoreboard
-	        scoreboard.initialize(p);
+			scoreboard.initialize(p);
 		}
-        
+
 		// Set running to true.
 		running = true;
-		
-		// Clear undecided to avoid ConcurrentModificationException.
-		undecided.clear();
 
 		Messenger.announce(this, Msg.ARENA_START);
-		endTimer.startTimer();
-		hillTimer.runTask();
 		return true;
 	}
 
@@ -348,7 +343,7 @@ public class Arena {
 	public void forceEnd() {
 		endArena();
 	}
-	
+
 	public void setSpectator(Player p) {
 		p.teleport(spec);
 		specPlayers.add(p);
@@ -370,44 +365,50 @@ public class Arena {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
 	}
-	
+
 	public void pickClass(Player p, String classname) {
-		ArenaClass arenaClass = plugin.getArenaManager().getClasses().get(classname);
+		ArenaClass arenaClass = plugin.getArenaManager().getClasses()
+				.get(classname);
 		if (arenaClass == null) {
 			return;
 		}
-		
-		if (!settings.getBoolean("change-class-in-arena") && arenaPlayers.contains(p)) {
+
+		if (!settings.getBoolean("change-class-in-arena")
+				&& arenaPlayers.contains(p)) {
 			return;
 		}
-		
-		boolean canPick = (arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p));
-		
+
+		boolean canPick = (arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers
+				.contains(p));
+
 		if (!canPick) {
 			return;
 		}
-		
+
 		invManager.clearInventory(p);
+		setArenaClass(p, arenaClass);
 		arenaClass.giveItems(p);
-		
-		if (undecided.contains(p))
-			undecided.remove(p);
 	}
 	
+	/*
+	 * FIXME: Classes aren't being assigned at random on arena start.
+	 */
 	public void giveRandomClass(Player p) {
-		Random random = new Random();		
-		List<String> classes = new LinkedList<String>(plugin.getArenaManager().getClasses().keySet());
-		
+		Random random = new Random();
+		List<String> classes = new LinkedList<String>(plugin.getArenaManager()
+				.getClasses().keySet());
+
 		String className = classes.remove(random.nextInt(classes.size()));
-        while (!plugin.has(p, "koth.classes." + className)) {
-            if (classes.isEmpty()) {
-                Messenger.info("Player '" + p.getName() + "' does not have access to any classes!");
-                removePlayer(p, false);
-                return;
-            }
-            className = classes.remove(random.nextInt(classes.size()));
-        }
-        pickClass(p, className);
+		while (!plugin.has(p, "koth.classes." + className.toLowerCase())) {
+			if (classes.isEmpty()) {
+				Messenger.info("Player '" + p.getName()
+						+ "' does not have access to any classes!");
+				removePlayer(p, false);
+				return;
+			}
+			className = classes.remove(random.nextInt(classes.size()));
+		}
+		pickClass(p, className);
 	}
 
 
@@ -438,11 +439,12 @@ public class Arena {
 	public Location getLocation(String path) {
 		return parseLocation(warps, path, world);
 	}
-	
+
 	public Location getHillLocation(String path) {
-		return parseLocation(warps.getConfigurationSection("hills"), path, world);
+		return parseLocation(warps.getConfigurationSection("hills"), path,
+				world);
 	}
-	
+
 	public void setLocation(String path, Location loc) {
 		ConfigUtil.setLocation(warps, path, loc);
 	}
@@ -456,7 +458,7 @@ public class Arena {
 	}
 
 	public Location getLobby() {
-		try{
+		try {
 			lobby = getLocation("lobby");
 			return lobby;
 		} catch (Exception e) {
@@ -534,10 +536,6 @@ public class Arena {
 	public Set<Player> getSpectators() {
 		return Collections.unmodifiableSet(specPlayers);
 	}
-	
-	public Set<Player> getUndecided() {
-		return Collections.unmodifiableSet(undecided);
-	}
 
 	public boolean isRunning() {
 		return running;
@@ -602,10 +600,11 @@ public class Arena {
 
 	public boolean isReady() {
 		ready = false;
-		
-		if (red == null || blue == null || spec == null || lobby == null || warps.getConfigurationSection("hills") == null)
+
+		if (red == null || blue == null || spec == null || lobby == null
+				|| warps.getConfigurationSection("hills") == null)
 			return ready;
-		
+
 		ready = true;
 		return ready;
 	}
@@ -614,8 +613,18 @@ public class Arena {
 		this.ready = ready;
 		return ready;
 	}
-	
+
 	public ScoreboardManager getScoreboard() {
 		return scoreboard;
+	}
+	
+	public ArenaClass getClass(Player p) {
+		PlayerData data = getData(p);
+		return data.getArenaClass();
+	}
+	
+	public void setArenaClass(Player p, ArenaClass arenaClass) {
+		PlayerData data = getData(p);
+		data.setArenaClass(arenaClass);
 	}
 }
