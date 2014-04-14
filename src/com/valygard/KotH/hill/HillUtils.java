@@ -13,6 +13,8 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.util.MathUtil;
 
 /**
+ * This class is not for those who are bad at math :)
+ * 
  * @author Anand
  * 
  */
@@ -24,42 +26,66 @@ public class HillUtils {
 		this.arena = arena;
 	}
 
-	// Gets the total arena time and divides it by the hill clock to retrieve
-	// the amount of hills
+	/**
+	 * Gets the amount of hill rotations. To do this, we truncate the arena time
+	 * divided by the time loop of each rotation. Then we subtract 1, because we
+	 * don't want to rotate at 0. We also need to check how large the hills
+	 * configuration section is. If there is only 1 hill, there will obviously
+	 * be no rotations.
+	 * 
+	 * @return
+	 */
 	public final int getHillRotations() {
 		int rotations = (int) Math.floor(arena.getLength()
 				/ arena.getSettings().getInt("hill-clock"));
-		
-		return rotations - 1;
+
+		return (arena.getWarps().getConfigurationSection("hills")
+				.getKeys(false).size() > 1 ? rotations - 1 : 0);
 	}
 
+	/**
+	 * If there is more than one hill, the amount of rotations left is the
+	 * truncated value of the time remaining divided by the # of seconds
+	 * per-hill.
+	 * 
+	 * @return
+	 */
 	public int getRotationsLeft() {
 		int timeLeft = arena.getEndTimer().getRemaining();
 
-		return (int) (Math.floor(timeLeft
-				/ arena.getSettings().getInt("hill-clock")));
+		return (int) (arena.getWarps().getConfigurationSection("hills")
+				.getKeys(false).size() > 1 ? Math.floor(timeLeft
+				/ arena.getSettings().getInt("hill-clock")) : 0);
 	}
 
-	// Get the current hill location
+	/**
+	 * A method to get the location of the current hill.
+	 * 
+	 * @return
+	 */
 	public Location getCurrentHill() {
-		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft() + 1;
-		
+
 		if (hills.contains(current))
 			return arena.getHillLocation(String.valueOf(current));
 
-		// If there are 6 hills, and we are on the 7th rotation, we will use
-		// hills.get(7 - 6 (= 1, or arena.warps.hills.1, and loop through again.));
-		else {
-			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size ? MathUtil.getRemainder(current, size) : current));
-		}
+		int size = hills.size();
+		return arena.getHillLocation(String.valueOf(current > size ? MathUtil
+				.getRemainder(current, size) : current));
 	}
 
-	// An astute eye will note that not much is changed.
+	/**
+	 * For future reference, we want to get the location of the next hill (in
+	 * relation to the current hill).
+	 * 
+	 * @return
+	 */
 	public Location getNextHill() {
-		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
 		int current = getHillRotations() - getRotationsLeft() + 1;
 
@@ -69,44 +95,68 @@ public class HillUtils {
 		if (hills.contains(current + 1))
 			return arena.getHillLocation(String.valueOf(current + 1));
 
-		else {
-			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size + 1 ? MathUtil.getRemainder(current, size) + 1: current));
-		}
+		int size = hills.size();
+		return arena.getHillLocation(String
+				.valueOf(current > size + 1 ? MathUtil.getRemainder(current,
+						size) + 1 : current));
 	}
-	
-	// Basically the opposite of getNextHill();
+
+	/**
+	 * In case something goes awry, we want to be able to backtrack and get the
+	 * hill before the current one.
+	 * 
+	 * @return
+	 */
 	public Location getPreviousHill() {
-		ConfigurationSection section = arena.getWarps().getConfigurationSection("hills");
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft() - 1;
-		
+		int current = getHillRotations() - getRotationsLeft() + 1;
+
 		// There was no previous hill...
 		if (isFirstHill())
 			return null;
 
 		if (hills.contains(current - 1))
-			return arena.getHillLocation(String.valueOf(current));
-		
-		else {
-			int size = hills.size();
-			return arena.getHillLocation(String.valueOf(current > size - 1 ? MathUtil.getRemainder(current, size) - 1 : current));
-		}
+			return arena.getHillLocation(String.valueOf(current - 1));
+
+		int size = hills.size();
+		return arena.getHillLocation(String
+				.valueOf(current > size - 1 ? MathUtil.getRemainder(current,
+						size) - 1 : current));
 	}
-	
+
+	/**
+	 * Is this the first hill? If the amount of hills left happens to equal the
+	 * total number of rotations, then yes, it is.
+	 * 
+	 * @return
+	 */
 	public boolean isFirstHill() {
 		return (getRotationsLeft() == getHillRotations());
 	}
-	
+
+	/**
+	 * If there are no more rotations, we know we are on the last hill.
+	 * @return
+	 */
 	public boolean isLastHill() {
 		return (getRotationsLeft() <= 0);
 	}
-	
-	// Check if remaining time is equal to a switch time.
+
+	/**
+	 * A very important method, this checks to make sure we are at a point where
+	 * the next hill becomes the current one, and the current one becomes the
+	 * previous one. We will actually change the hills in the HillManager class,
+	 * utilizing this method.
+	 * 
+	 * @return
+	 */
 	public boolean isSwitchTime() {
 		if (isLastHill())
 			return false;
-		
-		return (getRotationsLeft() * arena.getSettings().getInt("hill-clock") == arena.getEndTimer().getRemaining());
+
+		return (getRotationsLeft() * arena.getSettings().getInt("hill-clock") == arena
+				.getEndTimer().getRemaining());
 	}
 }
