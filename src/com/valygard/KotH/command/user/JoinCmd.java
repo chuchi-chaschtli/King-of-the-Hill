@@ -20,7 +20,8 @@ import com.valygard.KotH.framework.ArenaManager;
 		name = "join", 
 		pattern = "join.*|j.*n",
 		desc = "Join an arena.",
-		playerOnly = true
+		playerOnly = true,
+		argsRequired = 0
 	)
 	@CommandPermission("koth.user.join")
 	@CommandUsage("/koth join <arena>")
@@ -32,13 +33,15 @@ public class JoinCmd implements Command {
 
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		if (am.getArenaWithName(args[0]) == null) {
-			Messenger.tell(sender, Msg.ARENA_NULL);
+		Arena arena;
+		
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
+		Player p = (Player) sender;
+		
+		if (arena == null) {
+			Messenger.tell(p, Msg.ARENA_NULL);
 			return false;
 		}
-		
-		Arena arena = am.getArenaWithName(args[0]);
-		Player p = (Player) sender;
 		
 		if (!arena.isReady()) {
 			Messenger.tell(p, Msg.ARENA_NOT_READY);

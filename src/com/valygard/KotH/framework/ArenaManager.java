@@ -550,4 +550,14 @@ public class ArenaManager {
 			arena.setReady(true);
 		}
 	}
+	
+	public boolean hasOneArena() {
+		return arenas.size() == 1;
+	}
+	
+	public Arena getOnlyArena() {
+		if (hasOneArena())
+			return arenas.get(0);
+		return null;
+	}
 }

@@ -22,7 +22,7 @@ public enum Msg {
 	ARENA_EXISTS("The arena specified already exists."),
 	ARENA_NO_PERMISSION("You do not have permission to this arena."),
 	ARENA_NOT_READY("This arena is not ready."),
-	ARENA_NULL("The arena specified does not exist."),
+	ARENA_NULL("You must specify an existing arena."),
 	ARENA_READY("The arena is ready to be used!"),
 	ARENA_REMOVED("You have removed &e'%'."),
 	ARENA_START("The arena has begun!"),

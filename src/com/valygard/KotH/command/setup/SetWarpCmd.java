@@ -20,7 +20,8 @@ import com.valygard.KotH.framework.ArenaManager;
 		name = "setwarp", 
 		pattern = "set(warp|loc).*|arenasetwarp",
 		desc = "Define a warp for an arena",
-		playerOnly = true
+		playerOnly = true,
+		argsRequired = 0
 )
 @CommandPermission("koth.setup.setwarps")
 @CommandUsage("/koth setwarp <arena> <red|blue|lobby|spec>")
@@ -33,7 +34,8 @@ public class SetWarpCmd implements Command {
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);

@@ -19,7 +19,8 @@ import com.valygard.KotH.framework.ArenaManager;
 @CommandInfo(
 		name = "players", 
 		pattern = "players.*|listp.*|p.*list",
-		desc = "View all players in an arena."
+		desc = "View all players in an arena.",
+		argsRequired = 0
 	)
 @CommandPermission("koth.user.listplayers")
 @CommandUsage("/koth players <arena>")
@@ -31,7 +32,8 @@ public class ListPlayersCmd implements Command {
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);

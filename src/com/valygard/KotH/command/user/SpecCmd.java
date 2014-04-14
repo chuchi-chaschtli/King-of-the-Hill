@@ -20,7 +20,8 @@ import com.valygard.KotH.framework.ArenaManager;
 		name = "spec", 
 		pattern = "spec.*",
 		desc = "Spectate a running arena.",
-		playerOnly = true
+		playerOnly = true,
+		argsRequired = 0
 	)
 @CommandPermission("koth.user.spectate")
 @CommandUsage("/koth spec <arena>")
@@ -32,8 +33,10 @@ public class SpecCmd implements Command {
 
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
 		Player p = (Player) sender;
+		
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);

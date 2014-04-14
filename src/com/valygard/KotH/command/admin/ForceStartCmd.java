@@ -18,7 +18,8 @@ import com.valygard.KotH.framework.ArenaManager;
 @CommandInfo(
 		name = "forcestart", 
 		pattern = "forces.*",
-		desc = "Force an arena to start."
+		desc = "Force an arena to start.",
+		argsRequired = 0
 )
 @CommandPermission("koth.admin.forcestart")
 @CommandUsage("/koth forcestart <arena>")
@@ -30,7 +31,8 @@ public class ForceStartCmd implements Command {
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);

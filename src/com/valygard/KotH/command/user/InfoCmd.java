@@ -21,7 +21,8 @@ import com.valygard.KotH.util.TimeUtil;
 @CommandInfo(
 		name = "info", 
 		pattern = "info.*|arenainfo",
-		desc = "View some information about a specified arena."
+		desc = "View some information about a specified arena.",
+		argsRequired = 0
 	)
 	@CommandPermission("koth.user.info")
 	@CommandUsage("/koth info <arena>")
@@ -33,12 +34,14 @@ public class InfoCmd implements Command {
 
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);
 			return false;
 		}
+		
 		Messenger.tell(sender, "Information for " + ChatColor.YELLOW + arena.getName() + ":");
 		
 		if (!arena.isRunning()) {

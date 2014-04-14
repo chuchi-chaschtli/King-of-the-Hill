@@ -18,7 +18,8 @@ import com.valygard.KotH.framework.ArenaManager;
 @CommandInfo(
 		name = "forceend", 
 		pattern = "force(e.*|stop)",
-		desc = "Force an arena to end."
+		desc = "Force an arena to end.",
+		argsRequired = 0
 )
 @CommandPermission("koth.admin.forceend")
 @CommandUsage("/koth forceend <arena>")
@@ -30,7 +31,8 @@ public class ForceEndCmd implements Command {
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
-		Arena arena = am.getArenaWithName(args[0]);
+		Arena arena;
+		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(sender, Msg.ARENA_NULL);
