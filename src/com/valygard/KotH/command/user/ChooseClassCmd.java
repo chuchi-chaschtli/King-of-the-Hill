@@ -46,7 +46,7 @@ public class ChooseClassCmd implements Command {
 			return false;
 		}
 		
-        if (!arena.getPlayersInLobby().contains(p)) {
+        if (!arena.inLobby(p)) {
             Messenger.tell(p, Msg.MISC_NO_ACCESS);
             return false;
         }

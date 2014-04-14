@@ -598,6 +598,10 @@ public class Arena {
 		else
 			return null;
 	}
+	
+	public boolean inLobby(Player p) {
+		return lobbyPlayers.contains(p);
+	}
 
 	public boolean isReady() {
 		ready = false;
