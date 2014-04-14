@@ -45,6 +45,7 @@ public class ChooseClassCmd implements Command {
 			Messenger.tell(p, Msg.ARENA_NULL);
 			return false;
 		}
+		
         if (!arena.getPlayersInLobby().contains(p)) {
             Messenger.tell(p, Msg.MISC_NO_ACCESS);
             return false;
@@ -54,22 +55,13 @@ public class ChooseClassCmd implements Command {
         ArenaClass ac = am.getClasses().get(lowercase);
         
         if (ac == null) {
-			List<String> classes = new ArrayList<String>();
-			
-			for (String s : am.getConfig().getConfigurationSection("classes")
-					.getKeys(false)) {
-				classes.add((p.hasPermission("koth.classes." + s.toLowerCase()) ? ChatColor.GREEN
-						: ChatColor.GRAY)
-						+ s.toLowerCase() + ChatColor.RESET + ",");
-			}
-			
-            String result = KotHUtils.formatList(classes, am.getPlugin());
-            Messenger.tell(p, Msg.MISC_LIST_CLASSES, result);
+			showAvailableClasses(am, p);
             return false;
         }
 
         if (!am.getPlugin().has(p, "koth.classes." + lowercase) && !lowercase.equals("random")) {
             Messenger.tell(p, Msg.CLASS_NO_ACCESS);
+            showAvailableClasses(am, p);
             return false;
         }
         
@@ -83,4 +75,17 @@ public class ChooseClassCmd implements Command {
         return true;
 	}
 
+	private void showAvailableClasses(ArenaManager am, Player p) {
+		List<String> classes = new ArrayList<String>();
+		
+		for (String s : am.getConfig().getConfigurationSection("classes")
+				.getKeys(false)) {
+			classes.add((p.hasPermission("koth.classes." + s.toLowerCase()) ? ChatColor.GREEN
+					: ChatColor.GRAY)
+					+ s.toLowerCase() + ChatColor.RESET + ",");
+		}
+		
+        String result = KotHUtils.formatList(classes, am.getPlugin());
+        Messenger.tell(p, Msg.MISC_LIST_CLASSES, result);
+	}
 }
