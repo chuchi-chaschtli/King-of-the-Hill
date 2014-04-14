@@ -89,8 +89,6 @@ public class ArenaClass {
         
         if (boots != null) 
         	inv.setBoots(boots);
-        
-		Messenger.tell(p, Msg.CLASS_CHOSEN, lowercaseName);
 	}
 	
     /**

@@ -30,7 +30,9 @@ public enum Msg {
 	CLASS_ADDED("You have created &e%&r with your inventory."),
 	CLASS_CHOSEN("You have chosen the &e%&r class."),
 	CLASS_EDITED("You have edited &e%&r with your inventory."),
+	CLASS_NO_ACCESS("Sorry, you can't use this class."),
 	CLASS_NULL("The class specified does not exist!"),
+	CLASS_RANDOM("You have chosen a random class!"),
 	CLASS_REMOVED("You have removed &e%&r."),
 	CLASS_SIGN_CREATED("You have created a class sign!"),
 	CMD_HELP("Use &e/koth help&r to view a list of commands."),
@@ -55,6 +57,8 @@ public enum Msg {
 	MISC_ARENA_ITEM_DROP_DISABLED("You may not drop items whilst in the arena."),
 	MISC_FRIENDLY_FIRE_DISABLED("Friendly fire has been disabled for this arena."),
 	MISC_LIST_ARENAS("Available arenas: %"),
+	MISC_LIST_CLASSES("Available classes: %"),
+	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
 	SPEC_JOIN("Enjoy the view!");
 
 	private String value;

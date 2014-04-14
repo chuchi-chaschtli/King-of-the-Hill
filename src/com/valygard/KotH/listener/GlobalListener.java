@@ -88,6 +88,7 @@ public class GlobalListener implements Listener {
 					break;
 				
 				arena.pickClass(p, formatted);
+				Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
 				break;
 			default:
 				break;

@@ -17,12 +17,12 @@ import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
 		name = "addclass", 
-		pattern = "(add.*|set.*)class.*",
+		pattern = "(add|set)class.*",
 		desc = "Add a new class with your inventory.",
 		playerOnly = true
 )
 @CommandPermission("koth.setup.addclass")
-@CommandUsage("/koth addclass <class-name> [-o]")
+@CommandUsage("/koth addclass <class> [-o]")
 /**
  * @author Anand
  *
@@ -36,6 +36,11 @@ public class SetClassCmd implements Command {
 		
 		String override = (args.length > 1 ? args[1] : "");
 		boolean overwrite = override.startsWith("-o");
+		
+		if (newClass.toLowerCase().equalsIgnoreCase("random")) {
+			Messenger.tell(p, "Sorry, 'random' is a reserved setting. Please choose a different name for your class.");
+			return false;
+		}
 		
 		am.createClassNode(newClass, p.getInventory(), overwrite);
 		if (overwrite)

@@ -408,6 +408,7 @@ public class Arena {
 			}
 			className = classes.remove(random.nextInt(classes.size()));
 		}
+		Messenger.tell(p, Msg.CLASS_RANDOM);
 		pickClass(p, className);
 	}
 
