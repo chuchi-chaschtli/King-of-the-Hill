@@ -31,6 +31,7 @@ import com.valygard.KotH.command.setup.SetClassCmd;
 import com.valygard.KotH.command.setup.SetHillCmd;
 import com.valygard.KotH.command.setup.SetWarpCmd;
 import com.valygard.KotH.command.user.ChooseClassCmd;
+import com.valygard.KotH.command.user.ChooseTeamCmd;
 import com.valygard.KotH.command.user.InfoCmd;
 import com.valygard.KotH.command.user.JoinCmd;
 import com.valygard.KotH.command.user.LeaveCmd;
@@ -203,6 +204,7 @@ public class CommandManager implements CommandExecutor {
 		register(ListPlayersCmd.class);
 		register(SpecCmd.class);
 		register(ChooseClassCmd.class);
+		register(ChooseTeamCmd.class);
 
 		// Setup Commands
 		register(CreateArenaCmd.class);

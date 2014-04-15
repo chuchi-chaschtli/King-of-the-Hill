@@ -44,6 +44,10 @@ permissions:
   koth.user.pickclass:
     default: false
     description: Choose a class.
+  # This permission is not given to default users by default, but ops instead.
+  koth.user.chooseteam:
+    default: op
+    description: Choose a team.
 
 # ---------- Setup ---------- #
   koth.setup:

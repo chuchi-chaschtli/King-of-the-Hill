@@ -59,6 +59,7 @@ public enum Msg {
 	MISC_LIST_ARENAS("Available arenas: %"),
 	MISC_LIST_CLASSES("Available classes: %"),
 	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
+	MISC_TEAM_JOINED("You have joined the %&r team."),
 	SPEC_JOIN("Enjoy the view!");
 
 	private String value;

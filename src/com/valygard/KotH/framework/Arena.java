@@ -227,10 +227,15 @@ public class Arena {
 	}
 
 	public void balanceTeams(Player p) {
-		if (redPlayers.size() >= bluePlayers.size())
+		String team;
+		if (redPlayers.size() >= bluePlayers.size()) {
 			bluePlayers.add(p);
-		else
+			team = "blue";
+		} else {
 			redPlayers.add(p);
+			team = "red";
+		}
+		Messenger.tell(p, Msg.MISC_TEAM_JOINED, ChatColor.valueOf(team.toUpperCase()) + team);
 	}
 
 	public boolean startArena() {
@@ -286,7 +291,8 @@ public class Arena {
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
 
-			balanceTeams(p);
+			if (!redPlayers.contains(p) && !bluePlayers.contains(p))
+				balanceTeams(p);
 
 			if (redPlayers.contains(p))
 				p.teleport(red);
@@ -390,9 +396,6 @@ public class Arena {
 		arenaClass.giveItems(p);
 	}
 	
-	/*
-	 * FIXME: Classes aren't being assigned at random on arena start.
-	 */
 	public void giveRandomClass(Player p) {
 		Random random = new Random();
 		List<String> classes = new LinkedList<String>(plugin.getArenaManager()

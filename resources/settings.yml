@@ -15,6 +15,7 @@ friendly-fire: false
 food-change: false
 one-life: false
 change-class-in-arena: false
+allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
 regen-health: true

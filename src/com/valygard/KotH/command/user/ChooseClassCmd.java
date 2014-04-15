@@ -23,13 +23,13 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
-		name = "choose", 
-		pattern = "(choose|pick)?class",
+		name = "chooseclass", 
+		pattern = "(choose|pick)class.*|class",
 		desc = "Choose a class",
 		playerOnly = true
 	)
-	@CommandPermission("koth.user.pickclass")
-	@CommandUsage("/koth class <class|random>")
+@CommandPermission("koth.user.pickclass")
+@CommandUsage("/koth chooseclass <class|random>")
 /**
  * @author Anand
  *
