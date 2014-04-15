@@ -4,6 +4,7 @@ version: 0.9.50
 website: http://valygard.com
 author: AoH_Ruthless
 description: A King of the Hill minigame.
+softdepend: [Vault]
 
 commands:
   koth:
