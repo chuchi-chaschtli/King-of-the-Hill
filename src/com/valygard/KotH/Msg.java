@@ -60,6 +60,8 @@ public enum Msg {
 	MISC_LIST_CLASSES("Available classes: %"),
 	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
 	MISC_TEAM_JOINED("You have joined the %&r team."),
+	REWARDS_GAINED("You have received rewards for playing!"),
+	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),
 	SPEC_JOIN("Enjoy the view!");
 
 	private String value;

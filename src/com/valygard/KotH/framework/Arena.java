@@ -29,6 +29,7 @@ import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.PlayerData;
+import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
@@ -80,11 +81,10 @@ public class Arena {
 	// Is the arena ready to be used?
 	private boolean ready;
 	
-	// Scoreboard
+	// Manager classes
 	private ScoreboardManager scoreboard;
-	
-	// InventoryManager
 	private InventoryManager invManager;
+	private RewardManager rewards;
 
 	// --------------------------- //
 	// CONSTRUCTOR
@@ -128,6 +128,7 @@ public class Arena {
 		
 		this.scoreboard 	= new ScoreboardManager(this);
 		this.invManager 	= new InventoryManager(this);
+		this.rewards		= new RewardManager(this, config.getConfigurationSection("arenas." + arenaName));
 	}
 	
 	
@@ -193,6 +194,17 @@ public class Arena {
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
 		
+		// Restore all of their data; i.e armor, inventory, health, etc.
+		PlayerData data = getData(p);
+		data.restoreData();
+		
+		// Then give rewards, only if the arena is ending.
+		if (end) {
+			rewards.givePrizes(p);
+		} else {
+			Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
+		}
+		
 		if (!end) {
 			if (arenaPlayers.contains(p))
 				arenaPlayers.remove(p);
@@ -214,10 +226,6 @@ public class Arena {
 			if (!end)
 				endArena();
 		}
-
-		// Restore all of their data; i.e armor, inventory, health, etc.
-		PlayerData data = getData(p);
-		data.restoreData();
 	}
 
 	public void kickPlayer(Player p) {
@@ -598,8 +606,15 @@ public class Arena {
 			return bluePlayers;
 		else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
 			return redPlayers;
-		else
-			return null;
+		return null;
+	}
+	
+	public Set<Player> getLoser() {
+		if (getWinner().equals(redPlayers))
+			return bluePlayers;
+		if (getWinner().equals(bluePlayers))
+			return redPlayers;
+		return null;
 	}
 	
 	public boolean inLobby(Player p) {
@@ -624,6 +639,10 @@ public class Arena {
 
 	public ScoreboardManager getScoreboard() {
 		return scoreboard;
+	}
+	
+	public RewardManager getRewards() {
+		return rewards;
 	}
 	
 	public ArenaClass getClass(Player p) {

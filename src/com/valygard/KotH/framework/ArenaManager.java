@@ -204,6 +204,9 @@ public class ArenaManager {
 		
 		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
 				makeSection(section, "warps"));
+		
+		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml",
+				makeSection(section, "prizes"));
 
 		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE).addParent("koth.arenas", true);
 
