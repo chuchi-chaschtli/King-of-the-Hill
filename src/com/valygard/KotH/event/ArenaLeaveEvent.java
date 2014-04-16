@@ -21,11 +21,14 @@ public class ArenaLeaveEvent extends Event {
 
 	private Arena arena;
 	private Player player;
+	
+	private boolean ending;
 
 	public ArenaLeaveEvent(Arena arena, Player player) {
-		this.arena = arena;
-
+		this.arena  = arena;
 		this.player = player;
+		
+		this.ending = false;
 	}
 
 	public Arena getArena() {
@@ -42,6 +45,14 @@ public class ArenaLeaveEvent extends Event {
 		if (arena.getRedTeam().contains(player))
 			return arena.getRedTeam();
 		return null;
+	}
+	
+	public boolean isEnding() {
+		return ending;
+	}
+	
+	public void setEnding(boolean value) {
+		ending = value;
 	}
 
 	@Override
