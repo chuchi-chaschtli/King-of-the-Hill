@@ -302,15 +302,15 @@ public class Arena {
 			if (!redPlayers.contains(p) && !bluePlayers.contains(p))
 				balanceTeams(p);
 
-			if (redPlayers.contains(p))
+			// Teleport players and initialize scoreboards
+			if (redPlayers.contains(p)) {
 				p.teleport(red);
-			else if (bluePlayers.contains(p))
+				scoreboard.initialize(p, scoreboard.getRedTeam());
+			} else if (bluePlayers.contains(p)) {
 				p.teleport(blue);
-			else
+				scoreboard.initialize(p, scoreboard.getBlueTeam());
+			} else
 				kickPlayer(p);
-
-			// Initialize scoreboard
-			scoreboard.initialize(p);
 		}
 
 		// Set running to true.

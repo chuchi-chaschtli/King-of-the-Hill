@@ -11,6 +11,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import com.valygard.KotH.framework.Arena;
 
@@ -21,7 +22,14 @@ import com.valygard.KotH.framework.Arena;
 public class ScoreboardManager {
 	private Arena arena;
     private Scoreboard scoreboard;
-    private Objective stats;
+    
+    // sidebar objective
+    private Objective sidebar;
+    
+    // two teams (Red and Blue)
+    private Team redteam, blueteam;
+    
+    // Three different scores (on the side bar)
     private Score red, blue, timeLeft;
     
     /**
@@ -32,13 +40,21 @@ public class ScoreboardManager {
         this.arena = arena;
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         
-		stats = scoreboard.registerNewObjective("Team Score", "dummy");
+        // sidebar
+		sidebar = scoreboard.registerNewObjective(ChatColor.YELLOW + "Arena Stats", "dummy");
 		
-		stats.setDisplaySlot(DisplaySlot.SIDEBAR);
+		sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
 		
-		red = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
-		blue = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
-		timeLeft = stats.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.YELLOW + "Time left -"));
+		red = sidebar.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
+		blue = sidebar.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
+		timeLeft = sidebar.getScore(Bukkit.getServer().getOfflinePlayer(ChatColor.YELLOW + "Time left -"));
+		
+		// teams
+		redteam = scoreboard.registerNewTeam("red");
+		blueteam = scoreboard.registerNewTeam("blue");
+		
+		redteam.setPrefix(ChatColor.DARK_RED + "Red >> " + ChatColor.RED);
+		blueteam.setPrefix(ChatColor.DARK_BLUE + "Blue >> " + ChatColor.BLUE);
     }
     
 	/**
@@ -48,6 +64,10 @@ public class ScoreboardManager {
 	 * @param p the player
 	 */
     public void removePlayer(Player p) {
+    	if (redteam.getPlayers().contains(p)) 
+    		redteam.removePlayer(p);
+    	if (blueteam.getPlayers().contains(p))
+    		blueteam.removePlayer(p);
     	p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
     }
     
@@ -71,8 +91,9 @@ public class ScoreboardManager {
      * 
      * @param p the player
      */
-    public void initialize(final Player p) {
+    public void initialize(final Player p, Team team) {
     	p.setScoreboard(scoreboard);
+    	team.addPlayer(p);
 		red.setScore(8);
 		blue.setScore(8);
 		timeLeft.setScore(8);
@@ -96,5 +117,21 @@ public class ScoreboardManager {
      */
     public void setTimeleft(int time) {
     	timeLeft.setScore(time);
+    }
+    
+    /**
+     * Get the red team.
+     * @return scoreboard team
+     */
+    public Team getRedTeam() {
+    	return redteam;
+    }
+    
+    /**
+     * Get the blue team.
+     * @return scoreboard team
+     */
+    public Team getBlueTeam() {
+    	return blueteam;
     }
 }
