@@ -1,5 +1,5 @@
 /**
- * HillScoreEvent.java is part of King of the Hill.
+ * ArenaScoreEvent.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
 package com.valygard.KotH.event;
@@ -19,7 +19,7 @@ import com.valygard.KotH.hill.HillTask;
  * @author Anand
  *
  */
-public class HillScoreEvent extends Event implements Cancellable {
+public class ArenaScoreEvent extends Event implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
     private Arena arena;
     
@@ -28,7 +28,7 @@ public class HillScoreEvent extends Event implements Cancellable {
     
     private boolean cancelled;
     
-    public HillScoreEvent(Arena arena) {
+    public ArenaScoreEvent(Arena arena) {
         this.arena = arena;
        
         this.manager   = new HillManager(arena);

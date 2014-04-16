@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.valygard.KotH.event.HillScoreEvent;
+import com.valygard.KotH.event.ArenaScoreEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**
@@ -41,7 +41,7 @@ public class HillTask {
 				arena.getScoreboard().setTimeleft(arena.getEndTimer().getRemaining());
 
 				// Call scoring event
-				HillScoreEvent event = new HillScoreEvent(arena);
+				ArenaScoreEvent event = new ArenaScoreEvent(arena);
 				arena.getPlugin().getServer().getPluginManager().callEvent(event);
 				if (event.isCancelled())
 					return;

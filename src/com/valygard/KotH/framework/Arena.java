@@ -326,12 +326,9 @@ public class Arena {
 			return false;
 		}
 
-		// Fire the event and check if it's been cancelled.
+		// Fire the event.
 		ArenaEndEvent event = new ArenaEndEvent(this);
 		plugin.getServer().getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			return false;
-		}
 
 		declareWinner();
 

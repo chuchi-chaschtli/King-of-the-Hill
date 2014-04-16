@@ -4,7 +4,9 @@
  */
 package com.valygard.KotH.event;
 
-import org.bukkit.event.Cancellable;
+import java.util.Set;
+
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -14,28 +16,21 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  *
  */
-public class ArenaEndEvent extends Event implements Cancellable {
+public class ArenaEndEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
     private Arena arena;
-    private boolean cancelled;
+    
+    private Set<Player> winner, loser;
     
     public ArenaEndEvent(Arena arena) {
         this.arena = arena;
-        this.cancelled = false;
+        
+        this.winner = arena.getWinner();
+        this.loser  = arena.getLoser();
     }
     
     public Arena getArena() {
         return arena;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
     
     public HandlerList getHandlers() {
@@ -44,5 +39,13 @@ public class ArenaEndEvent extends Event implements Cancellable {
      
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+    
+    public Set<Player> getWinner() {
+    	return winner;
+    }
+    
+    public Set<Player> getLoser() {
+    	return loser;
     }
 }

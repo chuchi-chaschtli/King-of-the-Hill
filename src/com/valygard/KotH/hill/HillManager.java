@@ -51,6 +51,10 @@ public class HillManager {
 		this.status = utils.getHillRotations() - utils.getRotationsLeft();
 	}
 
+	/**
+	 * Initializes the hill-sequence. This sets the status to 1 and allows for
+	 * the first hill to be placed.
+	 */
 	public void begin() {
 //		Location hill = utils.getCurrentHill();
 		
@@ -62,20 +66,26 @@ public class HillManager {
 //		setHillBoundary();
 	}
 
+	/**
+	 * Every second, this method is run to attempt to change the hills. However,
+	 * there is a series of checks that must be surpassed before the hill is
+	 * switched. In this event, if the HillChangeEvent is cancelled, then hills
+	 * will not rotate.
+	 */
 	public void changeHills() {
 		// We aren't going to change anymore if this is the last hill.
 		if (utils.isLastHill() || !arena.isRunning()) {
 			arena.forceEnd();
 			return;
 		}
-		
+
 		HillChangeEvent event = new HillChangeEvent(arena);
 		arena.getPlugin().getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			Messenger.info("The hill change was cancelled by an external force.");
 			return;
 		}
-		
+
 		if (utils.isFirstHill() && !utils.isSwitchTime()) {
 			begin();
 			return;
@@ -102,8 +112,12 @@ public class HillManager {
 //		setHillBoundary();
 	}
 
-	// Hills have a radius, marked by colored wool. The wool color matches the
-	// dominant team, and in case of draw or nobody, mark it arbitrary colors.
+	/**
+	 * Hills have a radius, marked by colored wool. The wool color matches the
+	 * dominant team, and in case of draw or nobody, mark it arbitrary colors.
+	 * 
+	 * Obsolete. Not deprecated because they will eventually be reimplemented.
+	 */
 	public void setHillBoundary() {
 		for (Block b : getHillBoundary()) {
 			hillBoundary.put(b.getLocation(), b.getType());
@@ -111,7 +125,11 @@ public class HillManager {
 		}
 	}
 	
-	// Resets the previous hill back to it's original block type.
+	/**
+	 * Change the hill boundary wool back to it's original block type.
+	 * 
+	 * Obsolete. Not deprecated because they will eventually be reimplemented.
+	 */
 	public void resetHillBoundary() {
 		for (Block b : getHillBoundary()) {
 			// If for some odd reason the block isn't in the hashmap
@@ -122,7 +140,15 @@ public class HillManager {
 			hillBoundary.remove(b.getLocation());
 		}
 	}
-	
+
+	/**
+	 * Sets the color of a block located in the hill boundary to match the
+	 * dominant team at any given point in time.
+	 * 
+	 * Obsolete. Not deprecated because they will eventually be reimplemented.
+	 * 
+	 * @param b the block
+	 */
 	private void setBlockColor(Block b) {
 		b.setType(Material.WOOL);
 		// Although this is normally dangerous, we just set it's type to wool.
@@ -135,17 +161,12 @@ public class HillManager {
 			wool.setColor(DyeColor.YELLOW);
 	}
 	
-	public Set<Player> getDominantTeam() {
-		if (getRedStrength() > getBlueStrength())
-			return arena.getRedTeam();
-		else if (getRedStrength() < getBlueStrength())
-			return arena.getBlueTeam();
-		// By the Trichotomy Property, the only option remaining if the strengths are equal.
-		else
-			return null;
-	}
-	
-	// Check if a certain player is in the hill.
+	/**
+	 * Check if any given player is inside of a hill.
+	 * 
+	 * @param p the player
+	 * @return boolean value
+	 */
 	public boolean containsPlayer(Player p) {
 		Location pLoc = p.getLocation();
 		Location l = utils.getCurrentHill();
@@ -162,6 +183,12 @@ public class HillManager {
 		return true;
 	}
 	
+	/**
+	 * Check if any given location is inside of a hill.
+	 * 
+	 * @param loc the location
+	 * @return boolean value
+	 */
 	public boolean containsLoc(Location loc) {
 		Location l = utils.getCurrentHill();
 		
@@ -177,6 +204,11 @@ public class HillManager {
 		return true;
 	}
 	
+	/**
+	 * Get the amount of players inside a hill.
+	 * 
+	 * @return an integer
+	 */
 	public int getPlayerCount() {
 		int count = 0;
 		for (Player p : arena.getPlayersInArena()) {
@@ -186,6 +218,11 @@ public class HillManager {
 		return count;
 	}
 	
+	/**
+	 * Get the amount of red players in a hill.
+	 * 
+	 * @return an integer.
+	 */
 	public int getRedStrength() {
 		int count = 0;
 		for (Player p : arena.getRedTeam()) {
@@ -195,6 +232,11 @@ public class HillManager {
 		return count;
 	}
 	
+	/**
+	 * Get the amount of blue players in a hill.
+	 * 
+	 * @return an integer
+	 */
 	public int getBlueStrength() {
 		int count = 0;
 		for (Player p : arena.getBlueTeam()) {
@@ -203,44 +245,108 @@ public class HillManager {
 		}
 		return count;
 	}
+	
+	/**
+	 * Get the team whichever has the higher 'strength' value.
+	 * 
+	 * @return a team (Player set)
+	 */
+	public Set<Player> getDominantTeam() {
+		if (getRedStrength() > getBlueStrength())
+			return arena.getRedTeam();
+		else if (getRedStrength() < getBlueStrength())
+			return arena.getBlueTeam();
+		// By the Trichotomy Property, the only option remaining if the strengths are equal.
+		else
+			return null;
+	}
 
+	/**
+	 * Get the material of a hill.
+	 * Obsolete. Not deprecated because they will eventually be reimplemented.
+	 * 
+	 * @return the hill material
+	 */
 	public Material getHillType() {
 		return hillType;
 	}
 
+	/**
+	 * Get which number rotation we are currently at.
+	 * 
+	 * @return an integer.
+	 */
 	public int getHillStatus() {
 		return status;
 	}
 
+	/**
+	 * If we want to set the current rotation via an external force, we can do so.
+	 * Obsolete. Not deprecated because it might eventually serve a purpose.
+	 * 
+	 * @param status
+	 */
 	public void setStatus(int status) {
 		this.status = status;
 	}
 	
+	/**
+	 * Get every block located on the hill boundary (specifically, it's block type).
+	 * Obsolete. Not deprecated because they will eventually be reimplemented. 
+	 * 
+	 * @return a Map<Location, Material>.
+	 */
 	public Map<Location, Material> getBoundary() {
 		return hillBoundary;
 	}
 	
+	/**
+	 * Get every block in the hill boundary. This is useful for checking if a
+	 * player is inside of a hill.
+	 * 
+	 * @return a block set.
+	 */
 	public Set<Block> getHillBoundary() {
 		Set<Block> block = new HashSet<Block>();
 		
 		Location l = utils.getCurrentHill();
 		int radius = arena.getSettings().getInt("hill-radius");
-		
+
 		block.clear();
-		for (Block b : arena.getSettings().getBoolean("circular-hill") ? LocationUtil.getCircularBoundary(l, radius) : LocationUtil.getSquareBoundary(l, radius)) {
+		for (Block b : arena.getSettings().getBoolean("circular-hill") ? LocationUtil
+				.getCircularBoundary(l, radius) : LocationUtil
+				.getSquareBoundary(l, radius)) {
 			block.add(b);
 		}
-        return block;
+		return block;
 	}
  	
+	/**
+	 * Get the block type of a location.
+	 * 
+	 * @param loc the location
+	 * @return a material.
+	 */
 	public Material getBlockType(Location loc) {
 		return getBlockType(loc.getWorld().getBlockAt(loc));
 	}
 	
+	/**
+	 * This method checks to see if a block is null, then assigns it's material to air if it is.
+	 * 
+	 * @param block the block
+	 * @return a material.
+	 */
 	public Material getBlockType(Block block) {
 		return (block == null ? Material.AIR : block.getType());
 	}
 	
+	/**
+	 * Change the block types.
+	 * Obsolete. Not deprecated because they will eventually be reimplemented.
+	 * 
+	 * @param loc the location
+	 */
 	public void revertBlock(Location loc) {
 		Material m = oldType;
 		Block b = loc.getWorld().getBlockAt(loc);
