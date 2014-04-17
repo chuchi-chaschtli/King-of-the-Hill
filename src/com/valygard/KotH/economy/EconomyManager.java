@@ -23,7 +23,7 @@ public class EconomyManager {
 		this.plugin = plugin;
 	}
 	
-	public boolean giveMoney(Player p, ItemStack item) {
+	public boolean deposit(Player p, ItemStack item) {
         if (plugin.getEconomy() != null) {
             EconomyResponse result = plugin.getEconomy().depositPlayer(p.getName(), getAmount(item));
             return (result.type == ResponseType.SUCCESS);
@@ -31,11 +31,11 @@ public class EconomyManager {
         return false;
     }
 
-    public boolean takeMoney(Player p, ItemStack item) {
-        return takeMoney(p, getAmount(item));
+    public boolean withdraw(Player p, ItemStack item) {
+        return withdraw(p, getAmount(item));
     }
 
-    public boolean takeMoney(Player p, double amount) {
+    public boolean withdraw(Player p, double amount) {
         if (plugin.getEconomy() != null) {
             EconomyResponse result = plugin.getEconomy().withdrawPlayer(p.getName(), amount);
             return (result.type == ResponseType.SUCCESS);
@@ -48,17 +48,22 @@ public class EconomyManager {
     }
 
     public boolean hasEnough(Player p, double amount) {
-        return plugin.getEconomy() == null || (plugin.getEconomy().getBalance(p.getName()) >= amount);
+        return plugin.getEconomy() == null || (getMoney(p) >= amount);
     }
     
-    public String economyFormat(ItemStack item) {
-        return economyFormat(getAmount(item));
+    public double getMoney(Player p) {
+    	return plugin.getEconomy().getBalance(p.getName());
+    }
+    
+    public String format(ItemStack item) {
+        return format(getAmount(item));
     }
 
-    public String economyFormat(double amount) {
-        return plugin.getEconomy() == null ? null : plugin.getEconomy().format(amount);
+    public String format(double amount) {
+        return (plugin.getEconomy() == null ? null : plugin.getEconomy().format(amount));
     }
 
+    // It's parsed as an item.
     private double getAmount(ItemStack item) {
         double major = item.getAmount();
         double minor = item.getDurability() / 100D;

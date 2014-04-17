@@ -23,6 +23,7 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.listener.GlobalListener;
 import com.valygard.KotH.util.ConfigUtil;
+import com.valygard.KotH.util.resources.UpdateChecker;
 
 /**
  * @author Anand
@@ -40,8 +41,6 @@ public class KotH extends JavaPlugin {
 	// Messages related
 	public static YamlConfiguration MESSAGES;
 	public static File MESSAGES_FILE;
-	// Economy Id
-	public static final int MONEY_ID = -69;
 
 	public void onEnable() {
 		// Load the regular configuration file
@@ -75,6 +74,8 @@ public class KotH extends JavaPlugin {
 				arena.forceEnd();
 			}
 		}
+		
+		UpdateChecker.shutdown();
 	}
 	
 	private void initializeVariables() {

@@ -99,13 +99,27 @@ public class RewardManager {
         } else {
             List<ItemStack> result = new ArrayList<ItemStack>();
             for (String item : items) {
-                ItemStack indiResult = ItemParser.parseItem(item);
+            	if (item.startsWith("$")) {
+            		parseMoney(item);
+            		continue;              
+            	}	
+            	ItemStack indiResult = ItemParser.parseItem(item);
                 if (indiResult != null) {
                     result.add(indiResult);
                 }
             }
             return result;
         }
+	}
+	
+	/**
+	 * Parse money, which is tagged by the uniqe $ identifier.
+	 * 
+	 * @param str string to parse.
+	 * @return the money.
+	 */
+	public double parseMoney(String str) {
+		return ItemParser.parseMoney(str);
 	}
 	
 	/**

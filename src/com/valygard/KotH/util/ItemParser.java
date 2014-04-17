@@ -15,6 +15,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
+import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.Messenger;
 
 /**
@@ -126,6 +127,18 @@ public class ItemParser {
         return result;
     }
     
+    public static double parseMoney(String money) {
+        if (money == null || money.equals(""))
+            return 0.00;
+        
+        String[] cents = money.split(".");
+        
+        if (cents.length > 2 || (!money.startsWith("$") && !money.contains(".")))
+        	throw new IllegalArgumentException("Money has been incorrectly defined in the config-file.");
+        
+        return Double.valueOf(money.substring(2, money.length()));
+    }
+    
     public static ItemStack parseItem(String item) {
         if (item == null || item.equals(""))
             return null;
@@ -191,7 +204,7 @@ public class ItemParser {
 	private static short getData(String data, String name) {
         // Wool is special
         if (name.equalsIgnoreCase("wool")) {
-        	DyeColor dye = getEnumFromString(DyeColor.class, data);
+        	DyeColor dye = KotHUtils.getEnumFromString(DyeColor.class, data);
             if (dye == null) 
             	dye = DyeColor.getByWoolData(Byte.parseByte(data));
             return dye.getWoolData();
@@ -236,15 +249,5 @@ public class ItemParser {
         } else {
             stack.addUnsafeEnchantment(e, lvl);
         }
-    }
-    
-    public static <T extends Enum<T>> T getEnumFromString(Class<T> c, String string) {
-        if (c != null && string != null) {
-            try {
-                return Enum.valueOf(c, string.trim().toUpperCase());
-            }
-            catch(IllegalArgumentException ex) {}
-        }
-        return null;
     }
 }

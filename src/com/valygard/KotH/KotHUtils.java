@@ -17,7 +17,14 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class KotHUtils {
 	
-	
+	/**
+	 * Format a list into a string.
+	 * 
+	 * @param list a list
+	 * @param none a check to see if a player can join an arena.
+	 * @param plugin the main class.
+	 * @return the string
+	 */
     public static <E> String formatList(Collection<E> list, boolean none, KotH plugin) {
         if (list == null || list.isEmpty()) {
             return (none ? "You cannot join any arenas." : "");
@@ -47,6 +54,12 @@ public class KotHUtils {
     	return formatList(list, true, (KotH) plugin); 
     }
     
+    /**
+     * Format a string into list form.
+     * 
+     * @param list the string.
+     * @return a string list.
+     */
 	public static List<String> formatList(String list) {
         List<String> result = new LinkedList<String>();
         if (list == null) return result;
@@ -57,6 +70,23 @@ public class KotHUtils {
             result.add(part.trim());
         
         return result;
+    }
+	
+	/**
+	 * Return an enumeration from a specified string.
+	 * 
+	 * @param c the enum
+	 * @param string the string
+	 * @return an enum class.
+	 */
+    public static <T extends Enum<T>> T getEnumFromString(Class<T> c, String string) {
+        if (c != null && string != null) {
+            try {
+                return Enum.valueOf(c, string.trim().toUpperCase());
+            }
+            catch(IllegalArgumentException ex) {}
+        }
+        return null;
     }
 
 }
