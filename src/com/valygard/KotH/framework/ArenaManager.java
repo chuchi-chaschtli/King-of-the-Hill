@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -32,6 +33,7 @@ import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.ItemParser;
+import com.valygard.KotH.util.UUIDUtil;
 
 /**
  * @author Anand
@@ -463,9 +465,9 @@ public class ArenaManager {
 		return null;
 	}
 
-	public Arena getArenaWithPlayer(String playerName) {
+	public Arena getArenaWithPlayer(UUID id) {
 		for (Arena arena : arenas) {
-			Player player = Bukkit.getServer().getPlayer(playerName);
+			Player player = UUIDUtil.getPlayerFromUUID(id);
 			if (arena.getPlayersInArena().contains(player)
 					|| arena.getPlayersInLobby().contains(player)
 					|| arena.getSpectators().contains(player))
