@@ -5,5 +5,5 @@
 <b>If you have any issues, report them to the bug tracker.</b></a>
 
 <a href="http://valygard.com">
-![KotH LogoType](https://raw.githubusercontent.com/AoHRuthless/King-of-the-Hill/master/media/KotHLogo.jpg)<br>
+![KotH LogoType](https://raw.githubusercontent.com/AoHRuthless/King-of-the-Hill/master/media/KotH-Banner.png)<br>
 <b><i>Join our server at mc.valygard.com</i></b></a>
