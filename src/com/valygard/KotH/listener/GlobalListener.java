@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -167,9 +168,16 @@ public class GlobalListener implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onJoinEvent(PlayerJoinEvent e) {
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
+		
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		// Just in case the onQuitEvent didn't execute, remove the player here.
+		if (arena != null && arena.isRunning()) {
+			arena.removePlayer(p, false);
+		}
 
 		// Updater check; only notify on certain specifications.
 		if (!p.hasPermission("koth.admin") && !p.isOp()
@@ -180,6 +188,17 @@ public class GlobalListener implements Listener {
 			return;
 
 		UpdateChecker.checkForUpdates(plugin, p);
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onQuit(PlayerQuitEvent e) {
+		Player p = e.getPlayer();
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null) {
+			return;
+		}
+		arena.removePlayer(p, false);
 	}
 
 	// --------------------------- //
