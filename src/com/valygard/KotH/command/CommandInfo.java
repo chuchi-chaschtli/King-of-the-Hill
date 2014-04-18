@@ -2,7 +2,7 @@
  * CommandInfo.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.command.util;
+package com.valygard.KotH.command;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

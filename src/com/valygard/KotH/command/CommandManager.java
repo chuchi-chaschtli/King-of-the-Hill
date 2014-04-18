@@ -38,9 +38,6 @@ import com.valygard.KotH.command.user.LeaveCmd;
 import com.valygard.KotH.command.user.ListArenaCmd;
 import com.valygard.KotH.command.user.ListPlayersCmd;
 import com.valygard.KotH.command.user.SpecCmd;
-import com.valygard.KotH.command.util.CommandInfo;
-import com.valygard.KotH.command.util.CommandPermission;
-import com.valygard.KotH.command.util.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 
 /**
