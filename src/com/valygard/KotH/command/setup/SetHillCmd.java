@@ -85,11 +85,11 @@ public class SetHillCmd implements Command {
 			}
 		} else {
 			int number = Integer.parseInt(args[1]);
-			if (s.getKeys(false).contains(number)) {
+			if (s.getString(String.valueOf(number)) != null) {
 				ConfigUtil.setLocation(s, String.valueOf(number), p.getLocation());
 				Messenger.tell(p, Msg.HILLS_RESET, String.valueOf(number));
 			} else {
-				Messenger.tell(p, "There is not a hill with the specified number.");
+				Messenger.tell(p, "There is no hill with the specified number.");
 				return false;
 			}
 		}
