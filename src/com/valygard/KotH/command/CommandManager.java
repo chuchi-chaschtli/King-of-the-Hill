@@ -234,7 +234,7 @@ public class CommandManager implements CommandExecutor {
 			return;
 
 		try {
-			commands.put(info.name(), c.newInstance());
+			commands.put(info.pattern(), c.newInstance());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

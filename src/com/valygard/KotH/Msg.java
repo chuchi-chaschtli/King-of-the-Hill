@@ -34,7 +34,6 @@ public enum Msg {
 	CLASS_NULL("The class specified does not exist!"),
 	CLASS_RANDOM("You have chosen a random class!"),
 	CLASS_REMOVED("You have removed &e%&r."),
-	CLASS_SIGN_CREATED("You have created a class sign!"),
 	CMD_HELP("Use &e/koth help&r to view a list of commands."),
 	CMD_MULTIPLE_MATCHES("Did you mean one of these commands?"),
     CMD_NO_MATCHES("Command not found. Type &e/koth help&r"),
@@ -63,6 +62,7 @@ public enum Msg {
 	MISC_TEAM_JOINED("You have joined the %&r team."),
 	REWARDS_GAINED("You have received rewards for playing!"),
 	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),
+	SIGN_CREATED("You have created a new &e%&r sign!"),
 	SPEC_JOIN("Enjoy the view!");
 
 	private String value;

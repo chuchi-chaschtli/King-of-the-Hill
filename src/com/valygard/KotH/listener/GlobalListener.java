@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -66,48 +67,71 @@ public class GlobalListener implements Listener {
 		Block b = e.getClickedBlock();
 		if (b == null)
 			return;
-		
+
 		if (!b.getType().equals(Material.SIGN)
 				&& !b.getType().equals(Material.SIGN_POST)
 				&& !b.getType().equals(Material.WALL_SIGN))
 			return;
 
 		Sign s = (Sign) b.getState();
-		
+
 		if (!s.getLine(0).equalsIgnoreCase(ChatColor.DARK_PURPLE + "[KotH]"))
 			return;
-		
-		switch (e.getAction()) {
-			case RIGHT_CLICK_BLOCK:
-			case LEFT_CLICK_BLOCK:
-				String formatted = ChatColor.stripColor(s.getLine(1)).replace(" ", "");
+
+		switch1: switch (e.getAction()) {
+		case RIGHT_CLICK_BLOCK:
+		case LEFT_CLICK_BLOCK:
+			switch2: switch (s.getLine(1)) {
+			case "join":
+				Bukkit.dispatchCommand(p, "koth join " + s.getLine(2));
+				break switch2;
+				
+			case "leave":
+				if (am.getArenaWithName(s.getLine(2)) != null
+						&& am.getArenaWithPlayer(p).equals(
+								am.getArenaWithName(s.getLine(2)))) {
+					Bukkit.dispatchCommand(p, "koth leave");
+					break switch2;
+				}
+				Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
+				break switch2;
+				
+			case "spectate":
+				Bukkit.dispatchCommand(p, "koth spec " + s.getLine(2));
+				break switch2;
+				
+			default:
+				String formatted = ChatColor.stripColor(s.getLine(1)).replace(
+						" ", "");
 				if (am.getClasses().get(formatted) == null)
-					break;
-				
+					break switch2;
+
 				Arena arena = am.getArenaWithPlayer(p);
-				
+
 				if (arena == null)
-					break;
-				
+					break switch2;
+
 				if (!plugin.has(p, "koth.classes." + formatted))
-					break;
-				
-				double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser.parseMoney(s.getLine(2)));
+					break switch2;
+
+				double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser
+						.parseMoney(s.getLine(2)));
 				EconomyManager em = plugin.getEconomyManager();
-				
+
 				if (em.getMoney(p) < fee) {
 					Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
-					break;
+					break switch2;
 				}
-				
+
 				arena.pickClass(p, formatted);
 				Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
-				break;
-			default:
-				break;
+				break switch2;
+			}
+		default:
+			break switch1;
 		}
 	}
-	
+
 	@EventHandler
 	public void onHillEntryOrExit(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
@@ -115,8 +139,9 @@ public class GlobalListener implements Listener {
 
 		if (arena == null)
 			return;
-		
-		if (!arena.isRunning() || arena.getSpectators().contains(p) || arena.getPlayersInLobby().contains(p) || p.isDead())
+
+		if (!arena.isRunning() || arena.getSpectators().contains(p)
+				|| arena.getPlayersInLobby().contains(p) || p.isDead())
 			return;
 
 		HillManager manager = arena.getHillManager();
@@ -136,18 +161,18 @@ public class GlobalListener implements Listener {
 			Messenger.tell(p, Msg.HILLS_LEFT);
 		}
 	}
-	
+
 	@EventHandler
 	public void onFoodChange(FoodLevelChangeEvent e) {
 		Player p = (Player) e.getEntity();
 		Arena arena = am.getArenaWithPlayer(p);
-		
+
 		if (arena == null)
 			return;
-		
+
 		if (arena.getSettings().getBoolean("food-change"))
 			return;
-		
+
 		p.setFoodLevel(20);
 		p.setSaturation(20);
 		p.setExhaustion(0F);
@@ -166,61 +191,62 @@ public class GlobalListener implements Listener {
 		
 		if (!arena.getPlayersInArena().contains(p))
 			return;
-		
+
 		// Eliminate default message
 		e.setCancelled(true);
-		
+
 		for (Player player : arena.getPlayersInArena()) {
 			player.sendMessage(getChatFormat(p, e.getMessage()));
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onJoinEvent(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		
+
 		// Updater check; only notify on certain specifications.
-		if (!p.hasPermission("koth.admin") && !p.isOp() && !p.hasPermission("koth.admin.update"))
+		if (!p.hasPermission("koth.admin") && !p.isOp()
+				&& !p.hasPermission("koth.admin.update"))
 			return;
-		
+
 		if (!plugin.getConfig().getBoolean("global.check-for-updates"))
 			return;
-		
+
 		UpdateChecker.checkForUpdates(plugin, p);
 	}
-	
+
 	// --------------------------- //
 	// Arena-Managed Events
 	// --------------------------- //
-	
+
 	@EventHandler
 	public void onItemDrop(PlayerDropItemEvent e) {
 		Player p = e.getPlayer();
 		Arena arena = am.getArenaWithPlayer(p);
-		
-		if (arena == null || !p.hasPermission("koth.admin.dropitems")) 
+
+		if (arena == null || !p.hasPermission("koth.admin.dropitems"))
 			return;
-		
+
 		if (arena.getSettings().getBoolean("drop-items"))
 			return;
-		
+
 		e.setCancelled(true);
 		Messenger.tell(p, Msg.MISC_ARENA_ITEM_DROP_DISABLED);
 	}
-	
+
 	@EventHandler
 	public void onRegainHealth(EntityRegainHealthEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			Arena arena = am.getArenaWithPlayer(p);
-			
-			if (arena == null) 
+
+			if (arena == null)
 				return;
-			
+
 			if (arena.getSettings().getBoolean("regen-health"))
 				return;
-			
+
 			e.setCancelled(true);
 		}
 	}
@@ -243,11 +269,11 @@ public class GlobalListener implements Listener {
 			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
 					+ ChatColor.RESET + " has killed you.");
 		}
-		
+
 		if (arena.getSettings().getBoolean("one-life")) {
 			arena.removePlayer(p, false);
 		}
-		
+
 		e.getDrops().clear();
 		e.setDeathMessage(null);
 		if (!arena.getSettings().getBoolean("drop-xp"))
@@ -261,7 +287,7 @@ public class GlobalListener implements Listener {
 
 		if (arena == null)
 			return;
-		
+
 		// Cheater cheater pumpkin eater
 		if (!arena.getRedTeam().contains(p) && !arena.getBlueTeam().contains(p)) {
 			arena.kickPlayer(p);
@@ -271,10 +297,12 @@ public class GlobalListener implements Listener {
 			e.setRespawnLocation(arena.getRedSpawn());
 		else if (arena.getBlueTeam().contains(p))
 			e.setRespawnLocation(arena.getBlueSpawn());
-		
+
 		ArenaClass ac = arena.getData(p).getArenaClass();
-		if (ac != null) ac.giveItems(p);
-		else arena.giveRandomClass(p);
+		if (ac != null)
+			ac.giveItems(p);
+		else
+			arena.giveRandomClass(p);
 	}
 
 	@EventHandler
@@ -282,22 +310,23 @@ public class GlobalListener implements Listener {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			Player d = (Player) e.getDamager();
-			
+
 			Arena arena = am.getArenaWithPlayer(p);
-			
+
 			if (arena == null || !arena.getPlayersInArena().contains(d))
 				return;
-			
+
 			if (arena.getSettings().getBoolean("indestructible-weapons"))
 				repairWeapon(d);
-			
+
 			if (arena.getSettings().getBoolean("indestructible-armor"))
 				repairArmor(p);
-			
+
 			if (arena.getSettings().getBoolean("friendly-fire"))
 				return;
-			
-			// One way of checking if they have the same team is by checking if they have the same spawn.
+
+			// One way of checking if they have the same team is by checking if
+			// they have the same spawn.
 			if (arena.getSpawn(p).equals(arena.getSpawn(d))) {
 				e.setCancelled(true);
 				Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
@@ -311,22 +340,54 @@ public class GlobalListener implements Listener {
 	
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onSignChange(SignChangeEvent e) {
-		if (am.getClasses().get(e.getLine(1)) == null) {
-			return;
-		}
+		String l2 = e.getLine(1);
+		String l3 = e.getLine(2);
 		
 		Player p = e.getPlayer();
-		String s = e.getLine(2);
-		if (s != null && (!s.startsWith("$") || s.split(".").length > 2)) {
-			Messenger.tell(p, "Invalid price option given!");
+		if (!plugin.has(p, "koth.admin.signs")) {
 			return;
 		}
-		
-		if (!plugin.has(p, "koth.admin.signs"))
-			return;
-		
-		Messenger.tell(e.getPlayer(), Msg.CLASS_SIGN_CREATED);
-		e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
+			
+		Arena arena = am.getArenaWithName(l3);
+		switch (l2) {
+		case "join":
+			if (l3 == null || arena == null) {
+				break;
+			}
+
+			Messenger.tell(p, Msg.SIGN_CREATED, "join");
+			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
+			break;
+		case "leave":
+			if (l3 == null || arena == null) {
+				break;
+			}
+
+			Messenger.tell(p, Msg.SIGN_CREATED, "leave");
+			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
+			break;
+		case "spectate":
+			if (l3 == null || arena == null) {
+				break;
+			}
+
+			Messenger.tell(p, Msg.SIGN_CREATED, "spectate");
+			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
+			break;
+		default:
+			if (am.getClasses().get(l2) == null) {
+				break;
+			}
+
+			if (l3 != null && (!l3.startsWith("$") || l3.split(".").length > 2)) {
+				Messenger.tell(p, "Invalid price option given!");
+				break;
+			}
+
+			Messenger.tell(p, Msg.SIGN_CREATED, "class");
+			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
+			break;
+		}
 	}
 	
 	@EventHandler
@@ -341,24 +402,24 @@ public class GlobalListener implements Listener {
 					&& !arena.getPlayersInLobby().contains(p)
 					&& !arena.getSpectators().contains(p))
 				continue;
-			
+
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
-		
+
 		if (p.hasPermission("koth.admin.placeblocks"))
 			return;
-		
+
 		for (Arena arena : am.getArenas()) {
 			if (!arena.getPlayersInArena().contains(p)
 					&& !arena.getPlayersInLobby().contains(p)
 					&& !arena.getSpectators().contains(p))
 				continue;
-			
+
 			e.setCancelled(true);
 		}
 	}
@@ -380,65 +441,72 @@ public class GlobalListener implements Listener {
 	// --------------------------- //
 	// Getters and Misc.
 	// --------------------------- //
-	
+
 	private String getKillMessage(Player killer, Player killed) {
 		String name = ChatColor.YELLOW + killed.getName() + ChatColor.RESET;
-		if (killer.getHealth() <= 3.5)
+		if (killer.getHealth() <= 3.5) {
 			return "You have barely bested " + name + ".";
-		else if (killer.getHealth() >= 16.5)
+		} else if (killer.getHealth() >= 16.5) {
 			return "You destroyed " + name + " in the field of combat.";
-		else if (killer.getHealth() < 16.5 && killer.getHealth() >= 10)
+		} else if (killer.getHealth() < 16.5 && killer.getHealth() >= 10) {
 			return name + " did not put up much of a fight.";
-		else
+		} else {
 			return "You have emerged superior to " + name
 					+ " after a good fight.";
-	}
-	
-	private String getChatFormat(Player p, String msg) {
-		Arena arena = am.getArenaWithPlayer(p);
-		if (arena == null)
-			return null;
-		if (arena.getRedTeam().contains(p))
-			return ChatColor.DARK_RED + "[Red] " + ChatColor.RED + p.getName() + ": " + msg;
-		else if (arena.getBlueTeam().contains(p))
-			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE + p.getName() + ": "+ msg;
-		return null;
-	}
-	
-	private void repairWeapon(Player p) {
-		Arena arena = am.getArenaWithPlayer(p);
-		ArenaClass ac = arena.getData(p).getArenaClass();
-		if (ac != null && ac.containsUnbreakableWeapons()) {
-			ItemStack weapon = p.getItemInHand();
-			if (ArenaClass.isWeapon(weapon)) {
-				weapon.setDurability((short) 0);
-			}
 		}
 	}
 
-    private void repairArmor(Player p) {
+	private String getChatFormat(Player p, String msg) {
+		Arena arena = am.getArenaWithPlayer(p);
+		if (arena == null) {
+			return null;
+		}
+
+		if (arena.getRedTeam().contains(p)) {
+			return ChatColor.DARK_RED + "[Red] " + ChatColor.RED + p.getName()
+					+ ": " + msg;
+		} else if (arena.getBlueTeam().contains(p)) {
+			return ChatColor.DARK_BLUE + "[Blue] " + ChatColor.BLUE
+					+ p.getName() + ": " + msg;
+		}
+		return null;
+	}
+
+	private void repairWeapon(Player p) {
 		Arena arena = am.getArenaWithPlayer(p);
 		ArenaClass ac = arena.getData(p).getArenaClass();
-        if (ac != null && ac.containsUnbreakableArmor()) {
-            PlayerInventory inv = p.getInventory();
-            
-            ItemStack stack = inv.getHelmet();
-            if (stack != null) 
-            	stack.setDurability((short) 0);
-            
-            stack = inv.getChestplate();
-            if (stack != null) 
-            	stack.setDurability((short) 0);
-            
-            stack = inv.getLeggings();
-            if (stack != null)
-            	stack.setDurability((short) 0);
-            
-            stack = inv.getBoots();
-            if (stack != null) 
-            	stack.setDurability((short) 0);
-        }
-    }
+		
+		if (ac != null && ac.containsUnbreakableWeapons()) {
+			ItemStack weapon = p.getItemInHand();
+			
+			if (ArenaClass.isWeapon(weapon))
+				weapon.setDurability((short) 0);
+		}
+	}
+
+	private void repairArmor(Player p) {
+		Arena arena = am.getArenaWithPlayer(p);
+		ArenaClass ac = arena.getData(p).getArenaClass();
+		if (ac != null && ac.containsUnbreakableArmor()) {
+			PlayerInventory inv = p.getInventory();
+
+			ItemStack stack = inv.getHelmet();
+			if (stack != null)
+				stack.setDurability((short) 0);
+
+			stack = inv.getChestplate();
+			if (stack != null)
+				stack.setDurability((short) 0);
+
+			stack = inv.getLeggings();
+			if (stack != null)
+				stack.setDurability((short) 0);
+
+			stack = inv.getBoots();
+			if (stack != null)
+				stack.setDurability((short) 0);
+		}
+	}
 
 	public KotH getPlugin() {
 		return plugin;
