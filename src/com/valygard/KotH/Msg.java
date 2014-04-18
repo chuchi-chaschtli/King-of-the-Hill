@@ -44,6 +44,7 @@ public enum Msg {
 	HILLS_ONE_LEFT("There is &b1 hill&r remaining!"),
 	HILLS_ENTERED("You have entered the hill."),
 	HILLS_LEFT("You have abandoned the hill."),
+	HILLS_RESET("You have changed the location of hill &e#%."),
 	HILLS_SWITCHED("The hill has moved positions!"),
 	JOIN_ALREADY_IN_ARENA("You are already in the arena."),
 	JOIN_ARENA("You have joined &e%."),
