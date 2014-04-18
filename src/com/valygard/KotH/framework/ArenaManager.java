@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -33,7 +32,6 @@ import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.ItemParser;
-import com.valygard.KotH.util.UUIDUtil;
 
 /**
  * @author Anand
@@ -46,7 +44,7 @@ public class ArenaManager {
 
 	// getting arenas
 	private List<Arena> arenas;
-	
+
 	// Arena Classes
 	private Map<String, ArenaClass> classes;
 
@@ -57,20 +55,20 @@ public class ArenaManager {
 	 * Constructor
 	 */
 	public ArenaManager(KotH plugin) {
-		this.plugin = plugin;
-		this.config = plugin.getConfig();
+		this.plugin 	= plugin;
+		this.config 	= plugin.getConfig();
 
-		this.arenas = new ArrayList<Arena>();
-		
-		this.classes = new HashMap<String, ArenaClass>();
+		this.arenas 	= new ArrayList<Arena>();
 
-		this.enabled = config.getBoolean("global.enabled", true);
+		this.classes 	= new HashMap<String, ArenaClass>();
+
+		this.enabled 	= config.getBoolean("global.enabled", true);
 	}
 
 	// --------------------------- //
 	// Initialization
 	// --------------------------- //
-	
+
 	/**
 	 * Initialize the class by loading arenas and classes.
 	 */
@@ -78,7 +76,7 @@ public class ArenaManager {
 		loadClasses();
 		loadArenas();
 	}
-	
+
 	/**
 	 * Load all arenas.
 	 */
@@ -96,7 +94,7 @@ public class ArenaManager {
 		for (World world : Bukkit.getServer().getWorlds()) {
 			loadArenasInWorld(world.getName());
 		}
-		
+
 		for (Arena arena : arenas)
 			getMissingWarps(arena);
 	}
@@ -203,14 +201,15 @@ public class ArenaManager {
 		ConfigurationSection section = makeSection(arenas, arenaName);
 		ConfigUtil.addMissingRemoveObsolete(plugin, "settings.yml",
 				makeSection(section, "settings"));
-		
+
 		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
 				makeSection(section, "warps"));
-		
+
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml",
 				makeSection(section, "prizes"));
 
-		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE).addParent("koth.arenas", true);
+		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE)
+				.addParent("koth.arenas", true);
 
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);
@@ -232,159 +231,183 @@ public class ArenaManager {
 		unregisterPermission("koth.arenas." + name);
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
-	
+
 	/**
 	 * Reload an arena.
 	 */
-    public boolean reloadArena(String name) {
-        Arena arena = getArenaWithName(name);
-        
-        if (arena == null) 
-        	return false;
+	public boolean reloadArena(String name) {
+		Arena arena = getArenaWithName(name);
 
-        arena.forceEnd();
-        arenas.remove(arena);
+		if (arena == null)
+			return false;
 
-        plugin.reloadConfig();
-        config = plugin.getConfig();
+		arena.forceEnd();
+		arenas.remove(arena);
 
-        loadArena(name);
-        return true;
-    }
-	
+		plugin.reloadConfig();
+		config = plugin.getConfig();
+
+		loadArena(name);
+		return true;
+	}
+
 	/**
-     * Load all class-related stuff.
-     */
-    public void loadClasses() {
-        ConfigurationSection section = makeSection(plugin.getConfig(), "classes");
-        ConfigUtil.addIfEmpty(plugin, "classes.yml", section);
+	 * Load all class-related stuff.
+	 */
+	public void loadClasses() {
+		ConfigurationSection section = makeSection(plugin.getConfig(),
+				"classes");
+		ConfigUtil.addIfEmpty(plugin, "classes.yml", section);
 
+		// Establish the map.
+		classes = new HashMap<String, ArenaClass>();
+		Set<String> classNames = section.getKeys(false);
 
-        // Establish the map.
-        classes = new HashMap<String, ArenaClass>();
-        Set<String> classNames = section.getKeys(false);
+		// Load each individual class.
+		for (String className : classNames) {
+			loadClass(className);
+		}
+	}
 
-        // Load each individual class.
-        for (String className : classNames) {
-            loadClass(className);
-        }
-    }
+	/**
+	 * Helper method for loading a single class.
+	 */
+	private ArenaClass loadClass(String classname) {
+		ConfigurationSection section = config
+				.getConfigurationSection("classes." + classname);
+		String lowercase = classname.toLowerCase();
 
-    /**
-     * Helper method for loading a single class.
-     */
-    private ArenaClass loadClass(String classname) {
-        ConfigurationSection section = config.getConfigurationSection("classes." + classname);
-        String lowercase = classname.toLowerCase();
+		// If the section doesn't exist, the class doesn't either.
+		if (section == null) {
+			Messenger.severe("Failed to load class '" + classname + "'.");
+			return null;
+		}
 
-        // If the section doesn't exist, the class doesn't either.
-        if (section == null) {
-            Messenger.severe("Failed to load class '" + classname + "'.");
-            return null;
-        }
-        
-        // Check if weapons and armor for this class should be unbreakable
-        boolean weps = section.getBoolean("indestructible-weapons", true);
-        boolean arms = section.getBoolean("indestructible-armor", true);
+		// Check if weapons and armor for this class should be unbreakable
+		boolean weps = section.getBoolean("indestructible-weapons", true);
+		boolean arms = section.getBoolean("indestructible-armor", true);
 
-        // Create an ArenaClass with the config-file name.
-        ArenaClass arenaClass = new ArenaClass(classname, weps, arms);
+		// Create an ArenaClass with the config-file name.
+		ArenaClass arenaClass = new ArenaClass(classname, weps, arms);
 
-        // Parse the items-node
-        List<String> items = section.getStringList("items");
-        if (items == null || items.isEmpty()) {
-            String str = section.getString("items", "");
-            List<ItemStack> stacks = ItemParser.parseItems(str);
-            arenaClass.setItems(stacks);
-        } else {
-            List<ItemStack> stacks = new ArrayList<ItemStack>();
-            for (String item : items) {
-                ItemStack stack = ItemParser.parseItem(item);
-                if (stack != null) {
-                    stacks.add(stack);
-                }
-            }
-            arenaClass.setItems(stacks);
-        }
+		// Parse the items-node
+		List<String> items = section.getStringList("items");
+		if (items == null || items.isEmpty()) {
+			String str = section.getString("items", "");
+			List<ItemStack> stacks = ItemParser.parseItems(str);
+			arenaClass.setItems(stacks);
+		} else {
+			List<ItemStack> stacks = new ArrayList<ItemStack>();
+			for (String item : items) {
+				ItemStack stack = ItemParser.parseItem(item);
+				if (stack != null) {
+					stacks.add(stack);
+				}
+			}
+			arenaClass.setItems(stacks);
+		}
 
-        // And the legacy armor-node
-        String armor = section.getString("armor", "");
-        if (!armor.equals("")) {
-            List<ItemStack> stacks = ItemParser.parseItems(armor);
-            arenaClass.setArmor(stacks);
-        }
+		// And the legacy armor-node
+		String armor = section.getString("armor", "");
+		if (!armor.equals("")) {
+			List<ItemStack> stacks = ItemParser.parseItems(armor);
+			arenaClass.setArmor(stacks);
+		}
 
-        // Get armor strings
-        String head  = section.getString("helmet", null);
-        String chest = section.getString("chestplate", null);
-        String legs  = section.getString("leggings", null);
-        String feet  = section.getString("boots", null);
+		// Get armor strings
+		String head = section.getString("helmet", null);
+		String chest = section.getString("chestplate", null);
+		String legs = section.getString("leggings", null);
+		String feet = section.getString("boots", null);
 
-        // Parse to ItemStacks
-        ItemStack helmet     = ItemParser.parseItem(head);
-        ItemStack chestplate = ItemParser.parseItem(chest);
-        ItemStack leggings   = ItemParser.parseItem(legs);
-        ItemStack boots      = ItemParser.parseItem(feet);
+		// Parse to ItemStacks
+		ItemStack helmet = ItemParser.parseItem(head);
+		ItemStack chestplate = ItemParser.parseItem(chest);
+		ItemStack leggings = ItemParser.parseItem(legs);
+		ItemStack boots = ItemParser.parseItem(feet);
 
-        // Set in ArenaClass
-        arenaClass.setHelmet(helmet);
-        arenaClass.setChestplate(chestplate);
-        arenaClass.setLeggings(leggings);
-        arenaClass.setBoots(boots);
+		// Set in ArenaClass
+		arenaClass.setHelmet(helmet);
+		arenaClass.setChestplate(chestplate);
+		arenaClass.setLeggings(leggings);
+		arenaClass.setBoots(boots);
 
-        // Register the permission.
-        registerPermission("koth.classes." + lowercase, PermissionDefault.TRUE).addParent("koth.classes", true);
+		// Register the permission.
+		registerPermission("koth.classes." + lowercase, PermissionDefault.TRUE)
+				.addParent("koth.classes", true);
 
-        // Finally add the class to the classes map.
-        classes.put(lowercase, arenaClass);
-        return arenaClass;
-    }
-    
-    public ArenaClass createClassNode(String classname, PlayerInventory inv, boolean overwrite) {
-        String path = "classes." + classname.toLowerCase();
-        if (!overwrite && config.getConfigurationSection(path) != null) {
-            return null;
-        }
+		// Finally add the class to the classes map.
+		classes.put(lowercase, arenaClass);
+		return arenaClass;
+	}
 
-        // Create the node.
-        config.set(path, "");
+	/**
+	 * Create a new class based on a player's inventory.
+	 * 
+	 * @param classname
+	 * @param inv
+	 * @param overwrite
+	 * @return
+	 */
+	public ArenaClass createClassNode(String classname, PlayerInventory inv,
+			boolean overwrite) {
+		String path = "classes." + classname.toLowerCase();
+		if (!overwrite && config.getConfigurationSection(path) != null) {
+			return null;
+		}
 
-        // Grab the section, create if missing
-        ConfigurationSection section = config.getConfigurationSection(path);
-        if (section == null) section = config.createSection(path);
+		// Create the node.
+		config.set(path, "");
 
-        // Take the current items and armor.
-        section.set("items", ItemParser.parseString(inv.getContents()));
-        section.set("armor", ItemParser.parseString(inv.getArmorContents()));
+		// Grab the section, create if missing
+		ConfigurationSection section = config.getConfigurationSection(path);
+		if (section == null)
+			section = config.createSection(path);
 
-        // If the helmet isn't a real helmet, set it explicitly.
-        ItemStack helmet = inv.getHelmet();
-        if (helmet != null && ArmorType.getType(helmet) != ArmorType.HELMET) {
-            section.set("helmet", ItemParser.parseString(helmet));
-        }
+		// Take the current items and armor.
+		section.set("items", ItemParser.parseString(inv.getContents()));
+		section.set("armor", ItemParser.parseString(inv.getArmorContents()));
 
-        // Save changes.
-        plugin.saveConfig();
+		// If the helmet isn't a real helmet, set it explicitly.
+		ItemStack helmet = inv.getHelmet();
+		if (helmet != null && ArmorType.getType(helmet) != ArmorType.HELMET) {
+			section.set("helmet", ItemParser.parseString(helmet));
+		}
 
-        // Load the class
-        return loadClass(classname);
-    }
+		// Save changes.
+		plugin.saveConfig();
 
-    public void removeClassNode(String classname) {
-        String lowercase = classname.toLowerCase();
-        if (!classes.containsKey(lowercase))
-            throw new IllegalArgumentException("Class does not exist!");
+		// Load the class
+		return loadClass(classname);
+	}
 
-        // Remove the class from the config-file and save it.
-        config.set("classes." + classname, null);
-        plugin.saveConfig();
+	/**
+	 * Remove an existing class.
+	 * 
+	 * @param classname
+	 */
+	public void removeClassNode(String classname) {
+		String lowercase = classname.toLowerCase();
+		if (!classes.containsKey(lowercase))
+			throw new IllegalArgumentException("Class does not exist!");
 
-        // Remove the class from the map.
-        classes.remove(lowercase);
+		// Remove the class from the config-file and save it.
+		config.set("classes." + classname, null);
+		plugin.saveConfig();
 
-        unregisterPermission("koth.classes." + lowercase);
-    }
+		// Remove the class from the map.
+		classes.remove(lowercase);
 
+		unregisterPermission("koth.classes." + lowercase);
+	}
+
+	/**
+	 * Register a permission when a new class or arena is added.
+	 * 
+	 * @param permString
+	 * @param value
+	 * @return
+	 */
 	private Permission registerPermission(String permString,
 			PermissionDefault value) {
 		PluginManager pm = plugin.getServer().getPluginManager();
@@ -398,35 +421,71 @@ public class ArenaManager {
 		return perm;
 	}
 
+	/**
+	 * Unregisters an existing per-arena / per-class permission.
+	 * 
+	 * @param s
+	 */
 	private void unregisterPermission(String s) {
 		plugin.getServer().getPluginManager().removePermission(s);
 	}
 
 	// --------------------------- //
-	// GETTERS
+	// Getters
 	// --------------------------- //
 
+	/**
+	 * Get the plugin's main class.
+	 * 
+	 * @return
+	 */
 	public KotH getPlugin() {
 		return plugin;
 	}
 
+	/**
+	 * Get all the arenas in list format.
+	 * 
+	 * @return
+	 */
 	public List<Arena> getArenas() {
 		return arenas;
 	}
-	
+
+	/**
+	 * Get all the Arena Classes with the class name as the key.
+	 * 
+	 * @return
+	 */
 	public Map<String, ArenaClass> getClasses() {
 		return classes;
 	}
 
+	/**
+	 * Is the plugin enabled?
+	 * 
+	 * @return
+	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	/**
+	 * Change whether or not the plugin is enabled.
+	 * 
+	 * @param value
+	 */
 	public void setEnabled(boolean value) {
 		this.enabled = value;
 		config.set("global.enabled", value);
 	}
 
+	/**
+	 * Get all enabled arenas.
+	 * 
+	 * @param arenas
+	 * @return
+	 */
 	public List<Arena> getEnabledArenas(List<Arena> arenas) {
 		List<Arena> result = new ArrayList<Arena>(arenas.size());
 		for (Arena arena : arenas) {
@@ -436,6 +495,12 @@ public class ArenaManager {
 		return result;
 	}
 
+	/**
+	 * Get all arenas a player has permission for.
+	 * 
+	 * @param p
+	 * @return
+	 */
 	public List<Arena> getPermittedArenas(Player p) {
 		List<Arena> result = new ArrayList<Arena>(arenas.size());
 		for (Arena arena : arenas) {
@@ -445,6 +510,13 @@ public class ArenaManager {
 		return result;
 	}
 
+	/**
+	 * Get the intersection of the enabled, and the permitted arenas of a
+	 * player.
+	 * 
+	 * @param p
+	 * @return
+	 */
 	public List<Arena> getEnabledAndPermittedArenas(Player p) {
 		List<Arena> result = new ArrayList<Arena>(arenas.size());
 		for (Arena arena : arenas) {
@@ -455,6 +527,12 @@ public class ArenaManager {
 		return result;
 	}
 
+	/**
+	 * Get a specific arena with a player.
+	 * 
+	 * @param player
+	 * @return
+	 */
 	public Arena getArenaWithPlayer(Player player) {
 		for (Arena arena : arenas) {
 			if (arena.getPlayersInArena().contains(player)
@@ -465,21 +543,23 @@ public class ArenaManager {
 		return null;
 	}
 
-	public Arena getArenaWithPlayer(UUID id) {
-		for (Arena arena : arenas) {
-			Player player = UUIDUtil.getPlayerFromUUID(id);
-			if (arena.getPlayersInArena().contains(player)
-					|| arena.getPlayersInLobby().contains(player)
-					|| arena.getSpectators().contains(player))
-				return arena;
-		}
-		return null;
-	}
-
+	/**
+	 * Get an arena with it's config-name.
+	 * 
+	 * @param arenaName
+	 * @return
+	 */
 	public Arena getArenaWithName(String arenaName) {
 		return getArenaWithName(this.arenas, arenaName);
 	}
 
+	/**
+	 * Get an arena based on all the arenas and picking one out.
+	 * 
+	 * @param arenas
+	 * @param arenaName
+	 * @return
+	 */
 	public Arena getArenaWithName(Collection<Arena> arenas, String arenaName) {
 		for (Arena arena : arenas)
 			if (arena.getName().equals(arenaName))
@@ -487,22 +567,30 @@ public class ArenaManager {
 		return null;
 	}
 
-	public Arena getArenaWithSpectator(Player p) {
-		for (Arena arena : arenas) {
-			if (arena.getSpectators().contains(p))
-				return arena;
-		}
-		return null;
-	}
-	
+	/**
+	 * Get the config.yml, where all arenas are stored.
+	 * 
+	 * @return
+	 */
 	public FileConfiguration getConfig() {
 		return config;
 	}
-	
+
+	/**
+	 * Get all arenas in the config file.
+	 * 
+	 * @return
+	 */
 	public ConfigurationSection getArenasInConfig() {
 		return config.getConfigurationSection("arenas");
 	}
 
+	/**
+	 * Get the warps an arena needs before it's ready.
+	 * 
+	 * @param arena
+	 * @param p
+	 */
 	public void getMissingWarps(Arena arena, Player p) {
 		List<String> missing = new ArrayList<String>();
 		if (arena.getRedSpawn() == null)
@@ -530,7 +618,12 @@ public class ArenaManager {
 			arena.setReady(true);
 		}
 	}
-	
+
+	/**
+	 * Get the missing warps of an arena.
+	 * 
+	 * @param arena
+	 */
 	public void getMissingWarps(Arena arena) {
 		List<String> missing = new ArrayList<String>();
 		if (arena.getRedSpawn() == null)
@@ -545,7 +638,8 @@ public class ArenaManager {
 		if (arena.getSpec() == null)
 			missing.add("spectator,");
 
-		if (arena.getWarps() == null || arena.getWarps().getConfigurationSection("hills") == null)
+		if (arena.getWarps() == null
+				|| arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills,");
 
 		if (missing.size() > 0) {
@@ -555,11 +649,22 @@ public class ArenaManager {
 			arena.setReady(true);
 		}
 	}
-	
+
+	/**
+	 * If there is only one arena, we can remove unnecessary arguments in
+	 * commands.
+	 * 
+	 * @return
+	 */
 	public boolean hasOneArena() {
 		return arenas.size() == 1;
 	}
-	
+
+	/**
+	 * Get the only arena if there is only one arena.
+	 * 
+	 * @return
+	 */
 	public Arena getOnlyArena() {
 		if (hasOneArena())
 			return arenas.get(0);
