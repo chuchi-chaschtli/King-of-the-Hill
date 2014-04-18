@@ -136,7 +136,7 @@ public class ItemParser {
         if (cents.length > 2 || (!money.startsWith("$") && !money.contains(".")))
         	throw new IllegalArgumentException("Money has been incorrectly defined in the config-file.");
         
-        return Double.valueOf(money.substring(2, money.length()));
+        return Double.valueOf(money.substring(1));
     }
     
     public static ItemStack parseItem(String item) {
