@@ -5,7 +5,6 @@
 package com.valygard.KotH;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +29,7 @@ public class RewardManager {
 	private ConfigurationSection prizes;
 	
 	// The different kinds of players there are to give rewards to.
+	@SuppressWarnings("unused")
 	private Set<Player> winner, loser, all;
 	
 	/**
@@ -45,10 +45,6 @@ public class RewardManager {
 		this.prizes  = ConfigUtil.makeSection(section, "prizes");
 		
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml", prizes);
-		
-		this.winner	 = arena.getWinner();
-		this.loser   = arena.getLoser();
-		this.all	 = arena.getPlayersInArena();
 	}
 
 	/**
@@ -116,7 +112,7 @@ public class RewardManager {
 	 * @return a player set.
 	 */
 	public Set<Player> getWinners() {
-		return Collections.unmodifiableSet(winner);
+		return arena.getWinner();
 	}
 	
 	/**
@@ -125,7 +121,7 @@ public class RewardManager {
 	 * @return a player set.
 	 */
 	public Set<Player> getLosers() {
-		return Collections.unmodifiableSet(loser);
+		return arena.getLoser();
 	}
 	
 	/**
@@ -134,7 +130,7 @@ public class RewardManager {
 	 * @return all players.
 	 */
 	public Set<Player> getAllPlayers() {
-		return Collections.unmodifiableSet(all);
+		return arena.getPlayersInArena();
 	}
 	
 	/**

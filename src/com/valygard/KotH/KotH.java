@@ -23,7 +23,6 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.listener.GlobalListener;
 import com.valygard.KotH.util.ConfigUtil;
-import com.valygard.KotH.util.resources.UpdateChecker;
 
 /**
  * @author Anand
@@ -76,8 +75,6 @@ public class KotH extends JavaPlugin {
 				arena.forceEnd();
 			}
 		}
-		
-		UpdateChecker.shutdown();
 	}
 	
 	private void initializeVariables() {
