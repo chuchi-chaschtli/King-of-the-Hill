@@ -51,10 +51,12 @@ import com.valygard.KotH.util.resources.UpdateChecker;
 public class GlobalListener implements Listener {
 	private KotH plugin;
 	private ArenaManager am;
+	private EconomyManager em;
 
 	public GlobalListener(KotH plugin) {
 		this.plugin = plugin;
-		this.am = plugin.getArenaManager();
+		this.am 	= plugin.getArenaManager();
+		this.em 	= plugin.getEconomyManager();
 	}
 	
 	// --------------------------- //
@@ -87,10 +89,10 @@ public class GlobalListener implements Listener {
 		case RIGHT_CLICK_BLOCK:
 		case LEFT_CLICK_BLOCK:
 			if (am.getClasses().get(formatted) != null) {
-				if (formatted.equalsIgnoreCase("random"))
+				if (!formatted.equalsIgnoreCase("random")) {	
+					handleClassSign(s, p);
 					break;
-				handleClassSign(s, p);
-				break;
+				}
 			}
 			handleCommandSign(s, p);
 			break;
@@ -514,7 +516,6 @@ public class GlobalListener implements Listener {
 
 		double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser
 				.parseMoney(s.getLine(2)));
-		EconomyManager em = plugin.getEconomyManager();
 
 		if (em.getMoney(p) < fee) {
 			Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
@@ -522,6 +523,7 @@ public class GlobalListener implements Listener {
 		}
 
 		arena.pickClass(p, formatted);
+		em.withdraw(p, fee);
 		Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
 	}
 	
@@ -532,7 +534,7 @@ public class GlobalListener implements Listener {
 		}
 		
 		double fee = ItemParser.parseMoney(ChatColor.stripColor(s.getLine(3)).toLowerCase());	
-		if (plugin.getEconomyManager().getMoney(p) < fee) {
+		if (em.getMoney(p) < fee) {
 			Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
 			return;
 		}
@@ -575,6 +577,8 @@ public class GlobalListener implements Listener {
 			handleClassSign(s, p);
 			break;
 		}
+		
+		em.withdraw(p, fee);
 	}
 	
 	public KotH getPlugin() {
