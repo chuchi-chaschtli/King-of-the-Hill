@@ -15,6 +15,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
+import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.Messenger;
 
@@ -128,15 +129,10 @@ public class ItemParser {
     }
     
     public static double parseMoney(String money) {
-        if (money == null || money.equals(""))
-            return 0.00;
-        
-        String[] cents = money.split(".");
-        
-        if (cents.length > 2 || (!money.startsWith("$") && !money.contains(".")))
-        	throw new IllegalArgumentException("Money has been incorrectly defined in the config-file.");
-        
-        return Double.valueOf(money.substring(1));
+       if (!money.matches("\\$(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
+    	   return 0.00;
+       }
+       return Double.valueOf(money.substring(1));
     }
     
     public static ItemStack parseItem(String item) {
@@ -171,10 +167,18 @@ public class ItemParser {
 
         return result;
     }
-    
+
+    @SuppressWarnings("deprecation")
     private static ItemStack singleItem(String item) {
-        String name = getType(item);
-        return new ItemStack(Material.matchMaterial(name.toUpperCase().replace("-", "_")));
+    	if (item.matches("\\$(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
+    		double amount = Double.parseDouble(item.substring(1));
+
+    		int major = (int) amount;
+    		int minor = ((int) (amount * 100D)) % 100;
+    		return new ItemStack(KotH.ECONOMY_ID, major, (short) minor);
+    	}
+    	String name = getType(item);
+    	return new ItemStack(Material.matchMaterial(name.toUpperCase().replace("-", "_")));
     }
     
     private static ItemStack withAmount(String item, String amount) {

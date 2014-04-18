@@ -41,6 +41,8 @@ public class KotH extends JavaPlugin {
 	// Messages related
 	public static YamlConfiguration MESSAGES;
 	public static File MESSAGES_FILE;
+	
+	public static int ECONOMY_ID = -69;
 
 	public void onEnable() {
 		// Load the regular configuration file
