@@ -63,6 +63,7 @@ public enum Msg {
 	REWARDS_GAINED("You have received rewards for playing!"),
 	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),
 	SIGN_CREATED("You have created a new &e%&r sign!"),
+	SIGN_INVALID("The &5[KotH]&r sign you just created is invalid!"),
 	SPEC_JOIN("Enjoy the view!");
 
 	private String value;

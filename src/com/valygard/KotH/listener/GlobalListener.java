@@ -77,58 +77,24 @@ public class GlobalListener implements Listener {
 
 		if (!s.getLine(0).equalsIgnoreCase(ChatColor.DARK_PURPLE + "[KotH]"))
 			return;
+		
+		if (!plugin.has(p, "koth.user.signs"))
+			return;
 
-		switch1: switch (e.getAction()) {
+		String formatted = ChatColor.stripColor(s.getLine(1)).toLowerCase();
+		switch (e.getAction()) {
 		case RIGHT_CLICK_BLOCK:
 		case LEFT_CLICK_BLOCK:
-			switch2: switch (s.getLine(1)) {
-			case "join":
-				Bukkit.dispatchCommand(p, "koth join " + s.getLine(2));
-				break switch2;
-				
-			case "leave":
-				if (am.getArenaWithName(s.getLine(2)) != null
-						&& am.getArenaWithPlayer(p).equals(
-								am.getArenaWithName(s.getLine(2)))) {
-					Bukkit.dispatchCommand(p, "koth leave");
-					break switch2;
-				}
-				Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
-				break switch2;
-				
-			case "spectate":
-				Bukkit.dispatchCommand(p, "koth spec " + s.getLine(2));
-				break switch2;
-				
-			default:
-				String formatted = ChatColor.stripColor(s.getLine(1)).replace(
-						" ", "");
-				if (am.getClasses().get(formatted) == null)
-					break switch2;
-
-				Arena arena = am.getArenaWithPlayer(p);
-
-				if (arena == null)
-					break switch2;
-
-				if (!plugin.has(p, "koth.classes." + formatted))
-					break switch2;
-
-				double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser
-						.parseMoney(s.getLine(2)));
-				EconomyManager em = plugin.getEconomyManager();
-
-				if (em.getMoney(p) < fee) {
-					Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
-					break switch2;
-				}
-
-				arena.pickClass(p, formatted);
-				Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
-				break switch2;
+			if (am.getClasses().get(formatted) != null) {
+				if (formatted.equalsIgnoreCase("random"))
+					break;
+				handleClassSign(s, p);
+				break;
 			}
+			handleCommandSign(s, p);
+			break;
 		default:
-			break switch1;
+			break;
 		}
 	}
 
@@ -340,46 +306,52 @@ public class GlobalListener implements Listener {
 	
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onSignChange(SignChangeEvent e) {
-		String l2 = e.getLine(1);
-		String l3 = e.getLine(2);
+		String l2 = ChatColor.stripColor(e.getLine(1)).toLowerCase();
+		String l3 = ChatColor.stripColor(e.getLine(2));
 		
 		Player p = e.getPlayer();
 		if (!plugin.has(p, "koth.admin.signs")) {
 			return;
 		}
+		
+		if (!ChatColor.stripColor(e.getLine(0).toLowerCase()).equalsIgnoreCase("[koth]"))
+			return;
 			
 		Arena arena = am.getArenaWithName(l3);
 		switch (l2) {
 		case "join":
-			if (l3 == null || arena == null) {
-				break;
-			}
-
-			Messenger.tell(p, Msg.SIGN_CREATED, "join");
-			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
-			break;
 		case "leave":
-			if (l3 == null || arena == null) {
+		case "spectate":
+		case "players":
+		case "info":
+			if (arena == null) {
+				Messenger.tell(p, Msg.SIGN_INVALID);
 				break;
 			}
-
-			Messenger.tell(p, Msg.SIGN_CREATED, "leave");
+			Messenger.tell(p, Msg.SIGN_CREATED, l2);
 			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
 			break;
-		case "spectate":
-			if (l3 == null || arena == null) {
+		case "red":
+		case "redteam":
+		case "blue":
+		case "blueteam":
+			if (arena == null) {
+				Messenger.tell(p, Msg.SIGN_INVALID);
 				break;
 			}
-
-			Messenger.tell(p, Msg.SIGN_CREATED, "spectate");
+			Messenger.tell(p, Msg.SIGN_CREATED, l2.substring(0, l2.contains("red") ? 3 : 4));
 			e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
 			break;
 		default:
-			if (am.getClasses().get(l2) == null) {
+			String classname = ChatColor.stripColor(e.getLine(1)).toLowerCase();
+			String price	 = e.getLine(2);
+
+			if (am.getClasses().get(classname) == null) {
+				Messenger.tell(p, Msg.SIGN_INVALID);
 				break;
 			}
 
-			if (l3 != null && (!l3.startsWith("$") || l3.split(".").length > 2)) {
+			if (price != null && (!price.startsWith("$") || price.split(".").length > 2)) {
 				Messenger.tell(p, "Invalid price option given!");
 				break;
 			}
@@ -507,7 +479,85 @@ public class GlobalListener implements Listener {
 				stack.setDurability((short) 0);
 		}
 	}
+	
+	private void handleClassSign(Sign s, Player p) {
+		String formatted = ChatColor.stripColor(s.getLine(1)).toLowerCase();
+		if (am.getClasses().get(formatted) == null || formatted.equalsIgnoreCase("random"))
+			return;
 
+		Arena arena = am.getArenaWithPlayer(p);
+
+		if (arena == null)
+			return;
+
+		if (!plugin.has(p, "koth.classes." + formatted))
+			return;
+
+		double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser
+				.parseMoney(s.getLine(2)));
+		EconomyManager em = plugin.getEconomyManager();
+
+		if (em.getMoney(p) < fee) {
+			Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
+			return;
+		}
+
+		arena.pickClass(p, formatted);
+		Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
+	}
+	
+	private void handleCommandSign(Sign s, Player p) {
+		Arena arena = am.getArenaWithName(s.getLine(2));
+		if (arena == null) {
+			return;
+		}
+		
+		double fee = ItemParser.parseMoney(ChatColor.stripColor(s.getLine(3)).toLowerCase());	
+		if (plugin.getEconomyManager().getMoney(p) < fee) {
+			Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
+			return;
+		}
+		
+		String cmd = ChatColor.stripColor(s.getLine(1)).toLowerCase();
+		switch (cmd) {
+		case "leave":
+			Bukkit.dispatchCommand(p, "koth leave");
+			break;
+		case "join":
+			Bukkit.dispatchCommand(p, "koth join " + arena.getName());
+			break;
+		case "spectate":
+			Bukkit.dispatchCommand(p, "koth spec " + arena.getName());
+			break;
+		case "players":
+			Bukkit.dispatchCommand(p, "koth players " + arena.getName());
+			break;
+		case "info":
+			Bukkit.dispatchCommand(p, "koth info " + arena.getName());
+			break;
+		case "red":
+		case "redteam":
+		case "blue":
+		case "blueteam":
+			if (!arena.inLobby(p)) {
+				Messenger.tell(p, Msg.MISC_NO_ACCESS);
+				break;
+			}
+
+			/*
+			 * Substring the line to remove the word 'team'. Check if the line
+			 * is red, then substring at 3. Otherwise, if the line is blue,
+			 * substring at 4.
+			 */
+			Bukkit.dispatchCommand(p, "koth chooseteam "
+					+ cmd.substring(0, cmd.contains("red") ? 3 : 4));
+			break;
+		default:
+			handleClassSign(s, p);
+			break;
+		}
+	}
+	
 	public KotH getPlugin() {
 		return plugin;
 	}
