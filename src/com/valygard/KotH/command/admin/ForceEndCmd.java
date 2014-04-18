@@ -17,7 +17,7 @@ import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
 		name = "forceend", 
-		pattern = "force(e.*|stop)",
+		pattern = "force(end.*|stop.*)",
 		desc = "Force an arena to end.",
 		argsRequired = 0
 )

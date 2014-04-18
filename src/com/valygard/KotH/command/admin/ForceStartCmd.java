@@ -17,7 +17,7 @@ import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
 		name = "forcestart", 
-		pattern = "forces.*",
+		pattern = "force(begin.*|start.*)",
 		desc = "Force an arena to start.",
 		argsRequired = 0
 )
