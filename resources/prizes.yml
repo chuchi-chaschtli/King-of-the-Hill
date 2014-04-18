@@ -1,3 +1,4 @@
-winners: diamond_sword sharpness:2;knockback:1, emerald:3
-losers: dirt:4, iron_ingot
-all-players: gold_ingot:2
+completion:
+  winners: diamond_sword sharpness:2;knockback:1, emerald:3
+  losers: dirt:4, iron_ingot
+  all-players: gold_ingot:2

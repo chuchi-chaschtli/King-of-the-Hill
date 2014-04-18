@@ -50,9 +50,9 @@ public class RewardManager {
 		this.loser   = arena.getLoser();
 		this.all	 = arena.getPlayersInArena();
 	}
-	
+
 	/**
-	 * Give prizes to a player. Deprecated due to Player.updateInventory();
+	 * Give prizes to a player. This method only gives prizes at arena end.
 	 * 
 	 * @param p the player.
 	 */
@@ -64,6 +64,8 @@ public class RewardManager {
 			items = parseItems("winners");
 			
 			for (ItemStack is : items) {
+				if (is.getTypeId() == KotH.ECONOMY_ID)
+					continue;
 				p.getInventory().addItem(is);
 			}
 		}
@@ -72,12 +74,16 @@ public class RewardManager {
 			items = parseItems("losers");
 			
 			for (ItemStack is : items) {
+				if (is.getTypeId() == KotH.ECONOMY_ID)
+					continue;
 				p.getInventory().addItem(is);
 			}
 		}
 		items = parseItems("all-players");
 			
 		for (ItemStack is : items) {
+			if (is.getTypeId() == KotH.ECONOMY_ID)
+				continue;
 			p.getInventory().addItem(is);
 		}
 		p.updateInventory();
@@ -91,6 +97,7 @@ public class RewardManager {
 	 * @return a list of itemstacks.
 	 */
 	public List<ItemStack> parseItems(String str) {
+		ConfigurationSection prizes = ConfigUtil.makeSection(this.prizes, "completion");
         List<String> items = prizes.getStringList(str);
         if (items == null || items.isEmpty()) {
             String s = prizes.getString(str, "");
@@ -99,10 +106,6 @@ public class RewardManager {
         } else {
             List<ItemStack> result = new ArrayList<ItemStack>();
             for (String item : items) {
-            	if (item.startsWith("$")) {
-            		parseMoney(item);
-            		continue;              
-            	}	
             	ItemStack indiResult = ItemParser.parseItem(item);
                 if (indiResult != null) {
                     result.add(indiResult);
@@ -110,16 +113,6 @@ public class RewardManager {
             }
             return result;
         }
-	}
-	
-	/**
-	 * Parse money, which is tagged by the uniqe $ identifier.
-	 * 
-	 * @param str string to parse.
-	 * @return the money.
-	 */
-	public double parseMoney(String str) {
-		return ItemParser.parseMoney(str);
 	}
 	
 	/**
