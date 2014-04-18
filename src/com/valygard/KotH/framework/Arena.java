@@ -9,9 +9,11 @@ import static com.valygard.KotH.util.ConfigUtil.parseLocation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -83,10 +85,17 @@ public class Arena {
 	// Is the arena ready to be used?
 	private boolean ready;
 	
-	// Manager classes
+	// Scoreboard
 	private ScoreboardManager scoreboard;
+	
+	// Inventory
 	private InventoryManager invManager;
+	
+	// Rewards
 	private RewardManager rewards;
+	
+	// Has a player chosen a team?
+	private Map<Player, String> chosenPlayers = new HashMap<Player, String>();
 
 	// --------------------------- //
 	// CONSTRUCTOR
@@ -179,6 +188,15 @@ public class Arena {
 
 		lobbyPlayers.add(p);
 		p.teleport(lobby);
+		
+		if (chosenPlayers.containsKey(p)) {
+			String team = chosenPlayers.get(p);
+			if (team.equalsIgnoreCase("red"))
+				redPlayers.add(p);
+			if (team.equalsIgnoreCase("blue"))
+				bluePlayers.add(p);
+			chosenPlayers.remove(p);
+		}
 
 		p.setHealth(p.getMaxHealth());
 		p.setFireTicks(0);
@@ -655,6 +673,16 @@ public class Arena {
 	
 	public RewardManager getRewards() {
 		return rewards;
+	}
+	
+	public Set<Player> getChosenPlayers() {
+		return chosenPlayers.keySet();
+	}
+	
+	public void chooseTeam(Player p, String s) {
+		if (chosenPlayers.containsKey(p))
+			chosenPlayers.remove(p);
+		chosenPlayers.put(p, s);
 	}
 	
 	public ArenaClass getClass(Player p) {
