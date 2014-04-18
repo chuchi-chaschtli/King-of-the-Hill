@@ -38,7 +38,7 @@ public class ChooseTeamCmd implements Command {
 		Arena arena = am.getArenaWithPlayer(p);
 		
 		if (arena == null) {  
-			Messenger.tell(p, Msg.ARENA_NULL);
+			Messenger.tell(p, "You are not in an arena!");
 			return false;
 		}
 		
