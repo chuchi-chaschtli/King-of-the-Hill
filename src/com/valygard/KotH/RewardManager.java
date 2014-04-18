@@ -58,27 +58,22 @@ public class RewardManager {
 	 */
 	@SuppressWarnings("deprecation")
 	public void givePrizes(Player p) {
-		List<ItemStack> items;
+		List<ItemStack> items = null;
 		
 		if (winner.contains(p)) {
 			items = parseItems("winners");
-			
-			for (ItemStack is : items) {
-				if (is.getTypeId() == KotH.ECONOMY_ID)
-					continue;
-				p.getInventory().addItem(is);
-			}
 		}
 		
-		else if (loser.contains(p)) {
+		if (loser.contains(p)) {
 			items = parseItems("losers");
-			
-			for (ItemStack is : items) {
-				if (is.getTypeId() == KotH.ECONOMY_ID)
-					continue;
-				p.getInventory().addItem(is);
-			}
 		}
+		
+		 for (ItemStack is : items) {
+			if (is.getTypeId() == KotH.ECONOMY_ID)
+				continue;
+			p.getInventory().addItem(is);
+		}
+		
 		items = parseItems("all-players");
 			
 		for (ItemStack is : items) {
