@@ -34,10 +34,12 @@ import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillUtils;
+import com.valygard.KotH.util.ItemParser;
 import com.valygard.KotH.util.resources.UpdateChecker;
 
 /**
@@ -72,10 +74,13 @@ public class GlobalListener implements Listener {
 
 		Sign s = (Sign) b.getState();
 		
+		if (!s.getLine(0).equalsIgnoreCase(ChatColor.DARK_PURPLE + "[KotH]"))
+			return;
+		
 		switch (e.getAction()) {
 			case RIGHT_CLICK_BLOCK:
 			case LEFT_CLICK_BLOCK:
-				String formatted = ChatColor.stripColor(s.getLine(0)).replace(" ", "");
+				String formatted = ChatColor.stripColor(s.getLine(1)).replace(" ", "");
 				if (am.getClasses().get(formatted) == null)
 					break;
 				
@@ -86,6 +91,14 @@ public class GlobalListener implements Listener {
 				
 				if (!plugin.has(p, "koth.classes." + formatted))
 					break;
+				
+				double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser.parseMoney(s.getLine(2)));
+				EconomyManager em = plugin.getEconomyManager();
+				
+				if (em.getMoney(p) < fee) {
+					Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
+					break;
+				}
 				
 				arena.pickClass(p, formatted);
 				Messenger.tell(p, Msg.CLASS_CHOSEN, formatted.toLowerCase());
@@ -298,15 +311,22 @@ public class GlobalListener implements Listener {
 	
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onSignChange(SignChangeEvent e) {
-		if (am.getClasses().get(e.getLine(0)) == null) {
+		if (am.getClasses().get(e.getLine(1)) == null) {
 			return;
 		}
+		
 		Player p = e.getPlayer();
+		String s = e.getLine(2);
+		if (s != null && (!s.startsWith("$") || s.split(".").length > 2)) {
+			Messenger.tell(p, "Invalid price option given!");
+			return;
+		}
 		
 		if (!plugin.has(p, "koth.admin.signs"))
 			return;
 		
 		Messenger.tell(e.getPlayer(), Msg.CLASS_SIGN_CREATED);
+		e.setLine(0, ChatColor.DARK_PURPLE + "[KotH]");
 	}
 	
 	@EventHandler

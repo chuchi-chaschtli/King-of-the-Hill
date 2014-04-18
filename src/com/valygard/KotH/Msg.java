@@ -59,6 +59,7 @@ public enum Msg {
 	MISC_LIST_ARENAS("Available arenas: %"),
 	MISC_LIST_CLASSES("Available classes: %"),
 	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
+	MISC_NOT_ENOUGH_MONEY("You do not have enough money to perform this action!"),
 	MISC_TEAM_JOINED("You have joined the %&r team."),
 	REWARDS_GAINED("You have received rewards for playing!"),
 	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),
