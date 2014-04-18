@@ -41,6 +41,7 @@ import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.util.CommandInfo;
 import com.valygard.KotH.command.util.CommandPermission;
 import com.valygard.KotH.command.util.CommandUsage;
+import com.valygard.KotH.framework.ArenaManager;
 
 /**
  * @author Anand
@@ -48,11 +49,13 @@ import com.valygard.KotH.command.util.CommandUsage;
  */
 public class CommandManager implements CommandExecutor {
 	private KotH plugin;
+	private ArenaManager am;
 
 	private Map<String, Command> commands;
 
 	public CommandManager(KotH plugin) {
 		this.plugin = plugin;
+		this.am		= plugin.getArenaManager();
 
 		registerCommands();
 	}
@@ -118,6 +121,10 @@ public class CommandManager implements CommandExecutor {
 			Messenger.tell(sender, Msg.CMD_NOT_ENOUGH_ARGS);
 			showUsage(command, sender, true);
 			return true;
+		}
+
+		if (!command.execute(am, sender, params)) {
+			showUsage(command, sender, true);
 		}
 
 		return false;
