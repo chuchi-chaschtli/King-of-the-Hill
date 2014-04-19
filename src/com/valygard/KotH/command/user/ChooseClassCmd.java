@@ -68,10 +68,9 @@ public class ChooseClassCmd implements Command {
         if (!lowercase.equalsIgnoreCase("random")) {
         	arena.pickClass(p, lowercase);
         	Messenger.tell(p, Msg.CLASS_CHOSEN, lowercase);
-        	return false;
+        } else {
+        	arena.giveRandomClass(p);
         }
-        
-        arena.giveRandomClass(p);
         return true;
 	}
 
