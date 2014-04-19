@@ -76,14 +76,14 @@ public class ChooseClassCmd implements Command {
 
 	private void showAvailableClasses(ArenaManager am, Player p) {
 		List<String> classes = new ArrayList<String>();
-		
+
 		for (String s : am.getConfig().getConfigurationSection("classes")
 				.getKeys(false)) {
-			classes.add((p.hasPermission("koth.classes." + s.toLowerCase()) ? ChatColor.GREEN
+			classes.add((p.hasPermission("koth.classes." + s.toLowerCase()) ? ChatColor.DARK_GREEN
 					: ChatColor.GRAY)
 					+ s.toLowerCase() + ChatColor.RESET + ",");
 		}
-		
+
         String result = KotHUtils.formatList(classes, am.getPlugin());
         Messenger.tell(p, Msg.MISC_LIST_CLASSES, result);
 	}
