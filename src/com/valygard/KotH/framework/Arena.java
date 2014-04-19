@@ -380,10 +380,12 @@ public class Arena {
 		endTimer.halt();
 		running = false;
 
+		// Tie up loose ends
 		arenaPlayers.clear();
 		redPlayers.clear();
 		bluePlayers.clear();
 		specPlayers.clear();
+		chosenPlayers.clear();
 
 		return true;
 	}

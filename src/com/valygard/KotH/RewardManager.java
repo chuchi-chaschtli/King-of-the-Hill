@@ -29,7 +29,6 @@ public class RewardManager {
 	private ConfigurationSection prizes;
 	
 	// The different kinds of players there are to give rewards to.
-	@SuppressWarnings("unused")
 	private Set<Player> winner, loser, all;
 	
 	/**
@@ -58,10 +57,12 @@ public class RewardManager {
 		
 		if (winner.contains(p)) {
 			items = parseItems("winners");
+			winner.remove(p);
 		}
 		
 		if (loser.contains(p)) {
 			items = parseItems("losers");
+			loser.remove(p);
 		}
 		
 		 for (ItemStack is : items) {
@@ -77,6 +78,7 @@ public class RewardManager {
 				continue;
 			p.getInventory().addItem(is);
 		}
+		all.remove(p);
 		p.updateInventory();
 		Messenger.tell(p, Msg.REWARDS_GAINED);
 	}
