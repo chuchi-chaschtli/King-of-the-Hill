@@ -40,6 +40,7 @@ import com.valygard.KotH.event.ArenaStartEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
 import com.valygard.KotH.hill.HillUtils;
+import com.valygard.KotH.listener.AbilityListener;
 import com.valygard.KotH.time.AutoEndTimer;
 import com.valygard.KotH.time.AutoStartTimer;
 import com.valygard.KotH.util.ConfigUtil;
@@ -95,7 +96,10 @@ public class Arena {
 	private RewardManager rewards;
 	
 	// Has a player chosen a team?
-	private Map<Player, String> chosenPlayers = new HashMap<Player, String>();
+	private Map<Player, String> chosenPlayers;
+	
+	// AbilityListener
+	private AbilityListener abilityListener;
 
 	// --------------------------- //
 	// constructor
@@ -150,6 +154,10 @@ public class Arena {
 		this.scoreboard 	= new ScoreboardManager(this);
 		this.invManager 	= new InventoryManager(this);
 		this.rewards		= new RewardManager(this, config.getConfigurationSection("arenas." + arenaName));
+		
+		this.chosenPlayers 	= new HashMap<Player, String>();
+		
+		this.abilityListener= new AbilityListener(plugin);
 	}
 	
 	
@@ -386,6 +394,9 @@ public class Arena {
 		bluePlayers.clear();
 		specPlayers.clear();
 		chosenPlayers.clear();
+		
+		// Clear all landmines.
+		abilityListener.removeLandmines();
 
 		return true;
 	}
@@ -912,6 +923,36 @@ public class Arena {
 			return bluePlayers;
 		if (getWinner().equals(bluePlayers))
 			return redPlayers;
+		return null;
+	}
+	
+	/**
+	 * Get a player's team.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public Set<Player> getTeam(Player p) {
+		if (redPlayers.contains(p))
+			return redPlayers;
+		if (bluePlayers.contains(p))
+			return bluePlayers;
+		return null;
+	}
+	
+	/**
+	 * Get the team against a player.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public Set<Player> getOpposingTeam(Player p) {
+		if (getTeam(p).equals(null))
+			return null;
+		if (getTeam(p).equals(bluePlayers))
+			return redPlayers;
+		if (getTeam(p).equals(redPlayers))
+			return bluePlayers;
 		return null;
 	}
 

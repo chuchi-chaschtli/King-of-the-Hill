@@ -13,6 +13,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
  *
  */
 public enum Msg {
+	ABILITY_LANDMINE_EXPLODE("You have been blown up by a landmine that &e%&r placed."),
+	ABILITY_LANDMINE_PLACE("You have placed a landmine!"),
+	ABILITY_HORSE_SPAWNED("You have spawned a customized horse!"),
+	ABILITY_WOLF_SPAWNED("You have spawned a wolf!"),
+	ABILITY_ZOMBIE_SPAWNED("You have spawned a super-zombie!"),
 	ARENA_ADDED("You have added a new arena &e'%'."),
 	ARENA_AUTO_END("The arena will end in &e%!"),
 	ARENA_AUTO_START("The arena will begin in &e%&r seconds!"),
