@@ -101,7 +101,7 @@ public class AbilityListener implements Listener {
 				p.getVehicle().remove();
 			}
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK)});
-			ArenaAbilities.spawnZombie(p, arena.getTeam(p), arena.getOpposingTeam(p));
+			ArenaAbilities.spawnHorse(p);
 			Messenger.tell(p, Msg.ABILITY_HORSE_SPAWNED);
 			break;
 		default:
@@ -123,11 +123,11 @@ public class AbilityListener implements Listener {
 				// Boom if the pressure plate trigger(er) is the player who placed it or on the opposite team.
 				if (player.equals(p)) {
 					ArenaAbilities.boom(p);
-					Messenger.tell(p, "You have been blown up by your own landmine!");
+					Messenger.tell(p, "You triggered your own landmine!");
 				} else if (!arena.getTeam(player).equals(arena.getTeam(p))) {
 					ArenaAbilities.boom(p);
 					Messenger.tell(p, Msg.ABILITY_LANDMINE_EXPLODE, player.getName());
-					Messenger.tell(player, "Your landmine has exploded " + ChatColor.YELLOW +  p.getName() + ".");
+					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has triggered your landmine.");
 				} else {
 					e.setCancelled(false);
 					return;
@@ -202,6 +202,9 @@ public class AbilityListener implements Listener {
 			Zombie zombie = (Zombie) e.getEntity();
 			Player p = ArenaAbilities.getPlayerWithZombie(zombie);
 			
+			if (p == null)
+				return;
+			
 			if (!zombies.containsKey(p.getUniqueId()))
 				return;
 			
@@ -250,13 +253,10 @@ public class AbilityListener implements Listener {
 		if (wolves.containsKey(p.getUniqueId())) {
 			wolves.remove(p.getUniqueId());
 			for (Wolf wolf : p.getWorld().getEntitiesByClass(Wolf.class)) {
-				if (wolf.getCustomName() == null)
-					return;
-
-				if (wolf.getOwner().equals(p)
-						&& ArenaAbilities.getNames().toString()
-						.contains(wolf.getCustomName()))
-					wolf.remove();
+				if (!wolf.getOwner().equals(p))
+					continue;
+				
+				ArenaAbilities.removeEntityByName(wolf);
 			}
 		}
 	}

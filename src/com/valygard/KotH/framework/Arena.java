@@ -19,12 +19,18 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.util.Vector;
 
 import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
@@ -324,10 +330,6 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
-		
-		// Start timers first to avoid errors
-		endTimer.startTimer();
-		hillTimer.runTask();
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
@@ -361,6 +363,8 @@ public class Arena {
 			} else
 				kickPlayer(p);
 		}
+		endTimer.startTimer();
+		hillTimer.runTask();
 
 		// Set running to true.
 		running = true;
@@ -396,6 +400,7 @@ public class Arena {
 		redPlayers.clear();
 		bluePlayers.clear();
 		specPlayers.clear();
+		
 		chosenPlayers.clear();
 		
 		// Clear all landmines.
@@ -478,14 +483,55 @@ public class Arena {
 	 * Declare one team as victorious based on which set has a higher score.
 	 */
 	public void declareWinner() {
-		if (getWinner() == null)
+		if (getWinner() == null) { 
 			Messenger.announce(this, Msg.ARENA_DRAW);
+			return;
+		}
 		else if (getWinner().equals(redPlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
 		else if (getWinner().equals(bluePlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
+		
+		for (Player p : getWinner()) {
+			createFirework(p.getLocation());
+		}
+	}
+	
+	private void createFirework(Location loc) {
+		final Firework firework = loc.getWorld().spawn(loc, Firework.class);
+		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
+		
+		Random random = new Random();
+		
+		int red = random.nextInt(256);
+		int green = random.nextInt(256); 
+		int blue = random.nextInt(256);
+		
+		Type type = null;
+		int i = random.nextInt(5);
+		switch (i) {
+		case 0: type = Type.BALL; 		break;
+		case 1: type = Type.BALL_LARGE; break;
+		case 2: type = Type.BURST;		break;
+		case 3: type = Type.CREEPER;	break;
+		case 4: type = Type.STAR;		break;
+		}
+
+		data.addEffects(FireworkEffect.builder()
+				.withColor(Color.fromRGB(red, green, blue))
+				.withFade(Color.fromRGB(green, blue * 3 / 5 + 6, red * 5 / 6 + 2))
+				.with(type).build());
+		firework.setFireworkMeta(data);
+		Vector dir = new Vector(0, 10, 0);
+		firework.setVelocity(dir.multiply(11 * 0.35));
+
+		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+			public void run() {
+				firework.detonate();
+			}
+		}, 20 * random.nextInt(3) + 2);
 	}
 
 	/**

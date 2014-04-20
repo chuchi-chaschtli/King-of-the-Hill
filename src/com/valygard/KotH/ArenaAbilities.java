@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Horse.Variant;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
@@ -102,7 +103,7 @@ public class ArenaAbilities {
 		zombificus.setMaxHealth(zombificus.getMaxHealth() * 2.5);
 		zombificus.setHealth(zombificus.getMaxHealth());
 		
-		while (zombificus.getTarget().equals(p) || zombificus.getTarget().equals(teammates)) {
+		if (zombificus.getTarget() == null || zombificus.getTarget().equals(p)) {
 			// Convert the Set to a List.
 			List<Player> list = new ArrayList<Player>();
 			for (Player player : opponents) {
@@ -246,7 +247,28 @@ public class ArenaAbilities {
 				false);
 	}
 	
+	/**
+	 * Get all the awesome names.
+	 * @return
+	 */
 	public static String[] getNames() {
 		return names;
+	}
+
+	/**
+	 * To remove wolves or zombies, we check if it has a badass name.
+	 * This method removes it for us.
+	 * @param e
+	 */
+	public static void removeEntityByName(LivingEntity e) {
+		if (e.getCustomName() == null)
+			return;
+		
+		for (String s : names) {
+			if (e.getCustomName().equalsIgnoreCase(s)) {
+				e.remove(); 
+				break;
+			}
+		}
 	}
 }
