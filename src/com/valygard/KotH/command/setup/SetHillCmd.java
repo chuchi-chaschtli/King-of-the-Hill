@@ -22,8 +22,7 @@ import com.valygard.KotH.util.ConfigUtil;
 		name = "sethill", 
 		pattern = "(add|set)hill.*",
 		desc = "Set a new hill for an arena on your current location or override an existing one.",
-		playerOnly = true,
-		argsRequired = 0
+		playerOnly = true
 )
 @CommandPermission("koth.setup.sethill")
 @CommandUsage("/koth sethill <arena> [hill#]")
@@ -37,8 +36,7 @@ public class SetHillCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;
 		
-		Arena arena;
-		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
+		Arena arena = am.getArenaWithPlayer(p);
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);
 			return false;
