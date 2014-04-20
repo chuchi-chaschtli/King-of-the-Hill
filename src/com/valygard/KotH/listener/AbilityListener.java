@@ -11,12 +11,16 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -39,12 +43,18 @@ public class AbilityListener implements Listener {
 	
 	// Landmines
 	private Map<Location, UUID> landmines;
+	
+	// Does the player have any wolves or zombies?
+	private Map<UUID, Integer> wolves, zombies;
 
 	public AbilityListener(KotH plugin) {
 		this.plugin = plugin;
 		this.am 	= plugin.getArenaManager();
 		
 		this.landmines	= new HashMap<Location, UUID>();
+		
+		this.wolves		= new HashMap<UUID, Integer>();
+		this.zombies	= new HashMap<UUID, Integer>();
 	}
 	
 	@EventHandler
@@ -64,13 +74,29 @@ public class AbilityListener implements Listener {
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.BONE)});
 			ArenaAbilities.spawnWolf(p);
 			Messenger.tell(p, Msg.ABILITY_WOLF_SPAWNED);
+			
+			// Add the player to the wolves hashmap.
+			if (!wolves.containsKey(p.getUniqueId()))
+				wolves.put(p.getUniqueId(), 0);
+			wolves.put(p.getUniqueId(), wolves.get(p.getUniqueId()) + 1);
 			break;
+		// Spawn a zombie on a player.
 		case ROTTEN_FLESH:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.ROTTEN_FLESH)});
 			ArenaAbilities.spawnZombie(p, arena.getTeam(p), arena.getOpposingTeam(p));
 			Messenger.tell(p, Msg.ABILITY_ZOMBIE_SPAWNED);
+			
+			// Add the player to the zombies hashmap.
+			if (!zombies.containsKey(p.getUniqueId()))
+				zombies.put(p.getUniqueId(), 0);
+			zombies.put(p.getUniqueId(), zombies.get(p.getUniqueId()) + 1);
 			break;
+		// Spawn a horse.
 		case HAY_BLOCK:
+			// If a player already has a horse, remove it then spawn a new one.
+			if (p.getVehicle() != null && p.getVehicle() instanceof Horse) {
+				p.getVehicle().remove();
+			}
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK)});
 			ArenaAbilities.spawnZombie(p, arena.getTeam(p), arena.getOpposingTeam(p));
 			Messenger.tell(p, Msg.ABILITY_HORSE_SPAWNED);
@@ -133,10 +159,98 @@ public class AbilityListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent e) {
+		if (e.getEntity() instanceof Wolf) {
+			Wolf wolf = (Wolf) e.getEntity();
+			Player p = (Player) wolf.getOwner();
+			
+			if (p == null)
+				return;
+			
+			if (wolf.getCustomName() == null || !ArenaAbilities.getNames().toString().contains(wolf.getCustomName()))
+				return;
+			
+			if (!wolves.containsKey(p.getUniqueId()))
+				return;
+			
+			if (wolves.get(p.getUniqueId()) <= 1) {
+				wolves.remove(p.getUniqueId());
+			} else {
+				wolves.put(p.getUniqueId(), wolves.get(p.getUniqueId()) - 1);
+			}
+			Messenger.tell(p, Msg.ABILITY_WOLF_LOST, String.valueOf(wolves.get(p.getUniqueId())));
+		}
+		
+		if (e.getEntity() instanceof Zombie) {
+			Zombie zombie = (Zombie) e.getEntity();
+			Player p = ArenaAbilities.getPlayerWithZombie(zombie);
+			
+			if (!zombies.containsKey(p.getUniqueId()))
+				return;
+			
+			if (zombies.get(p.getUniqueId()) <= 1) {
+				zombies.remove(p.getUniqueId());
+			} else {
+				zombies.put(p.getUniqueId(), zombies.get(p.getUniqueId()) - 1);
+			}
+			Messenger.tell(p, Msg.ABILITY_ZOMBIE_LOST, String.valueOf(zombies.get(p.getUniqueId())));
+		}
+	}
+	
 	public void removeLandmines() {
 		for (Location l : landmines.keySet()) {
 			l.getBlock().setType(null);
 		}
 		landmines.clear();
+	}
+	
+	public void removeEntities(Player p) {
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null)
+			return;
+		
+		if (!arena.getPlayersInArena().contains(p))
+			return;
+		
+		removeWolves(p);
+		removeZombies(p);
+		removeHorses(p);
+	}
+	
+	public void removeWolves(Player p) {
+		if (wolves.containsKey(p.getUniqueId())) {
+			wolves.remove(p.getUniqueId());
+			for (Wolf wolf : p.getWorld().getEntitiesByClass(Wolf.class)) {
+				if (wolf.getCustomName() == null)
+					return;
+
+				if (wolf.getOwner().equals(p)
+						&& ArenaAbilities.getNames().toString()
+						.contains(wolf.getCustomName()))
+					wolf.remove();
+			}
+		}
+	}
+	
+	public void removeZombies(Player p) {
+		if (zombies.containsKey(p.getUniqueId())) {
+			zombies.remove(p.getUniqueId());
+			for (Zombie zombie : p.getWorld().getEntitiesByClass(Zombie.class)) {
+				if (zombie.getMaxHealth() == 50) {
+					zombie.remove();
+				}
+			}
+		}
+		ArenaAbilities.clearZombies(p);
+	}
+	
+	public void removeHorses(Player p) {
+		if (p.getVehicle() == null)
+			return;
+		
+		if (p.getVehicle() instanceof Horse)
+			p.getVehicle().remove();
 	}
 }

@@ -254,6 +254,9 @@ public class Arena {
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
 		
+		// Remove all their pets.
+		abilityListener.removeEntities(p);
+		
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
 		data.restoreData();

@@ -5,9 +5,12 @@
 package com.valygard.KotH;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
+
+import com.valygard.KotH.util.UUIDUtil;
 
 /**
  * @author Anand
@@ -32,6 +37,8 @@ public class ArenaAbilities {
 			"Tyrion", "Tupac", "Dr. Jekyll", "Dr. Frankenstein", "Rasheed",
 			"Clementine", "Rupert", "Ronald", "Tobias", "Harold", "Phineas",
 			"Gene", "Milo", "Chief Keef" };
+	
+	private static Map<UUID, List<Zombie>> zombies = new HashMap<UUID, List<Zombie>>();
 
 	/**
 	 * Spawn a wolf on a player.
@@ -75,6 +82,7 @@ public class ArenaAbilities {
 	 * @param p
 	 * @param teammates
 	 * @param opponents
+	 * @return
 	 */
 	public static void spawnZombie(Player p, Set<Player> teammates, Set<Player> opponents) {
 		Zombie zombificus = (Zombie) p.getWorld().spawnEntity(p.getLocation(), EntityType.ZOMBIE);
@@ -108,8 +116,54 @@ public class ArenaAbilities {
 			// Tidy up loose ends.
 			list.clear();
 		}
+		// Get all the zombies the player has, and add the new one.
+		List<Zombie> list = new ArrayList<Zombie>();
+		if (zombies.containsKey(p.getUniqueId())) {
+			for (Zombie zombie : zombies.get(p.getUniqueId())) {
+				list.add(zombie);
+			}
+		}
+		list.add(zombificus);
+		zombies.put(p.getUniqueId(), list);
+		// Clear the list since we've already stored it's contents and we don't need it.
+		list.clear();
+	}
+
+	/**
+	 * Get all the zombies a player has. We have to do this to clear them later,
+	 * because unlike wolves, we can't get the owner of a zombie.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public static List<Zombie> getZombies(Player p) {
+		if (!zombies.containsKey(p.getUniqueId()))
+			return null;
+
+		return zombies.get(p);
 	}
 	
+	/**
+	 * Clear all the zombies a player has.
+	 * @param p
+	 */
+	public static void clearZombies(Player p) {
+		if (!zombies.containsKey(p.getUniqueId()))
+			return;
+		
+		zombies.remove(p.getUniqueId());
+	}
+	
+	public static Player getPlayerWithZombie(Zombie z) {
+		for (Player p : UUIDUtil.extractPlayers(zombies.keySet())) {
+			List<Zombie> zombs = zombies.get(p.getUniqueId());
+			if (zombs.contains(z) && p.isOnline()) {
+				return p;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Spawn a horse on a player. This method randomly selects a horse variant
 	 * and armor, and automatially mounts the player on the horse. To
@@ -190,5 +244,9 @@ public class ArenaAbilities {
 	public static void boom(Location l) {
 		l.getWorld().createExplosion(l.getX(), l.getY(), l.getZ(), 4F, false,
 				false);
+	}
+	
+	public static String[] getNames() {
+		return names;
 	}
 }
