@@ -132,7 +132,7 @@ public class AbilityListener implements Listener {
 					e.setCancelled(false);
 					return;
 				}
-				e.getClickedBlock().setType(null);
+				e.getClickedBlock().setType(Material.AIR);
 				
 				// Remove the location from the current landmines.
 				List<Location> locs = landmines.get(player);
