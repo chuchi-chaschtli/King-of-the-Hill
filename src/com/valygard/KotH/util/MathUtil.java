@@ -14,6 +14,7 @@ public class MathUtil {
 	 * 
 	 * @param dividend the first number
 	 * @param divisor the second number
+	 * @deprecated obsolete, may find use later.
 	 * @return
 	 */
 	public static int getRemainder(int dividend, int divisor) {
@@ -25,6 +26,7 @@ public class MathUtil {
 	 * 
 	 * @param dividend the first number
 	 * @param divisor the second number
+	 * @deprecated obsolete, may find use later.
 	 * @return
 	 */
 	public static double getRemainder(double dividend, double divisor) {

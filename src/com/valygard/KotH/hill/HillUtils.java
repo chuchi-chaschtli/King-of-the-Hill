@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.valygard.KotH.framework.Arena;
-import com.valygard.KotH.util.MathUtil;
 
 /**
  * This class is not for those who are bad at math :)
@@ -77,9 +76,7 @@ public class HillUtils {
 		if (hills.contains(current))
 			return arena.getHillLocation(String.valueOf(current));
 
-		int size = hills.size();
-		return arena.getHillLocation(String.valueOf(current > size ? MathUtil
-				.getRemainder(current, size) : current));
+		return arena.getHillLocation(String.valueOf(1));
 	}
 
 	/**
@@ -100,10 +97,7 @@ public class HillUtils {
 		if (hills.contains(current + 1))
 			return arena.getHillLocation(String.valueOf(current + 1));
 
-		int size = hills.size();
-		return arena.getHillLocation(String
-				.valueOf(current > size + 1 ? MathUtil.getRemainder(current,
-						size) + 1 : current));
+		return arena.getHillLocation(String.valueOf(1));
 	}
 
 	/**
@@ -126,9 +120,7 @@ public class HillUtils {
 			return arena.getHillLocation(String.valueOf(current - 1));
 
 		int size = hills.size();
-		return arena.getHillLocation(String
-				.valueOf(current > size - 1 ? MathUtil.getRemainder(current,
-						size) - 1 : current));
+		return arena.getHillLocation(String.valueOf(size));
 	}
 
 	/**
