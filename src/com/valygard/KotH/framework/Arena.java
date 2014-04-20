@@ -968,6 +968,8 @@ public class Arena {
 	 * @return
 	 */
 	public Set<Player> getLoser() {
+		if (getWinner() == null)
+			return null;
 		if (getWinner().equals(redPlayers))
 			return bluePlayers;
 		if (getWinner().equals(bluePlayers))
