@@ -54,7 +54,7 @@ public class ChooseClassCmd implements Command {
         String lowercase = args[0].toLowerCase();
         ArenaClass ac = am.getClasses().get(lowercase);
         
-        if (ac == null) {
+        if (ac == null && !lowercase.equals("random")) {
 			showAvailableClasses(am, p);
             return false;
         }
@@ -65,7 +65,7 @@ public class ChooseClassCmd implements Command {
             return false;
         }
         
-        if (!lowercase.equalsIgnoreCase("random")) {
+        if (!lowercase.equals("random")) {
         	arena.pickClass(p, lowercase);
         	Messenger.tell(p, Msg.CLASS_CHOSEN, lowercase);
         } else {
