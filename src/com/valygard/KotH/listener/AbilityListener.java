@@ -4,8 +4,11 @@
  */
 package com.valygard.KotH.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -42,7 +45,7 @@ public class AbilityListener implements Listener {
 	private ArenaManager am;
 	
 	// Landmines
-	private Map<Location, UUID> landmines;
+	private Map<UUID, List<Location>> landmines;
 	
 	// Does the player have any wolves or zombies?
 	private Map<UUID, Integer> wolves, zombies;
@@ -51,7 +54,7 @@ public class AbilityListener implements Listener {
 		this.plugin = plugin;
 		this.am 	= plugin.getArenaManager();
 		
-		this.landmines	= new HashMap<Location, UUID>();
+		this.landmines	= new HashMap<UUID, List<Location>>();
 		
 		this.wolves		= new HashMap<UUID, Integer>();
 		this.zombies	= new HashMap<UUID, Integer>();
@@ -109,13 +112,14 @@ public class AbilityListener implements Listener {
 		if (e.getAction().equals(Action.PHYSICAL)) {
 			if (e.getClickedBlock().getType().equals(Material.STONE_PLATE)) {
 				Location l = e.getClickedBlock().getLocation();
+				Player player = getLandminePlacer(l);
+				
 				// Set cancelled to false so the pressure plate can still function normally.
-				if (!landmines.containsKey(l)) { 
+				if (player == null) {
 					e.setCancelled(false);
 					return;
 				}
-
-				Player player = UUIDUtil.getPlayerFromUUID(landmines.get(l));
+				
 				// Boom if the pressure plate trigger(er) is the player who placed it or on the opposite team.
 				if (player.equals(p)) {
 					ArenaAbilities.boom(p);
@@ -129,7 +133,12 @@ public class AbilityListener implements Listener {
 					return;
 				}
 				e.getClickedBlock().setType(null);
-				landmines.remove(l);
+				
+				// Remove the location from the current landmines.
+				List<Location> locs = landmines.get(player);
+				locs.remove(locs.indexOf(l));
+				landmines.put(player.getUniqueId(), locs);
+				
 				e.setCancelled(true);
 			}
 		}
@@ -150,7 +159,14 @@ public class AbilityListener implements Listener {
 		case STONE_PLATE:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.STONE_PLATE)});
 			Messenger.tell(p, Msg.ABILITY_LANDMINE_PLACE);
-			landmines.put(e.getBlock().getLocation(), p.getUniqueId());
+			
+			List<Location> list = new ArrayList<Location>();
+			if (landmines.containsKey(p.getUniqueId())) {
+				for (Location l : landmines.get(p.getUniqueId()))
+					list.add(l);
+			}
+			list.add(e.getBlock().getLocation());
+			landmines.put(p.getUniqueId(), list);
 			break;
 		default:
 			if (!p.hasPermission("koth.admin.placeblocks"))
@@ -199,10 +215,21 @@ public class AbilityListener implements Listener {
 	}
 	
 	public void removeLandmines() {
-		for (Location l : landmines.keySet()) {
-			l.getBlock().setType(null);
+		for (List<Location> l : landmines.values()) {
+			for (Location loc : l)
+				loc.getBlock().setType(null);
 		}
 		landmines.clear();
+	}
+	
+	public void removeLandmines(Player p) {
+		if (!landmines.containsKey(p.getUniqueId()))
+			return;
+		
+		for (Location l : landmines.get(p.getUniqueId())) {
+			l.getBlock().setType(null);
+			landmines.remove(p.getUniqueId());
+		}
 	}
 	
 	public void removeEntities(Player p) {
@@ -252,5 +279,14 @@ public class AbilityListener implements Listener {
 		
 		if (p.getVehicle() instanceof Horse)
 			p.getVehicle().remove();
+	}
+	
+	public Player getLandminePlacer(Location l) {
+		for (Entry<UUID, List<Location>> entry : landmines.entrySet()) {
+            if (entry.getValue().contains(l)) {
+            	return UUIDUtil.getPlayerFromUUID(entry.getKey());
+            }
+        }
+		return null;
 	}
 }
