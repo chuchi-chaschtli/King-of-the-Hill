@@ -28,7 +28,12 @@ public class MathUtil {
 	 * @return
 	 */
 	public static double getRemainder(double dividend, double divisor) {
-		return dividend % divisor;
+		if (divisor == 0) {
+			return 0.0;
+		}
+		
+		double quotient = dividend / divisor;
+		return (dividend > divisor ? dividend - (quotient * divisor) : 0.0);
 	}
 
 	/**
