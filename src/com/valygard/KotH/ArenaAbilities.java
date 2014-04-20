@@ -103,20 +103,6 @@ public class ArenaAbilities {
 		zombificus.setMaxHealth(zombificus.getMaxHealth() * 2.5);
 		zombificus.setHealth(zombificus.getMaxHealth());
 		
-		if (zombificus.getTarget() == null || zombificus.getTarget().equals(p)) {
-			// Convert the Set to a List.
-			List<Player> list = new ArrayList<Player>();
-			for (Player player : opponents) {
-				list.add(player);
-			}
-			
-			Player opponent = list.get(random.nextInt(opponents.size()));
-			zombificus.setTarget(opponent);
-			zombificus.teleport(opponent);
-			
-			// Tidy up loose ends.
-			list.clear();
-		}
 		// Get all the zombies the player has, and add the new one.
 		List<Zombie> list = new ArrayList<Zombie>();
 		if (zombies.containsKey(p.getUniqueId())) {

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -24,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -172,6 +174,49 @@ public class AbilityListener implements Listener {
 			if (!p.hasPermission("koth.admin.placeblocks"))
 				e.setCancelled(true);
 			break;
+		}
+	}
+	
+	@EventHandler
+	public void onEntityMove(EntityTargetLivingEntityEvent e) {
+		if (!(e.getEntity() instanceof Zombie))
+			return;
+		
+		if (!zombies.containsValue(e.getEntity()))
+			return;
+		
+		Zombie z = (Zombie) e.getEntity();
+		Player p = ArenaAbilities.getPlayerWithZombie(z);
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null || !arena.getPlayersInArena().contains(p)) {
+			z.remove();
+			return;
+		}
+		
+		// Players the zombie can't attack.
+		List<Player> untouchables = new ArrayList<Player>();
+		untouchables.add(p);
+		for (Player player : arena.getTeam(p)) {
+			untouchables.add(player);
+		}
+		// Clear list
+		untouchables.clear();
+		
+		if (untouchables.contains(e.getTarget())) {
+			// Convert opposing team to list format then get a random opponent.
+			List<Player> list = new ArrayList<Player>();
+			for (Player player : arena.getOpposingTeam(p)) {
+				list.add(player);
+			}
+			Random random = new Random();
+			
+			Player opponent = list.get(random.nextInt(list.size()));
+			z.setTarget(opponent);
+			z.teleport(opponent);
+			
+			// Clear the list.
+			list.clear();
 		}
 	}
 	
