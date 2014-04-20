@@ -51,11 +51,9 @@ public class ArenaLeaveEvent extends Event {
 		return ending;
 	}
 	
+	
 	public void setEnding(boolean value) {
 		ending = value;
-		
-		if (value)
-			arena.forceEnd();
 	}
 
 	@Override
