@@ -48,7 +48,7 @@ public class JoinCmd implements Command {
 			return false;
 		}
 		
-		if (arena.hasPlayer(p)) {
+		if (arena.inLobby(p) || arena.getPlayersInArena().contains(p)) {
 			Messenger.tell(p, Msg.JOIN_ALREADY_IN_ARENA);
 			return false;
 		}
