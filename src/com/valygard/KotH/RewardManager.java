@@ -28,9 +28,6 @@ public class RewardManager {
 	// The section where all the prizes are.
 	private ConfigurationSection prizes;
 	
-	// The different kinds of players there are to give rewards to.
-	private Set<Player> winner, loser, all;
-	
 	/**
 	 * Our constructor.
 	 * 
@@ -49,44 +46,49 @@ public class RewardManager {
 	/**
 	 * Give prizes to a player. This method only gives prizes at arena end.
 	 * 
-	 * @param p the player.
+	 * @param pthe player.
 	 */
 	@SuppressWarnings("deprecation")
 	public void givePrizes(Player p) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 
-		if (winner != null) {
-			if (winner.contains(p)) {
+		if (getWinners() != null) {
+			if (getWinners().contains(p)) {
 				items = parseItems("winners");
-				winner.remove(p);
+
+				for (ItemStack is : items) {
+					if (is.getTypeId() == KotH.ECONOMY_ID)
+						continue;
+					p.getInventory().addItem(is);
+				}
+				getWinners().remove(p);
 			}
 		}
 
-		if (loser != null) {
-			if (loser.contains(p)) {
+		if (getLosers() != null) {
+			if (getLosers().contains(p)) {
 				items = parseItems("losers");
-				loser.remove(p);
+
+				for (ItemStack is : items) {
+					if (is.getTypeId() == KotH.ECONOMY_ID)
+						continue;
+					p.getInventory().addItem(is);
+				}
+				getLosers().remove(p);
 			}
 		}
-		
-		 for (ItemStack is : items) {
-			if (is.getTypeId() == KotH.ECONOMY_ID)
-				continue;
-			p.getInventory().addItem(is);
-		}
-		
 		items = parseItems("all-players");
-			
+
 		for (ItemStack is : items) {
 			if (is.getTypeId() == KotH.ECONOMY_ID)
 				continue;
 			p.getInventory().addItem(is);
 		}
-		all.remove(p);
+		getAllPlayers().remove(p);
 		p.updateInventory();
 		Messenger.tell(p, Msg.REWARDS_GAINED);
 	}
-	
+
 	/**
 	 * A method for parsing items.
 	 * 
