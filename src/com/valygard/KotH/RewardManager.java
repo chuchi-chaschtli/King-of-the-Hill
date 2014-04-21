@@ -84,7 +84,6 @@ public class RewardManager {
 				continue;
 			p.getInventory().addItem(is);
 		}
-		getAllPlayers().remove(p);
 		p.updateInventory();
 		Messenger.tell(p, Msg.REWARDS_GAINED);
 	}

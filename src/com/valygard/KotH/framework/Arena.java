@@ -9,11 +9,9 @@ import static com.valygard.KotH.util.ConfigUtil.parseLocation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -101,9 +99,6 @@ public class Arena {
 	// Rewards
 	private RewardManager rewards;
 	
-	// Has a player chosen a team?
-	private Map<Player, String> chosenPlayers;
-	
 	// AbilityListener
 	private AbilityListener abilityListener;
 
@@ -161,8 +156,6 @@ public class Arena {
 		this.invManager 	= new InventoryManager(this);
 		this.rewards		= new RewardManager(this, config.getConfigurationSection("arenas." + arenaName));
 		
-		this.chosenPlayers 	= new HashMap<Player, String>();
-		
 		this.abilityListener= new AbilityListener(plugin);
 	}
 	
@@ -216,15 +209,6 @@ public class Arena {
 
 		lobbyPlayers.add(p);
 		p.teleport(lobby);
-		
-		if (chosenPlayers.containsKey(p)) {
-			String team = chosenPlayers.get(p);
-			if (team.equalsIgnoreCase("red"))
-				redPlayers.add(p);
-			if (team.equalsIgnoreCase("blue"))
-				bluePlayers.add(p);
-			chosenPlayers.remove(p);
-		}
 
 		p.setHealth(p.getMaxHealth());
 		p.setFireTicks(0);
@@ -268,10 +252,12 @@ public class Arena {
 		data.restoreData();
 		
 		// Then give rewards, only if the arena is ending.
-		if (end) {
-			rewards.givePrizes(p);
-		} else {
-			Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
+		if (running) {
+			if (end) {
+				rewards.givePrizes(p);
+			} else { 
+				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
+			}
 		}
 		
 		if (!end) {
@@ -401,8 +387,6 @@ public class Arena {
 		bluePlayers.clear();
 		specPlayers.clear();
 		
-		chosenPlayers.clear();
-		
 		// Clear all landmines.
 		abilityListener.removeLandmines();
 
@@ -499,7 +483,7 @@ public class Arena {
 		}
 	}
 	
-	private void createFirework(Location loc) {
+	public void createFirework(Location loc) {
 		final Firework firework = loc.getWorld().spawn(loc, Firework.class);
 		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
 		
@@ -950,11 +934,19 @@ public class Arena {
 
 	/**
 	 * Our winner is defined as whichever team has the higher score. If there is
-	 * none, then we return null to symbolize a draw.
+	 * none, then we return null to symbolize a draw. However, if one team
+	 * has no players, they cannot win.
 	 * 
 	 * @return
 	 */
 	public Set<Player> getWinner() {
+		// If one team has forfeit, run the following:
+		if (redPlayers.size() <= 0 && bluePlayers.size() > 0)
+			return bluePlayers;
+		else if (bluePlayers.size() <= 0 && redPlayers.size() > 0)
+			return redPlayers;
+		
+		// If there are players on both teams.
 		if (hillTimer.getBlueScore() > hillTimer.getRedScore())
 			return bluePlayers;
 		else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
@@ -1063,25 +1055,17 @@ public class Arena {
 	}
 
 	/**
-	 * This represents all the players who have picked a team.
-	 * 
-	 * @return
-	 */
-	public Set<Player> getChosenPlayers() {
-		return chosenPlayers.keySet();
-	}
-
-	/**
 	 * If the player has not chosen a team, place them in their desired choice.
 	 * Else, override their previous choice.
 	 * 
 	 * @param p
 	 * @param s
 	 */
-	public void chooseTeam(Player p, String s) {
-		if (chosenPlayers.containsKey(p))
-			chosenPlayers.remove(p);
-		chosenPlayers.put(p, s);
+	public void chooseTeam(Player p, String team) {
+		if (team.equalsIgnoreCase("red"))
+			redPlayers.add(p);
+		if (team.equalsIgnoreCase("blue"))
+			bluePlayers.add(p);
 	}
 
 	/**
