@@ -1008,6 +1008,16 @@ public class Arena {
 	public boolean inLobby(Player p) {
 		return lobbyPlayers.contains(p);
 	}
+	
+	/**
+	 * Check if a player is spectating.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public boolean isSpectating(Player p) {
+		return specPlayers.contains(p);
+	}
 
 	/**
 	 * The arena is ready to be used when all locations are defined.

@@ -299,8 +299,29 @@ public class GlobalListener implements Listener {
 			Player d = (Player) e.getDamager();
 
 			Arena arena = am.getArenaWithPlayer(p);
-
-			if (arena == null || !arena.getPlayersInArena().contains(d))
+			if (arena == null)
+				return;
+			
+			if (arena.inLobby(p) || arena.isSpectating(p)) {
+				e.setCancelled(true);
+				Messenger.tell(d, "You can't hurt players that are playing " + ChatColor.AQUA + "King of the Hill.");
+				return;
+			}
+			
+			// Only needed to see if the damager is trying to attack others.
+			Arena dArena = am.getArenaWithPlayer(d);
+			
+			if (dArena == null)
+				return;
+			
+			if (arena.inLobby(d) || arena.isSpectating(d)) {
+				e.setCancelled(true);
+				Messenger.tell(d, "You can't hurt players while playing " + ChatColor.AQUA + "King of the Hill.");
+				return;
+			}
+			
+			// Make sure weapons and armor don't break.
+			if (!arena.getPlayersInArena().contains(d))
 				return;
 
 			if (arena.getSettings().getBoolean("indestructible-weapons"))
