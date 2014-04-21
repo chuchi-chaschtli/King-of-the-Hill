@@ -53,7 +53,7 @@ public class RewardManager {
 	 */
 	@SuppressWarnings("deprecation")
 	public void givePrizes(Player p) {
-		List<ItemStack> items = null;
+		List<ItemStack> items = new ArrayList<ItemStack>();
 
 		if (winner != null) {
 			if (winner.contains(p)) {
