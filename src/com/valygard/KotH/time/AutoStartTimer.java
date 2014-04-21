@@ -104,7 +104,7 @@ public class AutoStartTimer {
 		@Override
 		public void run() {
 			// If the arena is in progress or there isn't any waiting players, abort.
-			if (arena.isRunning() || arena.getPlayersInLobby().isEmpty()) {
+			if (arena.isRunning() || arena.getPlayersInLobby().size() < arena.getSettings().getInt("min-players")) {
 				halt();
 				return;
 			}
