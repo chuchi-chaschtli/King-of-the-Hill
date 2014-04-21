@@ -54,15 +54,19 @@ public class RewardManager {
 	@SuppressWarnings("deprecation")
 	public void givePrizes(Player p) {
 		List<ItemStack> items = null;
-		
-		if (winner.contains(p)) {
-			items = parseItems("winners");
-			winner.remove(p);
+
+		if (winner != null) {
+			if (winner.contains(p)) {
+				items = parseItems("winners");
+				winner.remove(p);
+			}
 		}
-		
-		if (loser.contains(p)) {
-			items = parseItems("losers");
-			loser.remove(p);
+
+		if (loser != null) {
+			if (loser.contains(p)) {
+				items = parseItems("losers");
+				loser.remove(p);
+			}
 		}
 		
 		 for (ItemStack is : items) {
