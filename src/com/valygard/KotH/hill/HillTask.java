@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.event.ArenaScoreEvent;
 import com.valygard.KotH.framework.Arena;
@@ -22,6 +22,7 @@ public class HillTask {
 	private HillUtils utils;
 	
 	private Arena arena;
+	private BukkitTask task;
 	
 	// Scoring for the game.
 	private int redScore, blueScore;
@@ -34,7 +35,7 @@ public class HillTask {
 	}
 
 	public void runTask() {
-		Bukkit.getServer().getScheduler().runTaskTimer(arena.getPlugin(), new BukkitRunnable() {
+		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(), new Runnable() {
 			public void run() {
 				manager.changeHills();
 
@@ -48,17 +49,16 @@ public class HillTask {
 
 				// Update scores
 				Set<Player> dominant = manager.getDominantTeam();
-				if (dominant == null) 
-					return;
+				if (dominant != null) {
+					if (dominant.equals(arena.getRedTeam())) {
+						manager.setHillBoundary();
+						setRedScore(redScore + 1);
+					}
 
-				if (dominant.equals(arena.getRedTeam())) {
-					manager.setHillBoundary();
-					setRedScore(redScore + 1);
-				}
-
-				else if (dominant.equals(arena.getBlueTeam())) {
-					manager.setHillBoundary();
-					setBlueScore(blueScore + 1);
+					else if (dominant.equals(arena.getBlueTeam())) {
+						manager.setHillBoundary();
+						setBlueScore(blueScore + 1);
+					}
 				}
 
 				// Tidy up
@@ -68,9 +68,10 @@ public class HillTask {
 						|| arena.getScoreboard().getTimeLeft().getScore() <= 0
 						|| arena.getBlueTeam().size() <= 0
 						|| arena.getRedTeam().size() <= 0) {
-					cancel();
+					
 					manager.setStatus(utils.getHillRotations());
 					arena.forceEnd();
+					task.cancel();
 				}
 			}
 		}, 20, 20);
