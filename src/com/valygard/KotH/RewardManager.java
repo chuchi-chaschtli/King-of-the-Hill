@@ -6,7 +6,6 @@ package com.valygard.KotH;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -46,37 +45,20 @@ public class RewardManager {
 	/**
 	 * Give prizes to a player. This method only gives prizes at arena end.
 	 * 
-	 * @param pthe player.
+	 * @param p the player.
 	 */
 	@SuppressWarnings("deprecation")
-	public void givePrizes(Player p) {
+	public void givePrizes(Player p, boolean winner) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 
-		if (getWinners() != null) {
-			if (getWinners().contains(p)) {
-				items = parseItems("winners");
+		items = parseItems(winner ? "winners" : "losers");
 
-				for (ItemStack is : items) {
-					if (is.getTypeId() == KotH.ECONOMY_ID)
-						continue;
-					p.getInventory().addItem(is);
-				}
-				getWinners().remove(p);
-			}
+		for (ItemStack is : items) {
+			if (is.getTypeId() == KotH.ECONOMY_ID)
+				continue;
+			p.getInventory().addItem(is);
 		}
 
-		if (getLosers() != null) {
-			if (getLosers().contains(p)) {
-				items = parseItems("losers");
-
-				for (ItemStack is : items) {
-					if (is.getTypeId() == KotH.ECONOMY_ID)
-						continue;
-					p.getInventory().addItem(is);
-				}
-				getLosers().remove(p);
-			}
-		}
 		items = parseItems("all-players");
 
 		for (ItemStack is : items) {
@@ -111,33 +93,6 @@ public class RewardManager {
             }
             return result;
         }
-	}
-	
-	/**
-	 * Get the winning team in the arena.
-	 * 
-	 * @return a player set.
-	 */
-	public Set<Player> getWinners() {
-		return arena.getWinner();
-	}
-	
-	/**
-	 * Get the losing team in the arena.
-	 * 
-	 * @return a player set.
-	 */
-	public Set<Player> getLosers() {
-		return arena.getLoser();
-	}
-	
-	/**
-	 * Get all players in an arena.
-	 * 
-	 * @return all players.
-	 */
-	public Set<Player> getAllPlayers() {
-		return arena.getPlayersInArena();
 	}
 	
 	/**

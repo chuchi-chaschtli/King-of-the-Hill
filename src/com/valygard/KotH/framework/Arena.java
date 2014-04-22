@@ -74,6 +74,9 @@ public class Arena {
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
+	
+	// Get the winner later
+	private Set<Player> winner = new HashSet<Player>();
 
 	// Some booleans that are configuration-critical.
 	private boolean running, enabled;
@@ -236,8 +239,6 @@ public class Arena {
 		}		
 		ArenaLeaveEvent event = new ArenaLeaveEvent(this, p);
 		plugin.getServer().getPluginManager().callEvent(event);
-		if (end)
-			event.setEnding(true);
 		
 		invManager.clearInventory(p);
 
@@ -254,7 +255,7 @@ public class Arena {
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {
-				rewards.givePrizes(p);
+				rewards.givePrizes(p, winner.contains(p));
 			} else { 
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
 			}
@@ -372,6 +373,17 @@ public class Arena {
 		// Fire the event.
 		ArenaEndEvent event = new ArenaEndEvent(this);
 		plugin.getServer().getPluginManager().callEvent(event);
+		
+		// Set the winner, to be declared and given different rewards.
+		winner = getWinnerByScore();
+		if (winner.equals(redPlayers)) {
+			if (redPlayers.size() <= 0)
+				winner = bluePlayers;
+		}
+		if (winner.equals(bluePlayers)) {
+			if (bluePlayers.size() <= 0)
+				winner = redPlayers;
+		}
 
 		declareWinner();
 
@@ -467,18 +479,18 @@ public class Arena {
 	 * Declare one team as victorious based on which set has a higher score.
 	 */
 	public void declareWinner() {
-		if (getWinner() == null) { 
+		if (winner == null) { 
 			Messenger.announce(this, Msg.ARENA_DRAW);
 			return;
 		}
-		else if (getWinner().equals(redPlayers))
+		else if (winner.equals(redPlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
-		else if (getWinner().equals(bluePlayers))
+		else if (winner.equals(bluePlayers))
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
 		
-		for (Player p : getWinner()) {
+		for (Player p : winner) {
 			createFirework(p.getLocation());
 		}
 	}
@@ -934,24 +946,38 @@ public class Arena {
 
 	/**
 	 * Our winner is defined as whichever team has the higher score. If there is
-	 * none, then we return null to symbolize a draw. However, if one team
-	 * has no players, they cannot win.
+	 * none, then we return null to symbolize a draw.
 	 * 
 	 * @return
 	 */
-	public Set<Player> getWinner() {
-		// If one team has forfeit, run the following:
-		if (redPlayers.size() <= 0 && bluePlayers.size() > 0)
-			return bluePlayers;
-		else if (bluePlayers.size() <= 0 && redPlayers.size() > 0)
-			return redPlayers;
-		
+	public Set<Player> getWinnerByScore() {
 		// If there are players on both teams.
-		if (hillTimer.getBlueScore() > hillTimer.getRedScore())
-			return bluePlayers;
-		else if (hillTimer.getRedScore() > hillTimer.getBlueScore())
-			return redPlayers;
+		if (hillTimer.getBlueScore() > hillTimer.getRedScore()) {
+			winner = bluePlayers;
+			return winner;
+		} else if (hillTimer.getRedScore() > hillTimer.getBlueScore()) {
+			winner = redPlayers;
+			return winner;
+		}
 		return null;
+	}
+	
+	/**
+	 * Get the victor.
+	 * @return
+	 */
+	public Set<Player> getWinner() {
+		return winner;
+	}
+	
+	/**
+	 * Set the victor.
+	 * @param newWinner
+	 * @return
+	 */
+	public Set<Player> setWinner(Set<Player> newWinner) {
+		winner = newWinner;
+		return winner;
 	}
 
 	/**
@@ -960,11 +986,11 @@ public class Arena {
 	 * @return
 	 */
 	public Set<Player> getLoser() {
-		if (getWinner() == null)
+		if (winner == null)
 			return null;
-		if (getWinner().equals(redPlayers))
+		if (winner.equals(redPlayers))
 			return bluePlayers;
-		if (getWinner().equals(bluePlayers))
+		if (winner.equals(bluePlayers))
 			return redPlayers;
 		return null;
 	}
