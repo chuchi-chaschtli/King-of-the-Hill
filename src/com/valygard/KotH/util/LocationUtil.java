@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 /**
  * @author Anand
@@ -26,7 +25,7 @@ public class LocationUtil {
 	 * @param radius a double
 	 * @return
 	 */
-	public static Set<Block> getCircularBoundary(Location center, double radius) {
+	public static Set<Location> getCircularBoundary(Location center, double radius) {
 		if (radius <= 0)
 			throw new IllegalArgumentException("The radius must be a positive integer!");
 		
@@ -38,7 +37,7 @@ public class LocationUtil {
 		
 		int y = center.getBlockY();
 		
-		Set<Block> result = new HashSet<Block>();
+		Set<Location> result = new HashSet<Location>();
 		
 		double nextXn = 0;
 		forX: for (int x = 0; x <= ceilRadius; ++x) {
@@ -60,10 +59,10 @@ public class LocationUtil {
 				if (distanceSq(nextXn, zn) <= 1 && distanceSq(xn, nextZn) <= 1) {
 					continue;
 				}
-				Block q1 = center.getWorld().getBlockAt(x, y, z);
-				Block q2 = center.getWorld().getBlockAt(-x, y, z);
-				Block q3 = center.getWorld().getBlockAt(-x, y, -z);
-				Block q4 = center.getWorld().getBlockAt(x, y, -z);
+				Location q1 = new Location(center.getWorld(), x, y, z);
+				Location q2 = new Location(center.getWorld(), -x, y, z);
+				Location q3 = new Location(center.getWorld(), -x, y, -z);
+				Location q4 = new Location(center.getWorld(), x, y, -z);
 				
 				result.add(q1);
 				result.add(q2);
@@ -81,7 +80,7 @@ public class LocationUtil {
 	 * @param radius a double
 	 * @return
 	 */
-	public static Set<Block> getSquareBoundary(Location center, double radius) {
+	public static Set<Location> getSquareBoundary(Location center, double radius) {
 		if (radius <= 0)
 			throw new IllegalArgumentException("The radius must be a positive integer!");
 		
@@ -93,13 +92,13 @@ public class LocationUtil {
 		final int y = center.getBlockY();
 		final int z = center.getBlockZ();
 		
-		Set<Block> result = new HashSet<Block>();
+		Set<Location> result = new HashSet<Location>();
 		
 		for (int xn = x - ceilRadius; xn <= x + ceilRadius; xn++) {
 			for (int zn = z - ceilRadius; zn <= z + ceilRadius; zn++) {
 				boolean border = ((xn == x - ceilRadius || xn == x + ceilRadius) && (zn == z - ceilRadius || zn == z + ceilRadius));
 				if (border)
-					result.add(center.getWorld().getBlockAt(xn, y, zn));
+					result.add(new Location(center.getWorld(), xn, y, zn));
 			}
 		}
 		
