@@ -381,8 +381,12 @@ public class Arena {
 				winner = bluePlayers;
 		}
 		if (winner.equals(bluePlayers)) {
-			if (bluePlayers.size() <= 0)
-				winner = redPlayers;
+			if (bluePlayers.size() <= 0) {
+				if (redPlayers.size() <= 0)
+					winner = null;
+				else
+					winner = redPlayers;
+			}
 		}
 
 		declareWinner();
