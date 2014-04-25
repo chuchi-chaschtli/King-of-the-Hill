@@ -59,7 +59,7 @@ public class HillUtils {
 
 		return (int) (arena.getWarps().getConfigurationSection("hills")
 				.getKeys(false).size() > 1 ? Math.floor(timeLeft
-				/ arena.getSettings().getInt("hill-clock")) : 0);
+				/ arena.getSettings().getInt("hill-clock")) - 1 : 0);
 	}
 
 	/**
@@ -68,15 +68,9 @@ public class HillUtils {
 	 * @return the location of the current hill
 	 */
 	public Location getCurrentHill() {
-		ConfigurationSection section = arena.getWarps()
-				.getConfigurationSection("hills");
-		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft() + 1;
-
-		if (hills.contains(current))
-			return arena.getHillLocation(String.valueOf(current));
-
-		return arena.getHillLocation(String.valueOf(1));
+		int current = getHillRotations() - getRotationsLeft();
+		
+		return getHill(current);
 	}
 
 	/**
@@ -86,18 +80,11 @@ public class HillUtils {
 	 * @return the location of the next hill
 	 */
 	public Location getNextHill() {
-		ConfigurationSection section = arena.getWarps()
-				.getConfigurationSection("hills");
-		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft() + 1;
+		int current = getHillRotations() - getRotationsLeft();
 
 		if (isLastHill())
 			return null;
-
-		if (hills.contains(current + 1))
-			return arena.getHillLocation(String.valueOf(current + 1));
-
-		return arena.getHillLocation(String.valueOf(1));
+		return getHill(current + 1);
 	}
 
 	/**
@@ -107,30 +94,31 @@ public class HillUtils {
 	 * @return the location of the previous hill
 	 */
 	public Location getPreviousHill() {
-		ConfigurationSection section = arena.getWarps()
-				.getConfigurationSection("hills");
-		Set<String> hills = section.getKeys(false);
-		int current = getHillRotations() - getRotationsLeft() + 1;
+		int current = getHillRotations() - getRotationsLeft();
 
 		// There was no previous hill...
 		if (isFirstHill())
 			return null;
-
-		if (hills.contains(current - 1))
-			return arena.getHillLocation(String.valueOf(current - 1));
-
-		int size = hills.size();
-		return arena.getHillLocation(String.valueOf(size));
+		
+		return getHill(current - 1);
+	}
+	
+	public Location getHill(int status) {
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
+		Set<String> hills = section.getKeys(false);
+		if (status > hills.size())
+			return arena.getHillLocation(String.valueOf(status % hills.size()));
+		return arena.getHillLocation(String.valueOf(status));
 	}
 
 	/**
-	 * Is this the first hill? If the amount of hills left happens to equal the
-	 * total number of rotations, then yes, it is.
+	 * Returns whether or not we are on the first hill.
 	 * 
 	 * @return true / false
 	 */
 	public boolean isFirstHill() {
-		return (getRotationsLeft() == getHillRotations());
+		return (getRotationsLeft() + 1 == getHillRotations());
 	}
 
 	/**
@@ -153,7 +141,7 @@ public class HillUtils {
 		if (isLastHill())
 			return false;
 
-		return (getRotationsLeft() * arena.getSettings().getInt("hill-clock") == arena
+		return ((getRotationsLeft() + 1) * arena.getSettings().getInt("hill-clock") == arena
 				.getEndTimer().getRemaining());
 	}
 }
