@@ -189,7 +189,9 @@ public class ArenaAbilities {
 		}
 		
 		// Set it's equipment
-		horse.getInventory().setArmor(new ItemStack(barding));
+		if (barding != null) {
+			horse.getInventory().setArmor(new ItemStack(barding));
+		}
 		horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
 		horse.setCarryingChest(false);
 		
