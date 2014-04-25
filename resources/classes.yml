@@ -3,4 +3,4 @@
     armor: iron-boots, iron-leggings, iron-chestplate, iron-helmet
   Archer:
     items: bow arrow_infinite:1;arrow_damage:1, potion:8229:3, arrow
-    armor: leather-boots, leather-leggings, leather-boots, leather-helmet
+    armor: leather-boots, leather-leggings, leather-chestplate, leather-helmet
