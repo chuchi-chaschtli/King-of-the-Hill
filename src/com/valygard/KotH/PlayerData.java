@@ -56,6 +56,8 @@ public class PlayerData {
 		this.health		= player.getHealth();
 		this.level		= player.getLevel();
 		this.exp		= player.getExp();
+		
+		this.arenaClass = null;
 	}
 
 	/**
