@@ -4,30 +4,23 @@
  */
 package com.valygard.KotH;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Horse.Variant;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
-
-import com.valygard.KotH.util.UUIDUtil;
+import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class ArenaAbilities {
 	// The greatest names a mob could ever hope to have.
@@ -38,38 +31,41 @@ public class ArenaAbilities {
 			"Tyrion", "Tupac", "Dr. Jekyll", "Dr. Frankenstein", "Rasheed",
 			"Clementine", "Rupert", "Ronald", "Tobias", "Harold", "Phineas",
 			"Gene", "Milo", "Chief Keef" };
-	
-	private static Map<UUID, List<Zombie>> zombies = new HashMap<UUID, List<Zombie>>();
 
 	/**
 	 * Spawn a wolf on a player.
 	 * 
+	 * @param plugin
 	 * @param p
 	 */
-	public static void spawnWolf(Player p) {
-		Wolf wolf = (Wolf) p.getWorld().spawnEntity(p.getLocation(), EntityType.WOLF);
-		
+	public static void spawnWolf(KotH plugin, Player p) {
+		Wolf wolf = (Wolf) p.getWorld().spawnEntity(p.getLocation(),
+				EntityType.WOLF);
+
 		// Adult
 		wolf.setAdult();
 		wolf.setAgeLock(true);
-		
+
 		// Hype it up!
 		wolf.setAngry(true);
-		
+
 		// Give it to the player.
 		wolf.setTamed(true);
 		wolf.setOwner(p);
-		
+
 		// Misc
 		wolf.setBreed(false);
 		wolf.setSitting(false);
-		
+
 		Random random = new Random();
 		String name = names[random.nextInt(names.length)];
 		wolf.setCustomName(name);
 		wolf.setCustomNameVisible(true);
+		
+		// Add a tag so we know the wolf was spawned during the arena.
+		wolf.setMetadata(p.getName(), new FixedMetadataValue(plugin, "yes!"));
 	}
-	
+
 	/**
 	 * Spawn a zombie on a player. This zombie is going to be edited so it
 	 * doesn't attack the player or the player's teammates. Also sets a custom
@@ -78,76 +74,68 @@ public class ArenaAbilities {
 	 * of the sun if it is daytime, we give it 250% health. If it's not daytime
 	 * ... too bad.
 	 * 
-	 * Throws huge errors on Spigot.
-	 * 
+	 * @param plugin
 	 * @param p
 	 * @param teammates
 	 * @param opponents
 	 * @return
 	 */
-	public static void spawnZombie(Player p, Set<Player> teammates, Set<Player> opponents) {
-		Zombie zombificus = (Zombie) p.getWorld().spawnEntity(p.getLocation(), EntityType.ZOMBIE);
-		
+	public static void spawnZombie(KotH plugin, Player p,
+			Set<Player> teammates, Set<Player> opponents) {
+		Zombie zombificus = (Zombie) p.getWorld().spawnEntity(p.getLocation(),
+				EntityType.ZOMBIE);
+
 		// Some settings
 		zombificus.setBaby(false);
 		zombificus.setVillager(false);
 		zombificus.setCanPickupItems(false);
-		
+
 		// Add a sweet name to the zombie.
 		Random random = new Random();
 		String name = names[random.nextInt(names.length)];
 		zombificus.setCustomName(name);
 		zombificus.setCustomNameVisible(true);
-		
+
 		// Much more health to make Zombificus feared.
 		zombificus.setMaxHealth(zombificus.getMaxHealth() * 2.5);
 		zombificus.setHealth(zombificus.getMaxHealth());
-		
-		// Get all the zombies the player has, and add the new one.
-		List<Zombie> list = new ArrayList<Zombie>();
-		if (zombies.containsKey(p.getUniqueId())) {
-			for (Zombie zombie : zombies.get(p.getUniqueId())) {
-				list.add(zombie);
-			}
-		}
-		list.add(zombificus);
-		zombies.put(p.getUniqueId(), list);
-		// Clear the list since we've already stored it's contents and we don't need it.
-		list.clear();
+
+		// Add a tag so we know who the zombie belongs to.
+		zombificus.setMetadata(p.getName(), new FixedMetadataValue(plugin,
+				"yes!"));
 	}
 
 	/**
-	 * Get all the zombies a player has. We have to do this to clear them later,
-	 * because unlike wolves, we can't get the owner of a zombie.
+	 * Loop through all the players in the zombie's world.
+	 * If the zombie's metadata equals any of the player's names,
+	 * return that player.
 	 * 
-	 * @param p
+	 * @param z
 	 * @return
 	 */
-	public static List<Zombie> getZombies(Player p) {
-		if (!zombies.containsKey(p.getUniqueId()))
-			return null;
-
-		return zombies.get(p);
+	public static Player getPlayerWithZombie(Zombie z) {
+		for (Player p : z.getWorld().getPlayers()) {
+			if (z.hasMetadata(p.getName()))
+				return p;
+		}
+		return null;
 	}
 	
 	/**
-	 * Clear all the zombies a player has.
-	 * @param p
+	 * Instead of looping through all players, we can check if the wolf has an
+	 * owner. If so, we also want to check if the wolf's metadata equals that
+	 * player name. This ensures that this wolf was spawned during the arena.
+	 * 
+	 * @param wolf
+	 * @return
 	 */
-	public static void clearZombies(Player p) {
-		if (!zombies.containsKey(p.getUniqueId()))
-			return;
-		
-		zombies.remove(p.getUniqueId());
-	}
-	
-	public static Player getPlayerWithZombie(Zombie z) {
-		for (Player p : UUIDUtil.extractPlayers(zombies.keySet())) {
-			List<Zombie> zombs = zombies.get(p.getUniqueId());
-			if (zombs.contains(z) && p.isOnline()) {
-				return p;
-			}
-		}
+	public static Player getPlayerWithWolf(Wolf wolf) {
+		if (wolf.getOwner() == null)
+			return null;
+
+		Player p = (Player) wolf.getOwner();
+		if (wolf.hasMetadata(p.getName()))
+			return p;
 		return null;
 	}
 
@@ -161,54 +149,71 @@ public class ArenaAbilities {
 	 */
 	public static void spawnHorse(Player p) {
 		// Spawn the horse.
-		Horse horse = (Horse) p.getWorld().spawnEntity(p.getLocation(), EntityType.HORSE);
-		
+		Horse horse = (Horse) p.getWorld().spawnEntity(p.getLocation(),
+				EntityType.HORSE);
+
 		Random random = new Random();
-		
-		int type 	= random.nextInt(5);
-		int armor   = random.nextInt(4);
-		
+
+		int type = random.nextInt(5);
+		int armor = random.nextInt(4);
+
 		// Set it's variant and armor randomly.
 		Variant variant = Variant.HORSE;
 		switch (type) {
-		case 1: variant = Variant.DONKEY; 			break;
-		case 2: variant = Variant.MULE; 			break;
-		case 3: variant = Variant.SKELETON_HORSE; 	break;
-		case 4: variant = Variant.UNDEAD_HORSE; 	break;
-		default:									break;
+		case 1:
+			variant = Variant.DONKEY;
+			break;
+		case 2:
+			variant = Variant.MULE;
+			break;
+		case 3:
+			variant = Variant.SKELETON_HORSE;
+			break;
+		case 4:
+			variant = Variant.UNDEAD_HORSE;
+			break;
+		default:
+			break;
 		}
-		
+
 		horse.setVariant(variant);
-		
+
 		Material barding = null;
 		switch (armor) {
-		case 1: barding = Material.IRON_BARDING;	break;
-		case 2: barding = Material.GOLD_BARDING;	break;
-		case 3: barding = Material.DIAMOND_BARDING;	break;
-		default:									break;
+		case 1:
+			barding = Material.IRON_BARDING;
+			break;
+		case 2:
+			barding = Material.GOLD_BARDING;
+			break;
+		case 3:
+			barding = Material.DIAMOND_BARDING;
+			break;
+		default:
+			break;
 		}
-		
+
 		// Set it's equipment
 		if (barding != null) {
 			horse.getInventory().setArmor(new ItemStack(barding));
 		}
 		horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
 		horse.setCarryingChest(false);
-		
+
 		// Set the owner
 		horse.setTamed(true);
 		horse.setDomestication(horse.getMaxDomestication());
 		horse.setOwner(p);
 		horse.setPassenger(p);
-		
+
 		// Not invincible, but hard af to kill.
 		horse.setMaxHealth(horse.getMaxHealth() * 5);
 		horse.setHealth(horse.getMaxHealth());
-		
+
 		// Misc.
 		horse.setAdult();
 		horse.setBreed(false);
-		
+
 		// Can't forget the name!
 		String name = names[random.nextInt(names.length)];
 		horse.setCustomName(name);
@@ -234,29 +239,13 @@ public class ArenaAbilities {
 		l.getWorld().createExplosion(l.getX(), l.getY(), l.getZ(), 4F, false,
 				false);
 	}
-	
+
 	/**
 	 * Get all the awesome names.
+	 * 
 	 * @return
 	 */
 	public static String[] getNames() {
 		return names;
-	}
-
-	/**
-	 * To remove wolves or zombies, we check if it has a badass name.
-	 * This method removes it for us.
-	 * @param e
-	 */
-	public static void removeEntityByName(LivingEntity e) {
-		if (e.getCustomName() == null)
-			return;
-		
-		for (String s : names) {
-			if (e.getCustomName().equalsIgnoreCase(s)) {
-				e.remove(); 
-				break;
-			}
-		}
 	}
 }

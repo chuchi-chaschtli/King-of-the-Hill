@@ -6,6 +6,7 @@ package com.valygard.KotH.listener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,7 +43,6 @@ import com.valygard.KotH.util.UUIDUtil;
  *
  */
 public class AbilityListener implements Listener {
-	@SuppressWarnings("unused")
 	private KotH plugin;
 	private ArenaManager am;
 	
@@ -77,7 +77,7 @@ public class AbilityListener implements Listener {
 		// If the player's hand item is a bone, spawn a wolf.
 		case BONE:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.BONE)});
-			ArenaAbilities.spawnWolf(p);
+			ArenaAbilities.spawnWolf(plugin, p);
 			Messenger.tell(p, Msg.ABILITY_WOLF_SPAWNED);
 			
 			// Add the player to the wolves hashmap.
@@ -88,7 +88,7 @@ public class AbilityListener implements Listener {
 		// Spawn a zombie on a player.
 		case ROTTEN_FLESH:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.ROTTEN_FLESH)});
-			ArenaAbilities.spawnZombie(p, arena.getTeam(p), arena.getOpposingTeam(p));
+			ArenaAbilities.spawnZombie(plugin, p, arena.getTeam(p), arena.getOpposingTeam(p));
 			Messenger.tell(p, Msg.ABILITY_ZOMBIE_SPAWNED);
 			
 			// Add the player to the zombies hashmap.
@@ -178,87 +178,75 @@ public class AbilityListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onEntityMove(EntityTargetLivingEntityEvent e) {
+	public void onEntityTarget(EntityTargetEvent e) {
 		if (!(e.getEntity() instanceof Zombie))
-			return;
-		
-		if (!zombies.containsValue(e.getEntity()))
 			return;
 		
 		Zombie z = (Zombie) e.getEntity();
 		Player p = ArenaAbilities.getPlayerWithZombie(z);
 		Arena arena = am.getArenaWithPlayer(p);
-		
 		if (arena == null || !arena.getPlayersInArena().contains(p)) {
 			z.remove();
 			return;
 		}
 		
-		// Players the zombie can't attack.
-		List<Player> untouchables = new ArrayList<Player>();
-		untouchables.add(p);
-		for (Player player : arena.getTeam(p)) {
-			untouchables.add(player);
-		}
-		// Clear list
-		untouchables.clear();
+		// Players the zombie can attack.
+		LinkedList<Player> attackable = new LinkedList<Player>(arena.getOpposingTeam(p));
+		Random random = new Random();
+		Player opponent = attackable.get(random.nextInt(attackable.size()));
 		
-		if (untouchables.contains(e.getTarget())) {
-			// Convert opposing team to list format then get a random opponent.
-			List<Player> list = new ArrayList<Player>();
-			for (Player player : arena.getOpposingTeam(p)) {
-				list.add(player);
-			}
-			Random random = new Random();
-			
-			Player opponent = list.get(random.nextInt(list.size()));
-			z.setTarget(opponent);
-			z.teleport(opponent);
-			
-			// Clear the list.
-			list.clear();
-		}
+		e.setTarget(opponent);
+		z.teleport(opponent);
+		
+		attackable.clear();
 	}
-	
+
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
 		if (e.getEntity() instanceof Wolf) {
 			Wolf wolf = (Wolf) e.getEntity();
 			Player p = (Player) wolf.getOwner();
-			
+
 			if (p == null)
 				return;
-			
-			if (wolf.getCustomName() == null || !ArenaAbilities.getNames().toString().contains(wolf.getCustomName()))
+
+			if (wolf.getCustomName() == null
+					|| !ArenaAbilities.getNames().toString()
+							.contains(wolf.getCustomName()))
 				return;
-			
+
 			if (!wolves.containsKey(p.getUniqueId()))
 				return;
-			
+
 			if (wolves.get(p.getUniqueId()) <= 1) {
 				wolves.remove(p.getUniqueId());
 			} else {
 				wolves.put(p.getUniqueId(), wolves.get(p.getUniqueId()) - 1);
 			}
-			Messenger.tell(p, Msg.ABILITY_WOLF_LOST, String.valueOf(wolves.get(p.getUniqueId())));
+			Messenger.tell(p, Msg.ABILITY_WOLF_LOST,
+					wolves.get(p.getUniqueId()) != null ? String.valueOf(wolves
+							.get(p.getUniqueId())) : String.valueOf(0));
 		}
-		
+
 		if (e.getEntity() instanceof Zombie) {
 			Zombie zombie = (Zombie) e.getEntity();
 			Player p = ArenaAbilities.getPlayerWithZombie(zombie);
-			
+
 			if (p == null)
 				return;
-			
+
 			if (!zombies.containsKey(p.getUniqueId()))
 				return;
-			
+
 			if (zombies.get(p.getUniqueId()) <= 1) {
 				zombies.remove(p.getUniqueId());
 			} else {
 				zombies.put(p.getUniqueId(), zombies.get(p.getUniqueId()) - 1);
 			}
-			Messenger.tell(p, Msg.ABILITY_ZOMBIE_LOST, String.valueOf(zombies.get(p.getUniqueId())));
+			Messenger.tell(p, Msg.ABILITY_ZOMBIE_LOST,
+					zombies.get(p.getUniqueId()) != null ? String
+							.valueOf(zombies.get(p.getUniqueId())) : String
+							.valueOf(0));
 		}
 	}
 	
@@ -292,30 +280,26 @@ public class AbilityListener implements Listener {
 		removeWolves(p);
 		removeZombies(p);
 		removeHorses(p);
+		
+		if (zombies.containsKey(p.getUniqueId()))
+			zombies.remove(p.getUniqueId());
+		if (wolves.containsKey(p.getUniqueId()))
+			wolves.remove(p.getUniqueId());
 	}
 	
 	public void removeWolves(Player p) {
-		if (wolves.containsKey(p.getUniqueId())) {
-			wolves.remove(p.getUniqueId());
-			for (Wolf wolf : p.getWorld().getEntitiesByClass(Wolf.class)) {
-				if (!wolf.getOwner().equals(p))
-					continue;
-				
-				ArenaAbilities.removeEntityByName(wolf);
-			}
+		for (Wolf wolf : p.getWorld().getEntitiesByClass(Wolf.class)) {
+			if (wolf.hasMetadata(p.getName()))
+				wolf.remove();
 		}
 	}
 	
 	public void removeZombies(Player p) {
-		if (zombies.containsKey(p.getUniqueId())) {
-			zombies.remove(p.getUniqueId());
-			for (Zombie zombie : p.getWorld().getEntitiesByClass(Zombie.class)) {
-				if (zombie.getMaxHealth() == 50) {
-					zombie.remove();
-				}
+		for (Zombie zombie : p.getWorld().getEntitiesByClass(Zombie.class)) {
+			if (zombie.getMaxHealth() == 50 && zombie.hasMetadata(p.getName())) {
+				zombie.remove();
 			}
 		}
-		ArenaAbilities.clearZombies(p);
 	}
 	
 	public void removeHorses(Player p) {
