@@ -52,6 +52,8 @@ public class EconomyManager {
     }
     
     public double getMoney(Player p) {
+    	if (plugin.getEconomy() == null)
+    		return 0.00;
     	return plugin.getEconomy().getBalance(p.getName());
     }
     
