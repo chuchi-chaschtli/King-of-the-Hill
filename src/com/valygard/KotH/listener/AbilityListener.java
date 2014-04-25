@@ -137,7 +137,8 @@ public class AbilityListener implements Listener {
 				e.getClickedBlock().setType(Material.AIR);
 				
 				// Remove the location from the current landmines.
-				List<Location> locs = landmines.get(player);
+				List<Location> locs = landmines.get(player.getUniqueId());
+				landmines.remove(player.getUniqueId());
 				locs.remove(locs.indexOf(l));
 				landmines.put(player.getUniqueId(), locs);
 				
@@ -159,9 +160,11 @@ public class AbilityListener implements Listener {
 		
 		switch (e.getBlock().getType()) {
 		case STONE_PLATE:
+			// Remove from inventory
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.STONE_PLATE)});
 			Messenger.tell(p, Msg.ABILITY_LANDMINE_PLACE);
 			
+			// Add the location to the current list.
 			List<Location> list = new ArrayList<Location>();
 			if (landmines.containsKey(p.getUniqueId())) {
 				for (Location l : landmines.get(p.getUniqueId()))
@@ -182,10 +185,11 @@ public class AbilityListener implements Listener {
 		if (!(e.getEntity() instanceof Zombie))
 			return;
 		
+		// Get the player who spawned the zombie, and ensure the player is in an arena.
 		Zombie z = (Zombie) e.getEntity();
 		Player p = ArenaAbilities.getPlayerWithZombie(z);
 		Arena arena = am.getArenaWithPlayer(p);
-		if (arena == null || !arena.getPlayersInArena().contains(p)) {
+		if (arena == null || !arena.getPlayersInArena().contains(p) || !arena.isRunning()) {
 			z.remove();
 			return;
 		}
@@ -196,6 +200,7 @@ public class AbilityListener implements Listener {
 		Player opponent = attackable.get(random.nextInt(attackable.size()));
 		
 		e.setTarget(opponent);
+		// Teleport the zombie to the new opponent.
 		z.teleport(opponent);
 		
 		attackable.clear();
@@ -203,6 +208,7 @@ public class AbilityListener implements Listener {
 
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
+		// Notify the player if their wolf or zombie died.
 		if (e.getEntity() instanceof Wolf) {
 			Wolf wolf = (Wolf) e.getEntity();
 			Player p = (Player) wolf.getOwner();
