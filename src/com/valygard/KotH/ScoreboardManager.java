@@ -53,8 +53,8 @@ public class ScoreboardManager {
 		redteam = scoreboard.registerNewTeam("red");
 		blueteam = scoreboard.registerNewTeam("blue");
 		
-		redteam.setPrefix(ChatColor.DARK_RED + "Red >> " + ChatColor.RED);
-		blueteam.setPrefix(ChatColor.DARK_BLUE + "Blue >> " + ChatColor.BLUE);
+		redteam.setPrefix("" + ChatColor.RED);
+		blueteam.setPrefix("" + ChatColor.BLUE);
     }
     
 	/**
