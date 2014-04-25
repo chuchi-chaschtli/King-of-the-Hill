@@ -280,10 +280,14 @@ public class GlobalListener implements Listener {
 			arena.kickPlayer(p);
 		}
 
-		if (arena.getRedTeam().contains(p))
+		if (arena.getRedTeam().contains(p)) {
 			e.setRespawnLocation(arena.getRedSpawn());
-		else if (arena.getBlueTeam().contains(p))
+			p.teleport(arena.getRedSpawn());
+		}
+		else if (arena.getBlueTeam().contains(p)) {
 			e.setRespawnLocation(arena.getBlueSpawn());
+			p.teleport(arena.getBlueSpawn());
+		}
 
 		ArenaClass ac = arena.getData(p).getArenaClass();
 		if (ac != null)
