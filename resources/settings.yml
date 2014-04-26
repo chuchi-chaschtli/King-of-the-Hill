@@ -8,7 +8,6 @@ hill-clock: 60
 hill-radius: 5
 hill-block: bedrock
 score-to-win: 150
-prevent-power-loss: true
 indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false

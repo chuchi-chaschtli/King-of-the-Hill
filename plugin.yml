@@ -6,7 +6,7 @@ author: AoH_Ruthless
 description: >
   A Minecraft minigame aimed at simulating the popular gametype 
   King of the Hill, as seen in various combative games.
-softdepend: [Vault, Factions]
+softdepend: [Vault]
 
 commands:
   koth:
