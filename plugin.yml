@@ -1,16 +1,28 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 0.9.60
+version: 1.0
 website: http://valygard.com
 author: AoH_Ruthless
-description: A King of the Hill minigame.
-softdepend: [Vault]
+description: >
+  A Minecraft minigame aimed at simulating the popular gametype 
+  King of the Hill, as seen in various combative games.
+softdepend: [Vault, Factions]
 
 commands:
   koth:
     description: Command for King of the Hill.
+    usage: >
+      ERROR! Find the error in your server log,
+      copy it into pastebin.com, and submit a bug
+      report at our ticket tracker: 
+      https://github.com/AoHRuthless/King-of-the-Hill/issues
   kingofthehill:
     description: Command for King of the Hill.
+    usage: >
+      ERROR! Find the error in your server log,
+      copy it into pastebin.com, and submit a bug
+      report at our ticket tracker: 
+      https://github.com/AoHRuthless/King-of-the-Hill/issues
     
 permissions:
 # ---------- Users ---------- #
@@ -24,6 +36,7 @@ permissions:
       koth.user.info: true
       koth.user.spectate: true
       koth.user.pickclass: true
+      koth.user.pickteam: true
       koth.user.signs: true
   koth.user.join:
     default: false
@@ -49,9 +62,8 @@ permissions:
   koth.user.signs:
     default: false
     description: Use arena signs.
-  # This permission is not given to default users by default, but ops instead.
   koth.user.pickteam:
-    default: op
+    default: false
     description: Choose a team.
 
 # ---------- Setup ---------- #
