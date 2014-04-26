@@ -1,3 +1,4 @@
 enabled: true
 check-for-updates: true
 allowed-cmds: /list, /notarealcommand
+logging: true

@@ -125,7 +125,8 @@ public class CommandManager implements CommandExecutor {
 		if (!command.execute(am, sender, params)) {
 			showUsage(command, sender, true);
 		}
-
+		
+		Messenger.log(sender.getName() + " has used command: " + "/koth " + info.name());
 		return false;
 	}
 

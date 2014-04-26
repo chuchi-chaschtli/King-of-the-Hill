@@ -4,7 +4,13 @@
  */
 package com.valygard.KotH;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -21,10 +27,43 @@ import com.valygard.KotH.framework.Arena;
  */
 public class Messenger {
 	private static final Logger log = Logger.getLogger("Minecraft");
+	private static final KotH plugin = KotH.plugin;
 
     private static final String prefix = "[KotH] ";
 
     private Messenger() {}
+    
+	public static void log(String level, String msg) {
+		if (!plugin.getConfig().getBoolean("global.logging"))
+			return;
+		
+		File dataFolder = plugin.getDataFolder();
+		try {
+			if(!dataFolder.exists()) {
+				dataFolder.mkdir();
+			}
+			
+			File file = new File(dataFolder, "KotH.log") ;
+			if(!file.exists()){
+				file.createNewFile();		
+			}
+			
+			Date date = new Date();
+			SimpleDateFormat df = new SimpleDateFormat("[MM-dd-yyyy HH:mm:ss]");
+			String time = df.format(date);
+			
+			FileWriter fw = new FileWriter(file, true);	  
+			PrintWriter pw = new PrintWriter(fw);
+			pw.println(time + " [PlayerCombat] [" + level.toUpperCase() + "] : " + msg);
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void log(String msg) {
+		log("info", msg);
+	}
 
     public static boolean tell(CommandSender p, String msg) {
         // If the input sender is null or the string is empty, return.
@@ -80,13 +119,16 @@ public class Messenger {
 
     public static void info(String msg) {
         log.info(prefix + msg);
+        log(msg);
     }
 
     public static void warning(String msg) {
         log.warning(prefix + msg);
+        log("warning", msg);
     }
 
     public static void severe(String msg) {
         log.severe(prefix + msg);
+        log("severe", msg);
     }
 }

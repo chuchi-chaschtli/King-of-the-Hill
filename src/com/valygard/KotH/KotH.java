@@ -43,16 +43,22 @@ public class KotH extends JavaPlugin {
 	public static File MESSAGES_FILE;
 	
 	public static int ECONOMY_ID = -69;
+	
+	// Static access of this class is needed for custom logging.
+	public static KotH plugin;
 
 	public void onEnable() {
 		// Load the regular configuration file
 		loadConfigFile();
 		
-		// Load vault
-		loadVault();
-		
 		// Define all variables, such as class instances
 		initializeVariables();
+		
+		// Load all arenas and classes
+		am.initialize();
+		
+		// Load vault
+		loadVault();
 
 		// Load the messages file.
 		loadMessagesFile();
@@ -62,9 +68,6 @@ public class KotH extends JavaPlugin {
 		
 		// Register our listeners
 		registerListeners();
-		
-		// Load all arenas and classes
-		am.initialize();
 	}
 	
 	public void onDisable() {
@@ -82,6 +85,8 @@ public class KotH extends JavaPlugin {
 		am = new ArenaManager(this);
 		cm = new CommandManager(this);
 		em = new EconomyManager(this);
+		
+		plugin = this;
 	}
 
 	private void registerCommands() {
@@ -165,12 +170,7 @@ public class KotH extends JavaPlugin {
 
 	private void loadConfigFile() {
 		saveDefaultConfig();
-		addDefaults();
-	}
-	
-	private void addDefaults() {
 		getConfig().options().header(getHeader());
-		
 		saveConfig();
 	}
 	
