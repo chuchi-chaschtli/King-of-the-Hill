@@ -222,7 +222,7 @@ public class GlobalListener implements Listener {
 		Messenger.tell(p, Msg.MISC_ARENA_ITEM_DROP_DISABLED);
 	}
 
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGH)
 	public void onRegainHealth(EntityRegainHealthEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
@@ -242,7 +242,7 @@ public class GlobalListener implements Listener {
 	// Combat Events
 	// --------------------------- //
 	
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGH)
 	public void onArenaDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 		Arena arena = am.getArenaWithPlayer(p);
@@ -267,7 +267,7 @@ public class GlobalListener implements Listener {
 			e.setDroppedExp(0);
 	}
 	
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGHEST)
 	public void onArenaRespawn(PlayerRespawnEvent e) {
 		Player p = e.getPlayer();
 		Arena arena = am.getArenaWithPlayer(p);
