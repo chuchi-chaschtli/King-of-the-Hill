@@ -33,6 +33,10 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.massivecraft.factions.entity.UPlayer;
+import com.massivecraft.factions.entity.UPlayerColls;
+import com.massivecraft.factions.event.FactionsEventPowerChange;
+import com.massivecraft.factions.event.FactionsEventPowerChange.PowerChangeReason;
 import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -292,6 +296,26 @@ public class GlobalListener implements Listener {
 		e.setDeathMessage(null);
 		if (!arena.getSettings().getBoolean("drop-xp"))
 			e.setDroppedExp(0);
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onPowerLoss(FactionsEventPowerChange e) {
+		Player p = (Player) e.getUPlayer();
+		Arena arena = am.getArenaWithPlayer(p);
+		
+		if (arena == null) {
+			return;
+		}
+		
+		if (!arena.getSettings().getBoolean("prevent-power-loss")) {
+			return;
+		}
+		
+		UPlayer uplayer = UPlayerColls.get().getForWorld(p.getWorld().getName()).get(p.getName());
+		
+		if (e.getReason().equals(PowerChangeReason.DEATH)) {
+			e.setNewPower(uplayer.getPower());
+		}
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
