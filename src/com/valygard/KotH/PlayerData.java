@@ -85,6 +85,8 @@ public class PlayerData {
 		player.setGameMode(mode);
 		player.addPotionEffects(potions);
 		player.updateInventory();
+		
+		setArenaClass(null);
 	}
 	
 	private ItemStack parseItem(ItemStack i) {
