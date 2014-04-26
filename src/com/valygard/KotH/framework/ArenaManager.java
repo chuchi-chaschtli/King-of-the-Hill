@@ -520,7 +520,7 @@ public class ArenaManager {
 		String[] parts = cmds.split(",");
 
 		// Add in the /koth command.
-		allowedcmds.add("koth");
+		allowedcmds.add("/koth");
 
 		// Add in each command
 		for (String part : parts) {
