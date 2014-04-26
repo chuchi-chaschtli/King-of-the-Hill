@@ -169,11 +169,6 @@ public class KotH extends JavaPlugin {
 	}
 	
 	private void addDefaults() {
-		if (getConfig().getConfigurationSection("global") == null) {
-			getConfig().set("global.enabled", true);
-			getConfig().set("global.check-for-updates", true);
-		}
-		
 		getConfig().options().header(getHeader());
 		
 		saveConfig();

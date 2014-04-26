@@ -9,6 +9,7 @@ import static com.valygard.KotH.util.ConfigUtil.makeSection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,9 @@ public class ArenaManager {
 
 	// we have to make sure KotH is even enabled
 	private boolean enabled;
+	
+	// Commands that are allowed while playing koth.
+	private Set<String> allowedcmds;
 
 	/**
 	 * Constructor
@@ -63,6 +67,8 @@ public class ArenaManager {
 		this.classes 	= new HashMap<String, ArenaClass>();
 
 		this.enabled 	= config.getBoolean("global.enabled", true);
+		
+		this.allowedcmds= new HashSet<String>();
 	}
 
 	// --------------------------- //
@@ -70,11 +76,22 @@ public class ArenaManager {
 	// --------------------------- //
 
 	/**
-	 * Initialize the class by loading arenas and classes.
+	 * Initialize King of the Hill.
 	 */
 	public void initialize() {
+		loadGlobalSettings();
 		loadClasses();
 		loadArenas();
+	}
+	
+	/**
+	 * Load the global settings of the arena.
+	 */
+	public void loadGlobalSettings() {
+		ConfigurationSection section = plugin.getConfig().getConfigurationSection("global");
+        ConfigUtil.addMissingRemoveObsolete(plugin, "global.yml", section);
+        
+        setAllowedCmds(section);
 	}
 
 	/**
@@ -478,6 +495,47 @@ public class ArenaManager {
 	public void setEnabled(boolean value) {
 		this.enabled = value;
 		config.set("global.enabled", value);
+	}
+
+	/**
+	 * Get all the commands allowed in any arena.
+	 * 
+	 * @return
+	 */
+	public Set<String> getAllowedCmds() {
+		return allowedcmds;
+	}
+
+	/**
+	 * Initialize the allowedcmds by getting them from the global configuration
+	 * section and then adding them to our hashset.
+	 * 
+	 * @param section
+	 */
+	public void setAllowedCmds(ConfigurationSection section) {
+		// Grab the commanSds string
+		String cmds = section.getString("allowed-cmds", "");
+
+		// Split by commas
+		String[] parts = cmds.split(",");
+
+		// Add in the /koth command.
+		allowedcmds.add("koth");
+
+		// Add in each command
+		for (String part : parts) {
+			allowedcmds.add(part.trim().toLowerCase());
+		}
+	}
+
+	/**
+	 * Return true if the command is in the allowed cmds hashset.
+	 * 
+	 * @param cmd
+	 * @return
+	 */
+	public boolean isAcceptable(String cmd) {
+		return allowedcmds.contains(cmd);
 	}
 
 	/**

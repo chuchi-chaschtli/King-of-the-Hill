@@ -62,6 +62,7 @@ public enum Msg {
 	LEAVE_ARENA_NOT_RUNNING("This arena is not running."),
 	LEAVE_NOT_PLAYING("You are not in the arena."),
 	MISC_ARENA_ITEM_DROP_DISABLED("You may not drop items whilst in the arena."),
+	MISC_CMD_NOT_ALLOWED("You may not use this command in the arena!"),
 	MISC_FRIENDLY_FIRE_DISABLED("Friendly fire has been disabled for this arena."),
 	MISC_LIST_ARENAS("Available arenas: %"),
 	MISC_LIST_CLASSES("Available classes: %"),

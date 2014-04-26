@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -201,6 +202,32 @@ public class GlobalListener implements Listener {
 			return;
 		}
 		arena.removePlayer(p, false);
+	}
+	
+	@EventHandler
+	public void onPreprocess(PlayerCommandPreprocessEvent e) {
+		Player p = e.getPlayer();
+		Arena arena = am.getArenaWithPlayer(p);
+
+		if (arena == null) {
+			return;
+		}
+
+		if (e.isCancelled()
+				|| (!arena.inLobby(p) && !arena.isSpectating(p) && 
+						!arena.getPlayersInArena().contains(p))) {
+			return;
+		}
+		
+		// Although commands don't need an argument, this is safe.
+		String base = e.getMessage().split(" ")[0];
+		
+		if (am.isAcceptable(base)) {
+			return;
+		}
+		
+		e.setCancelled(true);
+		Messenger.tell(p, Msg.MISC_CMD_NOT_ALLOWED);
 	}
 
 	// --------------------------- //
