@@ -39,13 +39,23 @@ public class PlayerStats {
 	// File in the directory, which is player-specific.
 	private File file;
 	
+	// Only track stats if enabled in the arena-settings.
+	private boolean tracking;
+	
 	public PlayerStats(Player player, Arena arena) throws IOException {
-		this.player = player;
-		this.arena  = arena;
-		this.name	= arena.getName();
+		this.player 	= player;
+		this.arena  	= arena;
+		this.name		= arena.getName();
+		
+		this.tracking	= arena.getSettings().getBoolean("track-stats");
 		
 		this.dir	= new File(arena.getPlugin().getDataFolder(), "stats");
 		this.dir.mkdir();
+		
+		// Go no further if the arena is not meant to track results.
+		if (!tracking) {
+			return;
+		}
 		
 		this.file	= new File(dir, player.getUniqueId() + ".yml");
 		
@@ -64,7 +74,8 @@ public class PlayerStats {
 				this.kdr	= calculateRatio(kills, deaths);
 				this.wlr	= calculateRatio(wins, losses);
 			} catch (Exception e) {
-				System.out.println("STATS RESET FOR PLAYER: " + player.getName());
+				Messenger.severe("Stats reset for player '" + player.getName() + "'.");
+				e.printStackTrace();
 				resetStats();
 			}
 		}
@@ -76,11 +87,16 @@ public class PlayerStats {
 	}
 
 	public void saveStats() throws IOException {
+		if (!tracking) {
+			return;
+		}
+		
 		YamlConfiguration config = new YamlConfiguration();
 		try {
 			config.load(file);
 		} catch (Exception e) {
 			Messenger.severe("Could not load stats for player '" + player.getName() + "'.");
+			e.printStackTrace();
 			return;
 		}
 		
@@ -95,7 +111,6 @@ public class PlayerStats {
 		config.set(path + "wlr", wlr);
 		
 		config.save(file);
-		System.out.println("Wins for " + player.getName() + " : " + wins);
 	}
 	
 	public void resetStats() throws IOException {
@@ -111,6 +126,10 @@ public class PlayerStats {
 	}
 	
 	public void increment(String path) {
+		if (!tracking) {
+			return;
+		}
+		
 		YamlConfiguration config = new YamlConfiguration();
 		try {
 			config.load(file);
@@ -131,11 +150,8 @@ public class PlayerStats {
 			config.set(s, deaths);
 			break;
 		case "wins":
-			System.out.println("Wins for " + player.getName() + " : " + wins);
 			wins += 1;
-			System.out.println("Wins for " + player.getName() + " : " + wins);
 			config.set(s, wins);
-			System.out.println("Wins for " + player.getName() + " : " + wins);
 			break;
 		case "losses":
 			losses += 1;
@@ -148,7 +164,6 @@ public class PlayerStats {
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
 		}
-		System.out.println("Wins for " + player.getName() + " : " + wins);
 		try {
 			recalibrate();
 		} catch (IOException e) {
@@ -179,7 +194,6 @@ public class PlayerStats {
 		
 		wlr = calculateRatio(wins, losses);
 		config.set("arenas." + name + ".wlr", wlr);
-		System.out.println("Wins for " + player.getName() + " : " + wins);
 		saveStats();
 	}
 	
@@ -221,5 +235,14 @@ public class PlayerStats {
 	
 	public double getWLR() {
 		return wlr;
+	}
+	
+	public boolean isTracking() {
+		return tracking;
+	}
+	
+	public boolean setTracking(boolean value) {
+		tracking = value;
+		return tracking;
 	}
 }

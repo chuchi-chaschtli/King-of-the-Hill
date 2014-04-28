@@ -18,4 +18,5 @@ change-class-in-arena: false
 allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
+track-stats: true
 regen-health: true
