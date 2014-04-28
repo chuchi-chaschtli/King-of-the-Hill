@@ -78,21 +78,21 @@ public class RewardManager {
 	 */
 	public List<ItemStack> parseItems(String str) {
 		ConfigurationSection prizes = ConfigUtil.makeSection(this.prizes, "completion");
-        List<String> items = prizes.getStringList(str);
-        if (items == null || items.isEmpty()) {
-            String s = prizes.getString(str, "");
-            List<ItemStack> result = ItemParser.parseItems(s);
-            return result;
-        } else {
-            List<ItemStack> result = new ArrayList<ItemStack>();
-            for (String item : items) {
-            	ItemStack indiResult = ItemParser.parseItem(item);
-                if (indiResult != null) {
-                    result.add(indiResult);
-                }
-            }
-            return result;
-        }
+		List<String> items = prizes.getStringList(str);
+		if (items == null || items.isEmpty()) {
+			String s = prizes.getString(str, "");
+			List<ItemStack> result = ItemParser.parseItems(s);
+			return result;
+		} else {
+			List<ItemStack> result = new ArrayList<ItemStack>();
+			for (String item : items) {
+				ItemStack indiResult = ItemParser.parseItem(item);
+				if (indiResult != null) {
+					result.add(indiResult);
+				}
+			}
+			return result;
+		}
 	}
 	
 	/**

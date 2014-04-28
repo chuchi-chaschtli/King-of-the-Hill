@@ -37,6 +37,7 @@ import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.PlayerStats;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
@@ -102,8 +103,12 @@ public class GlobalListener implements Listener {
 		}
 	}
 
+	/*
+	 * While very memory-heavy to call the player move event every tick, it is
+	 * essential for checking if a player has entered or left a hill.
+	 */
 	@EventHandler
-	public void onHillEntryOrExit(PlayerMoveEvent e) {
+	public void onPlayerMove(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
 		Arena arena = am.getArenaWithPlayer(p);
 
@@ -282,6 +287,10 @@ public class GlobalListener implements Listener {
 			Messenger.tell(killer, getKillMessage(killer, p));
 			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
 					+ ChatColor.RESET + " has killed you.");
+			
+			PlayerStats stats = arena.getStats(killer);
+			if (stats != null)
+				stats.increment("kills");
 		}
 
 		if (arena.getSettings().getBoolean("one-life")) {
@@ -290,6 +299,11 @@ public class GlobalListener implements Listener {
 
 		e.getDrops().clear();
 		e.setDeathMessage(null);
+		
+		PlayerStats stats = arena.getStats(p);
+		if (stats != null)
+			stats.increment("deaths");
+		
 		if (!arena.getSettings().getBoolean("drop-xp"))
 			e.setDroppedExp(0);
 	}

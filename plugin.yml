@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 1.0
+version: 1.0.2
 website: http://valygard.com
 author: AoH_Ruthless
 description: >
@@ -11,18 +11,8 @@ softdepend: [Vault]
 commands:
   koth:
     description: Command for King of the Hill.
-    usage: >
-      ERROR! Find the error in your server log,
-      copy it into pastebin.com, and submit a bug
-      report at our ticket tracker: 
-      https://github.com/AoHRuthless/King-of-the-Hill/issues
   kingofthehill:
     description: Command for King of the Hill.
-    usage: >
-      ERROR! Find the error in your server log,
-      copy it into pastebin.com, and submit a bug
-      report at our ticket tracker: 
-      https://github.com/AoHRuthless/King-of-the-Hill/issues
     
 permissions:
 # ---------- Users ---------- #

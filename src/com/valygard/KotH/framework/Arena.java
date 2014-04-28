@@ -35,6 +35,7 @@ import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.PlayerData;
+import com.valygard.KotH.PlayerStats;
 import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.event.ArenaEndEvent;
@@ -70,8 +71,7 @@ public class Arena {
 	// Arena locations
 	private Location red, blue, lobby, spec;
 
-	// Players and teams
-	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
+	// Player types
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
 	
@@ -93,14 +93,12 @@ public class Arena {
 	// Is the arena ready to be used?
 	private boolean ready;
 	
-	// Scoreboard
+	// Player stuff
 	private ScoreboardManager scoreboard;
-	
-	// Inventory
 	private InventoryManager invManager;
-	
-	// Rewards
 	private RewardManager rewards;
+	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
+	private PlayerStats stats;
 	
 	// AbilityListener
 	private AbilityListener abilityListener;
@@ -258,6 +256,7 @@ public class Arena {
 				rewards.givePrizes(p, winner.contains(p));
 			} else { 
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
+				getStats(p).increment("losses");
 			}
 		}
 		
@@ -483,20 +482,36 @@ public class Arena {
 	 * Declare one team as victorious based on which set has a higher score.
 	 */
 	public void declareWinner() {
+		Set<Player> loser;
 		if (winner == null) { 
 			Messenger.announce(this, Msg.ARENA_DRAW);
+			for (Player p : arenaPlayers) {
+				getStats(p).increment("draws");
+			}
+			loser = null;
 			return;
 		}
-		else if (winner.equals(redPlayers))
+		else if (winner.equals(redPlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
-		else if (winner.equals(bluePlayers))
+			loser = bluePlayers;
+		} else if (winner.equals(bluePlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
+			loser = redPlayers;	
+		} else loser = null;
 		
 		for (Player p : winner) {
 			createFirework(p.getLocation());
+			getStats(p).increment("wins");
 		}
+		
+		if (loser == null) return;
+		
+		for (Player p : loser) {
+			getStats(p).increment("losses");
+		}
+		loser.clear();
 	}
 	
 	public void createFirework(Location loc) {
@@ -1092,6 +1107,16 @@ public class Arena {
 	 */
 	public RewardManager getRewards() {
 		return rewards;
+	}
+	
+	public PlayerStats getStats(Player p) {
+		try {
+			stats = new PlayerStats(p, this);
+		} catch (IOException e) {
+			Messenger.severe("Could not get the stats of player '" + p.getName() +"'!");
+			e.printStackTrace();
+		}
+		return stats;
 	}
 
 	/**
