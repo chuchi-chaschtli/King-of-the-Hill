@@ -42,6 +42,13 @@ public class PlayerStats {
 	// Only track stats if enabled in the arena-settings.
 	private boolean tracking;
 	
+	/**
+	 * The Constructor requires a player and an arena parameter.
+	 * 
+	 * @param player
+	 * @param arena
+	 * @throws IOException
+	 */
 	public PlayerStats(Player player, Arena arena) throws IOException {
 		this.player 	= player;
 		this.arena  	= arena;
@@ -57,11 +64,13 @@ public class PlayerStats {
 			return;
 		}
 		
+		// Create disk YAML file
 		this.file	= new File(dir, player.getUniqueId() + ".yml");
 		
 		YamlConfiguration config = new YamlConfiguration();
 		String path = "arenas." + name + ".";
 		if (file.exists()) {
+			// If the file exists, try to load it.
 			try {
 				config.load(file);
 				this.kills	= config.getInt(path + "kills");
@@ -72,7 +81,7 @@ public class PlayerStats {
 				this.draws  = config.getInt(path + "draws");
 				
 				this.kdr	= calculateRatio(kills, deaths);
-				this.wlr	= calculateRatio(wins, losses);
+				this.wlr		= calculateRatio(wins, losses);
 			} catch (Exception e) {
 				Messenger.severe("Stats reset for player '" + player.getName() + "'.");
 				e.printStackTrace();
@@ -86,6 +95,12 @@ public class PlayerStats {
 		config.save(file);
 	}
 
+	/**
+	 * Saves the player's stats. If the arena is tracking stats, try to load the
+	 * file and save all statistics.
+	 * 
+	 * @throws IOException
+	 */
 	public void saveStats() throws IOException {
 		if (!tracking) {
 			return;
@@ -113,18 +128,29 @@ public class PlayerStats {
 		config.save(file);
 	}
 	
+	/**
+	 * If we ever want to, reset the arena statistics for the player and save.
+	 * 
+	 * @throws IOException
+	 */
 	public void resetStats() throws IOException {
-		kills   = 0;
-		deaths 	= 0;
-		kdr 	= 0;
-		wins 	= 0;
-		losses	= 0;
-		draws 	= 0;
-		wlr 	= 0;
+		kills   	= 0;
+		deaths	 	= 0;
+		kdr 		= 0;
+		wins 		= 0;
+		losses		= 0;
+		draws	 	= 0;
+		wlr 		= 0;
 		
 		saveStats();
 	}
 	
+	/**
+	 * Whenever a player gets a kill, win, loss, draw, or death, we increment
+	 * that individual setting and save it to the config.
+	 * 
+	 * @param path
+	 */
 	public void increment(String path) {
 		if (!tracking) {
 			return;
@@ -164,6 +190,8 @@ public class PlayerStats {
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
 		}
+		
+		// Recalculate the ratios of the kdr and wlr.
 		try {
 			recalibrate();
 		} catch (IOException e) {
@@ -171,6 +199,14 @@ public class PlayerStats {
 		}
 	}
 	
+	/**
+	 * Calculate the ratio of two integers, such as kills v. deaths or wins v.
+	 * losses
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public double calculateRatio(int x, int y) {
 		if (y <= 1)
 			return x;
@@ -179,7 +215,13 @@ public class PlayerStats {
 		DecimalFormat df = new DecimalFormat("#.###");
 		return Double.valueOf(df.format(x / (y * 1.0)));
 	}
-	
+
+	/**
+	 * Recalibrating involves loading the config file then calculating the
+	 * ratios. It then saves the ratios to the configuration file.
+	 * 
+	 * @throws IOException
+	 */
 	public void recalibrate() throws IOException {
 		YamlConfiguration config = new YamlConfiguration();
 		try {

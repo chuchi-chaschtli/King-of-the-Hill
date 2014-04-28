@@ -73,7 +73,9 @@ public enum Msg {
 	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),
 	SIGN_CREATED("You have created a new &e%&r sign!"),
 	SIGN_INVALID("The &5[KotH]&r sign you just created is invalid!"),
-	SPEC_JOIN("Enjoy the view!");
+	SPEC_JOIN("Enjoy the view!"),
+	STATS("Your stats for the arena: %"),
+	STATS_NULL("You do not have stats for this arena. Play a few games first!");
 
 	private String value;
 

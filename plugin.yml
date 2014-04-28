@@ -1,6 +1,6 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 1.0.2
+version: 1.0.2.5
 website: http://valygard.com
 author: AoH_Ruthless
 description: >
@@ -23,11 +23,16 @@ permissions:
       koth.user.leave: true
       koth.user.listarenas: true
       koth.user.listplayers: true
+      koth.user.arenastats: true
       koth.user.info: true
       koth.user.spectate: true
       koth.user.pickclass: true
       koth.user.pickteam: true
       koth.user.signs: true
+      
+  koth.user.arenastats:
+    default: false
+    description: View your stats for an arena.
   koth.user.join:
     default: false
     description: Join an arena.

@@ -40,6 +40,7 @@ import com.valygard.KotH.command.user.LeaveCmd;
 import com.valygard.KotH.command.user.ListArenaCmd;
 import com.valygard.KotH.command.user.ListPlayersCmd;
 import com.valygard.KotH.command.user.SpecCmd;
+import com.valygard.KotH.command.user.StatsCmd;
 import com.valygard.KotH.framework.ArenaManager;
 
 /**
@@ -212,6 +213,7 @@ public class CommandManager implements CommandExecutor {
 		register(SpecCmd.class);
 		register(ChooseClassCmd.class);
 		register(ChooseTeamCmd.class);
+		register(StatsCmd.class);
 
 		// Setup Commands
 		register(CreateArenaCmd.class);
