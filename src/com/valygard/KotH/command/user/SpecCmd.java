@@ -45,7 +45,7 @@ public class SpecCmd implements Command {
 		
 		if (!arena.isEnabled() || !arena.isReady() || !arena.isRunning()) {
 			Messenger.tell(p, "The arena is not running at this time.");
-			return false;
+			return true;
 		}
 		
 		// Remove from team and arenaPlayers set

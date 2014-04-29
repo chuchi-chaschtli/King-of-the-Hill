@@ -39,7 +39,7 @@ public class SetClassCmd implements Command {
 		
 		if (newClass.toLowerCase().equalsIgnoreCase("random")) {
 			Messenger.tell(p, "Sorry, 'random' is a reserved setting. Please choose a different name for your class.");
-			return false;
+			return true;
 		}
 		
 		am.createClassNode(newClass, p.getInventory(), overwrite);

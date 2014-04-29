@@ -44,7 +44,7 @@ public class ChooseTeamCmd implements Command {
 		
 		if (!arena.inLobby(p) || !arena.getSettings().getBoolean("allow-lobby-team-change")) {
 			Messenger.tell(p, Msg.MISC_NO_ACCESS);
-			return false;
+			return true;
 		}
 		
 		String team = args[0].toLowerCase();

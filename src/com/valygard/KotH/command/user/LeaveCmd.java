@@ -34,7 +34,7 @@ public class LeaveCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (am.getArenaWithPlayer((Player) sender) == null) {
 			Messenger.tell(sender, Msg.LEAVE_NOT_PLAYING);
-			return false;
+			return true;
 		}
 		
 		am.getArenaWithPlayer((Player) sender).removePlayer((Player) sender, false); 

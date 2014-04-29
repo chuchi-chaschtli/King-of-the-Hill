@@ -34,7 +34,7 @@ public class CreateArenaCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (am.getArenaWithName(args[0]) != null) {
 			Messenger.tell(sender, Msg.ARENA_EXISTS);
-			return false;
+			return true;
 		}
 		
 		World world;

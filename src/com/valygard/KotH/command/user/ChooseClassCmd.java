@@ -48,7 +48,7 @@ public class ChooseClassCmd implements Command {
 		
         if (!arena.inLobby(p)) {
             Messenger.tell(p, Msg.MISC_NO_ACCESS);
-            return false;
+            return true;
         }
 
         String lowercase = args[0].toLowerCase();
@@ -56,13 +56,13 @@ public class ChooseClassCmd implements Command {
         
         if (ac == null && !lowercase.equals("random")) {
 			showAvailableClasses(am, p);
-            return false;
+            return true;
         }
 
         if (!am.getPlugin().has(p, "koth.classes." + lowercase) && !lowercase.equals("random")) {
             Messenger.tell(p, Msg.CLASS_NO_ACCESS);
             showAvailableClasses(am, p);
-            return false;
+            return true;
         }
         
         if (!lowercase.equals("random")) {

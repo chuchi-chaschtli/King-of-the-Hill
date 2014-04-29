@@ -88,7 +88,7 @@ public class SetHillCmd implements Command {
 				Messenger.tell(p, Msg.HILLS_RESET, String.valueOf(number));
 			} else {
 				Messenger.tell(p, "There is no hill with the specified number.");
-				return false;
+				return true;
 			}
 		}
 		am.getPlugin().saveConfig();
