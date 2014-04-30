@@ -401,7 +401,7 @@ public class GlobalListener implements Listener {
 			return;
 		}
 		
-		if (!ChatColor.stripColor(e.getLine(0).toLowerCase()).equalsIgnoreCase("[koth]"))
+		if (!ChatColor.stripColor(e.getLine(0).toLowerCase()).trim().equalsIgnoreCase("[koth]"))
 			return;
 			
 		Arena arena = am.getArenaWithName(l3);
@@ -411,6 +411,7 @@ public class GlobalListener implements Listener {
 		case "spectate":
 		case "players":
 		case "info":
+		case "stats":
 			if (arena == null) {
 				Messenger.tell(p, Msg.SIGN_INVALID);
 				break;
@@ -605,22 +606,17 @@ public class GlobalListener implements Listener {
 			return;
 		}
 		
-		String cmd = ChatColor.stripColor(s.getLine(1)).toLowerCase();
+		String cmd = ChatColor.stripColor(s.getLine(1)).toLowerCase().trim();
 		switch (cmd) {
 		case "leave":
 			Bukkit.dispatchCommand(p, "koth leave");
 			break;
 		case "join":
-			Bukkit.dispatchCommand(p, "koth join " + arena.getName());
-			break;
 		case "spectate":
-			Bukkit.dispatchCommand(p, "koth spec " + arena.getName());
-			break;
 		case "players":
-			Bukkit.dispatchCommand(p, "koth players " + arena.getName());
-			break;
+		case "stats":
 		case "info":
-			Bukkit.dispatchCommand(p, "koth info " + arena.getName());
+			Bukkit.dispatchCommand(p, "koth " + cmd + " " + arena.getName());
 			break;
 		case "red":
 		case "redteam":
@@ -631,11 +627,7 @@ public class GlobalListener implements Listener {
 				break;
 			}
 
-			/*
-			 * Substring the line to remove the word 'team'. Check if the line
-			 * is red, then substring at 3. Otherwise, if the line is blue,
-			 * substring at 4.
-			 */
+			// Substring the line to remove the word 'team'.
 			Bukkit.dispatchCommand(p, "koth chooseteam "
 					+ cmd.substring(0, cmd.contains("red") ? 3 : 4));
 			break;
