@@ -69,8 +69,28 @@ public class CommandManager implements CommandExecutor {
 			org.bukkit.command.Command cmd, String commandLabel, String[] args) {
 		String first = (args.length > 0 ? args[0] : "");
 		String last = (args.length > 0 ? args[args.length - 1] : "");
+		
+		if (first.toLowerCase().startsWith("ver")) {
+			StringBuilder foo = new StringBuilder();
+			foo.append("\n");
+			foo.append(ChatColor.DARK_GREEN).append("Author: ")
+					.append(ChatColor.RESET)
+					.append(plugin.getDescription().getAuthors()).append("\n");
+			foo.append(ChatColor.DARK_GREEN).append("Version: ")
+					.append(ChatColor.RESET)
+					.append(plugin.getDescription().getVersion()).append("\n");
+			foo.append(ChatColor.DARK_GREEN).append("Website: ")
+					.append(ChatColor.RESET)
+					.append(plugin.getDescription().getWebsite()).append("\n");
+			foo.append(ChatColor.DARK_GREEN).append("Description: ")
+					.append(ChatColor.RESET)
+					.append(plugin.getDescription().getDescription())
+					.append("\n");
+			Messenger.tell(sender, Msg.CMD_VERSION, foo.toString());
+			return true;
+		}
 
-		if (first.equals("?") || first.equals("help") || first.equals("")) {
+		if (first.equals("?") || first.equalsIgnoreCase("help") || first.equals("")) {
 			showHelp(sender);
 			return true;
 		}
