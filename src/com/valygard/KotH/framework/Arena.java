@@ -38,6 +38,7 @@ import com.valygard.KotH.PlayerData;
 import com.valygard.KotH.PlayerStats;
 import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
+import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaJoinEvent;
 import com.valygard.KotH.event.ArenaLeaveEvent;
@@ -100,6 +101,9 @@ public class Arena {
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private PlayerStats stats;
 	
+	// Economymanager
+	private EconomyManager em;
+	
 	// AbilityListener
 	private AbilityListener abilityListener;
 
@@ -151,6 +155,8 @@ public class Arena {
 
 		// Is the arena ready to be used?
 		this.ready 			= false;
+		
+		this.em				= plugin.getEconomyManager();
 		
 		// Misc.
 		this.scoreboard 	= new ScoreboardManager(this);
@@ -255,8 +261,21 @@ public class Arena {
 			if (end) {
 				rewards.givePrizes(p, winner.contains(p));
 			} else { 
+				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
+				// Add a loss.
 				getStats(p).increment("losses");
+				
+				// Take a fine for quitting.
+				String fee = settings.getString("quit-charge");
+				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
+					Messenger.warning("Quit-charge setting for arena '" + arenaName + "' is incorrect!");
+					fee = String.valueOf(0.00);
+				}
+				if (fee.startsWith("$"))
+					fee = fee.substring(1);
+				
+				em.withdraw(p, Double.parseDouble(fee));
 			}
 		}
 		

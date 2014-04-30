@@ -14,10 +14,11 @@ drop-xp: false
 friendly-fire: false
 food-change: false
 one-life: false
+regen-health: true
 change-class-in-arena: false
 allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
 track-stats: true
-regen-health: true
 entry-fee: $20.00
+quit-charge: $50

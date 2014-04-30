@@ -60,6 +60,8 @@ public class JoinCmd implements Command {
 			Messenger.warning("Entry-fee setting for arena '" + arena.getName() + "' is incorrect!");
 			fee = String.valueOf(0.00);
 		}
+		if (fee.startsWith("$"))
+			fee = fee.substring(1);
 		
 		if (econ != null) {
 			if (!em.hasEnough(p, Double.parseDouble(fee))) {
