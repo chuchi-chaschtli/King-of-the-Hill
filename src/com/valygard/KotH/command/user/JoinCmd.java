@@ -4,6 +4,8 @@
  */
 package com.valygard.KotH.command.user;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -13,6 +15,7 @@ import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
 import com.valygard.KotH.command.CommandUsage;
+import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 
@@ -46,6 +49,24 @@ public class JoinCmd implements Command {
 		if (!arena.isReady()) {
 			Messenger.tell(p, Msg.ARENA_NOT_READY);
 			return true;
+		}
+		
+		Economy econ = arena.getPlugin().getEconomy();
+		EconomyManager em = arena.getPlugin().getEconomyManager();
+		
+		String fee = arena.getSettings().getString("entry-fee");
+		
+		if (!fee.matches("\\$(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
+			Messenger.warning("Entry-fee setting for arena '" + arena.getName() + "' is incorrect!");
+			fee = String.valueOf(0.00);
+		}
+		
+		if (econ != null) {
+			if (!em.hasEnough(p, Double.parseDouble(fee))) {
+				Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);
+				return true;
+			}
+			em.withdraw(p, Double.parseDouble(fee));
 		}
 		
 		if (arena.inLobby(p) || arena.getPlayersInArena().contains(p)) {

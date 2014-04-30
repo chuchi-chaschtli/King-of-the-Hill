@@ -20,3 +20,4 @@ circular-hill: true
 drop-items: false
 track-stats: true
 regen-health: true
+entry-fee: $20.00
