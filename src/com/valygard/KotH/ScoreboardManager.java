@@ -20,7 +20,11 @@ import com.valygard.KotH.framework.Arena;
  *
  */
 public class ScoreboardManager {
+	// Arena stuff
 	private Arena arena;
+	private boolean enabled;
+	
+	// The scoreboard itself
     private Scoreboard scoreboard;
     
     // sidebar objective
@@ -37,21 +41,22 @@ public class ScoreboardManager {
      * @param arena an arena
      */
     public ScoreboardManager(Arena arena) {
-        this.arena = arena;
-        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        this.arena   	= arena;
+        this.enabled 	= arena.getSettings().getBoolean("use-scoreboard");
+        scoreboard 		= Bukkit.getScoreboardManager().getNewScoreboard();
         
         // sidebar
-		sidebar = scoreboard.registerNewObjective(ChatColor.YELLOW + "Arena Stats", "dummy");
+		sidebar 	= scoreboard.registerNewObjective(ChatColor.YELLOW + "Arena Stats", "dummy");
 		
 		sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
 		
-		red = sidebar.getScore(ChatColor.DARK_RED + "[Red Team]");
-		blue = sidebar.getScore(ChatColor.DARK_BLUE + "[Blue Team]");
-		timeLeft = sidebar.getScore(ChatColor.YELLOW + "Time left -");
+		red 		= sidebar.getScore(ChatColor.DARK_RED + "[Red Team]");
+		blue 		= sidebar.getScore(ChatColor.DARK_BLUE + "[Blue Team]");
+		timeLeft 	= sidebar.getScore(ChatColor.YELLOW + "Time left -");
 		
 		// teams
-		redteam = scoreboard.registerNewTeam("red");
-		blueteam = scoreboard.registerNewTeam("blue");
+		redteam 	= scoreboard.registerNewTeam("red");
+		blueteam 	= scoreboard.registerNewTeam("blue");
 		
 		redteam.setPrefix("" + ChatColor.RED);
 		blueteam.setPrefix("" + ChatColor.BLUE);
@@ -92,6 +97,9 @@ public class ScoreboardManager {
      * @param p the player
      */
     public void initialize(final Player p, Team team) {
+    	if (!enabled)
+    		return;
+    	
     	p.setScoreboard(scoreboard);
     	team.addPlayer(p);
 		red.setScore(8);
@@ -101,6 +109,17 @@ public class ScoreboardManager {
 		red.setScore(0);
 		blue.setScore(0);
 		timeLeft.setScore(arena.getSettings().getInt("arena-time"));
+    }
+    
+	/**
+	 * Removes the scoreboard by deleting it for all players.
+	 */
+    public void reset() {
+    	for (Player p : Bukkit.getOnlinePlayers()) {
+    		if (p.getScoreboard().equals(scoreboard))
+    			removePlayer(p);
+    	}
+    	scoreboard.clearSlot(DisplaySlot.SIDEBAR);
     }
     
     /**

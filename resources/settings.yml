@@ -20,5 +20,6 @@ allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
 track-stats: true
-entry-fee: $20.00
+entry-fee: 0.00
 quit-charge: $50
+use-scoreboard: true
