@@ -61,6 +61,7 @@ public class StatsCmd implements Command {
 		String wlr		= "Your WLR is" + makeString(stats, stats.getWins(), stats.getLosses());
 		
 		StringBuilder foo = new StringBuilder();
+		foo.append(ChatColor.YELLOW).append(args[0]).append(":").append(ChatColor.RESET);
 		foo.append("\n");
 		foo.append("You").append(" ").append("have").append(kills)
 				.append(deaths);
