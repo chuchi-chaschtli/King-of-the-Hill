@@ -90,8 +90,20 @@ public class CommandManager implements CommandExecutor {
 			return true;
 		}
 
-		if (first.equals("?") || first.equalsIgnoreCase("help") || first.equals("")) {
-			showHelp(sender);
+		String second = (args.length > 1 ? args[1] : "");
+		
+		if (first.equals("?") || first.equalsIgnoreCase("help")) {
+			if (!second.matches("\\d")) {
+				showHelp(sender);
+				return true;
+			}
+			
+			if (second.equals("") || Integer.parseInt(second) <= 1) {
+				showHelp(sender);
+				return true;
+			}
+			
+			showHelp(sender, Integer.parseInt(second));
 			return true;
 		}
 
@@ -181,11 +193,31 @@ public class CommandManager implements CommandExecutor {
 	}
 
 	private void showHelp(CommandSender sender) {
-		StringBuilder user = new StringBuilder();
-		StringBuilder admin = new StringBuilder();
-		StringBuilder setup = new StringBuilder();
+		showHelp(sender, 1);
+	}
+
+	private void showHelp(CommandSender sender, int page) {
+		int cmds = 0;
+		for (Command cmd : commands.values()) {
+			CommandPermission perm = cmd.getClass().getAnnotation(
+					CommandPermission.class);
+
+			if (plugin.has(sender, perm.value()))
+				cmds++;
+		}
+		
+		if (Math.ceil(cmds / 6.0) < page) {
+			Messenger.tell(sender,
+					"Given: " + page + "; Expected integer 1 and "
+							+ (int) Math.ceil(cmds / 6.0));
+			return;
+		}
+
+		StringBuilder buffy = new StringBuilder();
+		int number = 0;
 
 		for (Command cmd : commands.values()) {
+			number++;
 			CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
 			CommandPermission perm = cmd.getClass().getAnnotation(
 					CommandPermission.class);
@@ -194,27 +226,18 @@ public class CommandManager implements CommandExecutor {
 			if (!plugin.has(sender, perm.value()))
 				continue;
 
-			StringBuilder buffy;
-			if (perm.value().startsWith("koth.admin")) {
-				buffy = admin;
-			} else if (perm.value().startsWith("koth.setup")) {
-				buffy = setup;
-			} else {
-				buffy = user;
-			}
+			if ((page * 6) - 5 > number)
+				continue;
+
+			if (page * 6 < number)
+				break;
+
 			buffy.append("\n").append(ChatColor.RESET).append(usage.value())
 					.append(" ").append(ChatColor.YELLOW).append(info.desc());
 		}
 
-		if (admin.length() == 0 && setup.length() == 0) {
-			Messenger.tell(sender, "Available commands: " + user.toString());
-		} else {
-			Messenger.tell(sender, "User commands: " + user.toString());
-			if (setup.length() > 0)
-				Messenger.tell(sender, "Setup Commands: " + setup.toString());
-			if (admin.length() > 0)
-				Messenger.tell(sender, "Admin commands: " + admin.toString());
-		}
+		Messenger.tell(sender, ChatColor.DARK_GREEN + "Page " + page + ": "
+				+ ChatColor.RESET + buffy.toString());
 	}
 
 	// --------------------------- //
