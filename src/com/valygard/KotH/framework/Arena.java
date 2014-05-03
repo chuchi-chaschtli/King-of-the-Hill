@@ -249,8 +249,9 @@ public class Arena {
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
 		
-		// Remove all their pets.
+		// Remove all their pets and landmines.
 		abilityListener.removeEntities(p);
+		abilityListener.removeLandmines(p);
 		
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
@@ -420,9 +421,6 @@ public class Arena {
 		redPlayers.clear();
 		bluePlayers.clear();
 		specPlayers.clear();
-		
-		// Clear all landmines.
-		abilityListener.removeLandmines();
 
 		return true;
 	}

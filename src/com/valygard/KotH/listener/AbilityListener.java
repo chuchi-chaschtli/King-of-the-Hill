@@ -256,14 +256,6 @@ public class AbilityListener implements Listener {
 		}
 	}
 	
-	public void removeLandmines() {
-		for (List<Location> l : landmines.values()) {
-			for (Location loc : l)
-				loc.getBlock().setType(null);
-		}
-		landmines.clear();
-	}
-	
 	public void removeLandmines(Player p) {
 		if (!landmines.containsKey(p.getUniqueId()))
 			return;
