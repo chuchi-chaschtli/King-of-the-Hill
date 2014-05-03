@@ -30,6 +30,9 @@ public class PlayerStats {
 	private int kills, deaths;
 	private int wins, losses, draws;
 	
+	// Killstreak and winstreak
+	private int killstreak, winstreak;
+	
 	// kill-death ratio, win-loss ratio.
 	private double kdr, wlr;
 	
@@ -73,15 +76,18 @@ public class PlayerStats {
 			// If the file exists, try to load it.
 			try {
 				config.load(file);
-				this.kills	= config.getInt(path + "kills");
-				this.deaths	= config.getInt(path + "deaths");
+				this.kills		= config.getInt(path + "kills");
+				this.deaths		= config.getInt(path + "deaths");
 				
-				this.wins	= config.getInt(path + "wins");
-				this.losses = config.getInt(path + "losses");
-				this.draws  = config.getInt(path + "draws");
+				this.wins		= config.getInt(path + "wins");
+				this.losses 	= config.getInt(path + "losses");
+				this.draws 	 	= config.getInt(path + "draws");
 				
-				this.kdr	= calculateRatio(kills, deaths);
+				this.kdr		= calculateRatio(kills, deaths);
 				this.wlr		= calculateRatio(wins, losses);
+				
+				this.killstreak = config.getInt(path + "killstreak");
+				this.winstreak	= config.getInt(path + "winstreak");
 			} catch (Exception e) {
 				Messenger.severe("Stats reset for player '" + player.getName() + "'.");
 				e.printStackTrace();
@@ -98,10 +104,8 @@ public class PlayerStats {
 	/**
 	 * Saves the player's stats. If the arena is tracking stats, try to load the
 	 * file and save all statistics.
-	 * 
-	 * @throws IOException
 	 */
-	public void saveStats() throws IOException {
+	public void saveStats() {
 		if (!tracking) {
 			return;
 		}
@@ -125,15 +129,22 @@ public class PlayerStats {
 		config.set(path + "draws", draws);
 		config.set(path + "wlr", wlr);
 		
-		config.save(file);
+		config.set(path + "killstreak", killstreak);
+		config.set(path + "winstreak", winstreak);
+		
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			Messenger.severe("Could not save stats for player '" + player.getName() + "'.");
+			e.printStackTrace();
+			return;
+		}
 	}
 	
 	/**
 	 * If we ever want to, reset the arena statistics for the player and save.
-	 * 
-	 * @throws IOException
 	 */
-	public void resetStats() throws IOException {
+	public void resetStats() {
 		kills   	= 0;
 		deaths	 	= 0;
 		kdr 		= 0;
@@ -141,7 +152,45 @@ public class PlayerStats {
 		losses		= 0;
 		draws	 	= 0;
 		wlr 		= 0;
+		killstreak  = 0;
+		winstreak	= 0;
 		
+		saveStats();
+	}
+	
+	/**
+	 * At the end of every arena, reset a player's killstreak.
+	 */
+	public void resetKillstreak() {
+		YamlConfiguration config = new YamlConfiguration();
+		try {
+			config.load(file);
+		} catch (Exception e) {
+			Messenger.severe("Could not reset killstreak for player '" + player.getName() + "'.");
+			return;
+		}
+		String s = "arenas." + name + ".killstreak";
+		
+		killstreak = 0;
+		config.set(s, killstreak);
+		saveStats();
+	}
+	
+	/**
+	 * Reset the winstreak for a player.
+	 */
+	public void resetWinstreak() {
+		YamlConfiguration config = new YamlConfiguration();
+		try {
+			config.load(file);
+		} catch (Exception e) {
+			Messenger.severe("Could not reset winstreak for player '" + player.getName() + "'.");
+			return;
+		}
+		String s = "arenas." + name + ".winstreak";
+		
+		winstreak = 0;
+		config.set(s, winstreak);
 		saveStats();
 	}
 	
@@ -170,33 +219,44 @@ public class PlayerStats {
 		case "kills":
 			kills += 1;
 			config.set(s, kills);
+			
+			killstreak += 1;
+			config.set(s, killstreak);
 			break;
 		case "deaths":
 			deaths += 1;
 			config.set(s, deaths);
+			
+			killstreak = 0;
+			config.set(s, killstreak);
 			break;
 		case "wins":
 			wins += 1;
 			config.set(s, wins);
+			
+			winstreak += 1;
+			config.set(s, winstreak);
 			break;
 		case "losses":
 			losses += 1;
 			config.set(s, losses);
+			
+			winstreak = 0;
+			config.set(s, winstreak);
 			break;
 		case "draws":
 			draws += 1;
 			config.set(s, draws);
+			
+			winstreak = 0;
+			config.set(s, winstreak);
 			break;
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
 		}
 		
 		// Recalculate the ratios of the kdr and wlr.
-		try {
-			recalibrate();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		recalibrate();
 	}
 	
 	/**
@@ -219,10 +279,8 @@ public class PlayerStats {
 	/**
 	 * Recalibrating involves loading the config file then calculating the
 	 * ratios. It then saves the ratios to the configuration file.
-	 * 
-	 * @throws IOException
 	 */
-	public void recalibrate() throws IOException {
+	public void recalibrate() {
 		YamlConfiguration config = new YamlConfiguration();
 		try {
 			config.load(file);
@@ -277,6 +335,14 @@ public class PlayerStats {
 	
 	public double getWLR() {
 		return wlr;
+	}
+	
+	public int getKillstreak() {
+		return killstreak;
+	}
+	
+	public int getWinstreak() {
+		return winstreak;
 	}
 	
 	public boolean isTracking() {

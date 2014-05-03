@@ -289,8 +289,10 @@ public class GlobalListener implements Listener {
 					+ ChatColor.RESET + " has killed you.");
 			
 			PlayerStats stats = arena.getStats(killer);
-			if (stats != null)
+			if (stats != null) {
 				stats.increment("kills");
+				arena.getRewards().giveKillstreakRewards(killer);
+			}
 		}
 
 		if (arena.getSettings().getBoolean("one-life")) {

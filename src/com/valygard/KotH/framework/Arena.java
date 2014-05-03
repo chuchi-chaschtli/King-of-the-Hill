@@ -261,6 +261,7 @@ public class Arena {
 		if (running) {
 			if (end) {
 				rewards.givePrizes(p, winner.contains(p));
+				rewards.giveWinstreakRewards(p);
 			} else { 
 				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);

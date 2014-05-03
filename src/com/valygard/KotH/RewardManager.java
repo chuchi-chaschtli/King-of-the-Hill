@@ -69,6 +69,58 @@ public class RewardManager {
 		p.updateInventory();
 		Messenger.tell(p, Msg.REWARDS_GAINED);
 	}
+	
+	@SuppressWarnings("deprecation")
+	public void giveKillstreakRewards(Player p) {
+		PlayerStats stats = arena.getStats(p);
+		ConfigurationSection s = plugin.getConfig().getConfigurationSection(arena.getName() + ".prizes.killstreaks");
+		
+		if (s.getKeys(false).contains(String.valueOf(stats.getKillstreak()))) {
+			List<ItemStack> items = parseItems(String.valueOf(stats.getKillstreak()));
+
+			for (ItemStack is : items) {
+				if (is.getTypeId() == KotH.ECONOMY_ID)
+					continue;
+				p.getInventory().addItem(is);
+			}
+		}
+		Messenger.tell(p, Msg.REWARDS_KILLSTREAK_RECEIVED);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void giveWinstreakRewards(Player p) {
+		PlayerStats stats = arena.getStats(p);
+		ConfigurationSection s = plugin.getConfig().getConfigurationSection(arena.getName() + ".prizes.winstreaks");
+		
+		if (s.getKeys(false).contains(String.valueOf(stats.getWinstreak()))) {
+			List<ItemStack> items = parseItems(String.valueOf(stats.getWinstreak()));
+
+			for (ItemStack is : items) {
+				if (is.getTypeId() == KotH.ECONOMY_ID)
+					continue;
+				p.getInventory().addItem(is);
+			}
+		}
+		Messenger.tell(p, Msg.REWARDS_WINSTREAK_RECEIVED);
+	}
+	
+	/**
+	 * Parse items to be given out at arena end.
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public List<ItemStack> parseItems(String str) {
+		return parseItems(str, "completion");
+	}
+	
+	public List<ItemStack> parseKillstreakItems(String str) {
+		return parseItems(str, "killstreaks");
+	}
+	
+	public List<ItemStack> parseWinstreakItems(String str) {
+		return parseItems(str, "winstreaks");
+	}
 
 	/**
 	 * A method for parsing items.
@@ -76,8 +128,8 @@ public class RewardManager {
 	 * @param str the string in the configuration section.
 	 * @return a list of itemstacks.
 	 */
-	public List<ItemStack> parseItems(String str) {
-		ConfigurationSection prizes = ConfigUtil.makeSection(this.prizes, "completion");
+	public List<ItemStack> parseItems(String str, String path) {
+		ConfigurationSection prizes = ConfigUtil.makeSection(this.prizes, path);
 		List<String> items = prizes.getStringList(str);
 		if (items == null || items.isEmpty()) {
 			String s = prizes.getString(str, "");
