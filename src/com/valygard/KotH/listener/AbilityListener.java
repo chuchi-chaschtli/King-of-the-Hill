@@ -62,6 +62,11 @@ public class AbilityListener implements Listener {
 		this.zombies	= new HashMap<UUID, Integer>();
 	}
 	
+	
+	// --------------------------- //
+	// Events
+	// --------------------------- //
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
@@ -102,6 +107,7 @@ public class AbilityListener implements Listener {
 			if (p.getVehicle() != null && p.getVehicle() instanceof Horse) {
 				p.getVehicle().remove();
 			}
+			
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK)});
 			ArenaAbilities.spawnHorse(p);
 			Messenger.tell(p, Msg.ABILITY_HORSE_SPAWNED);
@@ -122,7 +128,7 @@ public class AbilityListener implements Listener {
 					return;
 				}
 				
-				// Boom if the pressure plate trigger(er) is the player who placed it or on the opposite team.
+				// Create explosion if the triggerer is the player who placed it or on the opposite team.
 				if (player.equals(p)) {
 					ArenaAbilities.boom(p);
 					Messenger.tell(p, "You triggered your own landmine!");
@@ -166,10 +172,12 @@ public class AbilityListener implements Listener {
 			
 			// Add the location to the current list.
 			List<Location> list = new ArrayList<Location>();
+			
 			if (landmines.containsKey(p.getUniqueId())) {
 				for (Location l : landmines.get(p.getUniqueId()))
 					list.add(l);
 			}
+			
 			list.add(e.getBlock().getLocation());
 			landmines.put(p.getUniqueId(), list);
 			break;
@@ -256,6 +264,12 @@ public class AbilityListener implements Listener {
 		}
 	}
 	
+	
+	
+	// --------------------------- //
+	// Remove stuff
+	// --------------------------- //
+	
 	public void removeLandmines(Player p) {
 		if (!landmines.containsKey(p.getUniqueId()))
 			return;
@@ -285,14 +299,14 @@ public class AbilityListener implements Listener {
 			wolves.remove(p.getUniqueId());
 	}
 	
-	public void removeWolves(Player p) {
+	private void removeWolves(Player p) {
 		for (Wolf wolf : p.getWorld().getEntitiesByClass(Wolf.class)) {
 			if (wolf.hasMetadata(p.getName()))
 				wolf.remove();
 		}
 	}
 	
-	public void removeZombies(Player p) {
+	private void removeZombies(Player p) {
 		for (Zombie zombie : p.getWorld().getEntitiesByClass(Zombie.class)) {
 			if (zombie.getMaxHealth() == 50 && zombie.hasMetadata(p.getName())) {
 				zombie.remove();
@@ -300,7 +314,7 @@ public class AbilityListener implements Listener {
 		}
 	}
 	
-	public void removeHorses(Player p) {
+	private void removeHorses(Player p) {
 		if (p.getVehicle() == null)
 			return;
 		
@@ -308,7 +322,7 @@ public class AbilityListener implements Listener {
 			p.getVehicle().remove();
 	}
 	
-	public Player getLandminePlacer(Location l) {
+	private Player getLandminePlacer(Location l) {
 		for (Entry<UUID, List<Location>> entry : landmines.entrySet()) {
             if (entry.getValue().contains(l)) {
             	return UUIDUtil.getPlayerFromUUID(entry.getKey());
