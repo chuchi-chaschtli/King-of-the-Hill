@@ -72,16 +72,30 @@ public class RewardManager {
 	
 	@SuppressWarnings("deprecation")
 	public void giveKillstreakRewards(Player p) {
+		String classname = arena.getClass(p).getLowercaseName();
 		PlayerStats stats = arena.getStats(p);
 		ConfigurationSection s = prizes.getConfigurationSection("killstreaks");
 		
 		if (s.getKeys(false).contains(String.valueOf(stats.getKillstreak()))) {
-			List<ItemStack> items = parseKillstreakItems(String.valueOf(stats.getKillstreak()));
-
-			for (ItemStack is : items) {
-				if (is.getTypeId() == KotH.ECONOMY_ID)
-					continue;
-				p.getInventory().addItem(is);
+			ConfigurationSection classes = s.getConfigurationSection(String.valueOf(stats.getKillstreak()));
+			
+			for (String string : classes.getKeys(false)) {
+				List<ItemStack> items;
+				if (string.equalsIgnoreCase("all")) {
+					items = parseKillstreakItems("all", String.valueOf(stats.getKillstreak()));
+				}
+				
+				else if (string.equalsIgnoreCase(classname)) {
+					items = parseKillstreakItems(classname, String.valueOf(stats.getKillstreak()));
+				}
+				
+				else continue;
+				
+				forX: for (ItemStack is : items) {
+					if (is.getTypeId() == KotH.ECONOMY_ID)
+						continue forX;
+					p.getInventory().addItem(is);
+				}
 			}
 			p.updateInventory();
 			Messenger.tell(p, Msg.REWARDS_KILLSTREAK_RECEIVED, String.valueOf(stats.getKillstreak()));
@@ -115,8 +129,8 @@ public class RewardManager {
 		return parseItems(str, "completion");
 	}
 	
-	public List<ItemStack> parseKillstreakItems(String str) {
-		return parseItems(str, "killstreaks");
+	public List<ItemStack> parseKillstreakItems(String str, String kills) {
+		return parseItems(str, "killstreaks." + kills);
 	}
 	
 	public List<ItemStack> parseWinstreakItems(String str) {
@@ -127,6 +141,7 @@ public class RewardManager {
 	 * A method for parsing items.
 	 * 
 	 * @param str the string in the configuration section.
+	 * @param path the config path.
 	 * @return a list of itemstacks.
 	 */
 	public List<ItemStack> parseItems(String str, String path) {

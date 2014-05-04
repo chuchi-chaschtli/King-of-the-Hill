@@ -3,8 +3,12 @@ completion:
   losers: dirt:4, iron_ingot
   all-players: gold_ingot:2
 killstreaks:
-  '3': iron_sword damage_all:3, diamond_boots:1
-  '6': diamond_helmet, diamond_leggings
+  '3': 
+    all: diamond_boots
+    swordmaster: iron_sword damage_all:3
+    archer: arrow:64
+  '6': 
+    all: diamond_helmet, diamond_leggings
 winstreaks:
   '2': diamond:5, gold_ingot:2
   '5': obsidian:20, wool:14:5
