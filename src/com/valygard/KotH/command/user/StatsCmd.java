@@ -60,6 +60,9 @@ public class StatsCmd implements Command {
 		String kdr		= "Your KDR is" + makeString(stats, stats.getKills(), stats.getDeaths());
 		String wlr		= "Your WLR is" + makeString(stats, stats.getWins(), stats.getLosses());
 		
+		String killstreak = (stats.getKillstreak() > 0 ? "You are on a" + makeString(stats.getKillstreak()) + "killstreak." : "");
+		String winstreak  = (stats.getWinstreak() > 0 ? "You are on a" + makeString(stats.getWinstreak()) + "winstreak." : "");
+		
 		StringBuilder foo = new StringBuilder();
 		foo.append(ChatColor.YELLOW).append(args[0]).append(":").append(ChatColor.RESET);
 		foo.append("\n");
@@ -68,10 +71,14 @@ public class StatsCmd implements Command {
 		foo.append("\n");
 		foo.append("You").append(" ").append("have").append(wins)
 				.append(losses).append(draws);
-		foo.append("\n");
-		foo.append(kdr);
-		foo.append("\n");
-		foo.append(wlr);
+		
+		foo.append("\n").append(" ");
+		foo.append("\n").append(kdr);
+		foo.append("\n").append(wlr);
+		
+		foo.append("\n").append(" ");
+		foo.append("\n").append(killstreak);
+		foo.append("\n").append(winstreak);
 		
 		Messenger.tell(p, Msg.STATS, foo.toString());
 		return true;
