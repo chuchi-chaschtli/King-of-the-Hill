@@ -27,6 +27,7 @@ public enum Msg {
 	ARENA_DRAW("The arena ended in a draw."),
 	ARENA_END("Arena ended."),
 	ARENA_EXISTS("The arena specified already exists."),
+	ARENA_IN_PROGRESS("Sorry, the arena is running at this time."),
 	ARENA_NO_PERMISSION("You do not have permission to this arena."),
 	ARENA_NOT_READY("This arena is not ready."),
 	ARENA_NULL("You must specify an existing arena."),

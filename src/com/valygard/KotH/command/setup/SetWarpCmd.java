@@ -46,6 +46,11 @@ public class SetWarpCmd implements Command {
 			am.getMissingWarps(arena, p);
 		}
 		
+		if (arena.isRunning()) {
+			Messenger.tell(p, Msg.ARENA_IN_PROGRESS);
+			return true;
+		}
+		
 		if (args.length > 1) {
 			switch (args[1]) {
 				case "red":
@@ -67,7 +72,8 @@ public class SetWarpCmd implements Command {
 					return false;
 			}
 			am.getMissingWarps(arena, p);
-			am.getPlugin().saveConfig();
+			am.saveConfig();
+			am.reloadArena(arena);
 		}
 		return true;
 	}

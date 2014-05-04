@@ -251,7 +251,7 @@ public class ArenaManager {
 	}
 
 	/**
-	 * Reload an arena.
+	 * Reload an arena with it's name.
 	 */
 	public boolean reloadArena(String name) {
 		Arena arena = getArenaWithName(name);
@@ -268,6 +268,20 @@ public class ArenaManager {
 		loadArena(name);
 		return true;
 	}
+	
+	/**
+	 * Reload an arena.
+	 */
+	public boolean reloadArena(Arena arena) {
+		return reloadArena(arena.getName());
+	}
+	
+	/**
+	 * Save the config
+	 */
+	public void saveConfig() {
+		plugin.saveConfig();
+	}
 
 	/**
 	 * Reload the config.
@@ -279,7 +293,7 @@ public class ArenaManager {
 			setEnabled(false);
 
 		for (Arena arena : arenas) {
-			arena.forceEnd();
+			reloadArena(arena);
 		}
 		plugin.reloadConfig();
 		config = plugin.getConfig();

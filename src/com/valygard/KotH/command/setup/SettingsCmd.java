@@ -59,6 +59,11 @@ public class SettingsCmd implements Command {
 			Messenger.tell(sender, foo.toString());
 			return true;
 		}
+		
+		if (arena.isRunning()) {
+			Messenger.tell(sender, Msg.ARENA_IN_PROGRESS);
+			return true;
+		}
 
 		Object value = arena.getSettings().get(args[1], null);
 		if (value == null) {
@@ -101,8 +106,8 @@ public class SettingsCmd implements Command {
 			arena.getSettings().set(args[1], args[2]);
 		}
 
-		am.getPlugin().saveConfig();
-		am.reloadArena(args[0]);
+		am.saveConfig();
+		am.reloadArena(arena);
 
 		foo.append("The ").append(ChatColor.DARK_GREEN).append(args[1])
 				.append(ChatColor.RESET).append(" setting for ");

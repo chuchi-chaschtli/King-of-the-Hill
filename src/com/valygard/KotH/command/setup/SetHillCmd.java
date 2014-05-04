@@ -42,6 +42,11 @@ public class SetHillCmd implements Command {
 			return false;
 		}
 		
+		if (arena.isRunning()) {
+			Messenger.tell(p, Msg.ARENA_IN_PROGRESS);
+			return true;
+		}
+		
 		ConfigurationSection warps = arena.getWarps();
 		
 		if (warps == null) {
@@ -91,7 +96,8 @@ public class SetHillCmd implements Command {
 				return true;
 			}
 		}
-		am.getPlugin().saveConfig();
+		am.saveConfig();
+		am.reloadArena(arena);
 		am.getMissingWarps(arena, p);
 		
 		return true;
