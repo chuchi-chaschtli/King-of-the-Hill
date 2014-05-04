@@ -70,6 +70,11 @@ public class RewardManager {
 		Messenger.tell(p, Msg.REWARDS_GAINED);
 	}
 	
+	/**
+	 * Give killstreak rewards to a player in the arena.
+	 * 
+	 * @param p the player
+	 */
 	@SuppressWarnings("deprecation")
 	public void giveKillstreakRewards(Player p) {
 		String classname = arena.getClass(p).getLowercaseName();
@@ -102,6 +107,11 @@ public class RewardManager {
 		}
 	}
 	
+	/**
+	 * Give prize rewards to players who have won several games in a row.
+	 * 
+	 * @param p the player
+	 */
 	@SuppressWarnings("deprecation")
 	public void giveWinstreakRewards(Player p) {
 		PlayerStats stats = arena.getStats(p);
@@ -129,10 +139,23 @@ public class RewardManager {
 		return parseItems(str, "completion");
 	}
 	
+	/**
+	 * Items to be given out as a killstreak. This is merely a helper method.
+	 * 
+	 * @param str
+	 * @param kills
+	 * @return
+	 */
 	public List<ItemStack> parseKillstreakItems(String str, String kills) {
 		return parseItems(str, "killstreaks." + kills);
 	}
 	
+	/**
+	 * Helper method for giving out winstreak items.
+	 * 
+	 * @param str
+	 * @return
+	 */
 	public List<ItemStack> parseWinstreakItems(String str) {
 		return parseItems(str, "winstreaks");
 	}
