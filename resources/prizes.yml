@@ -1,9 +1,9 @@
 completion:
-  winners: diamond_sword sharpness:2;knockback:1, emerald:3
+  winners: diamond_sword damage_all:2;knockback:1, emerald:3
   losers: dirt:4, iron_ingot
   all-players: gold_ingot:2
 killstreaks:
-  '3': iron_sword sharpness:3
+  '3': iron_sword damage_all:3, diamond_boots:1
   '6': diamond_helmet, diamond_leggings
 winstreaks:
   '2': diamond:5, gold_ingot:2
