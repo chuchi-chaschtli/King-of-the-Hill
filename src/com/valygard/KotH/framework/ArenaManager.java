@@ -51,7 +51,7 @@ public class ArenaManager {
 
 	// we have to make sure KotH is even enabled
 	private boolean enabled;
-	
+
 	// Commands that are allowed while playing koth.
 	private Set<String> allowedcmds;
 
@@ -59,16 +59,16 @@ public class ArenaManager {
 	 * Constructor
 	 */
 	public ArenaManager(KotH plugin) {
-		this.plugin 	= plugin;
-		this.config 	= plugin.getConfig();
+		this.plugin = plugin;
+		this.config = plugin.getConfig();
 
-		this.arenas 	= new ArrayList<Arena>();
+		this.arenas = new ArrayList<Arena>();
 
-		this.classes 	= new HashMap<String, ArenaClass>();
+		this.classes = new HashMap<String, ArenaClass>();
 
-		this.enabled 	= config.getBoolean("global.enabled", true);
-		
-		this.allowedcmds= new HashSet<String>();
+		this.enabled = config.getBoolean("global.enabled", true);
+
+		this.allowedcmds = new HashSet<String>();
 	}
 
 	// --------------------------- //
@@ -83,15 +83,16 @@ public class ArenaManager {
 		loadClasses();
 		loadArenas();
 	}
-	
+
 	/**
 	 * Load the global settings of the arena.
 	 */
 	public void loadGlobalSettings() {
-		ConfigurationSection section = plugin.getConfig().getConfigurationSection("global");
-        ConfigUtil.addMissingRemoveObsolete(plugin, "global.yml", section);
-        
-        setAllowedCmds(section);
+		ConfigurationSection section = plugin.getConfig()
+				.getConfigurationSection("global");
+		ConfigUtil.addMissingRemoveObsolete(plugin, "global.yml", section);
+
+		setAllowedCmds(section);
 	}
 
 	/**
@@ -267,25 +268,25 @@ public class ArenaManager {
 		loadArena(name);
 		return true;
 	}
-	
+
 	/**
 	 * Reload the config.
 	 */
 	public void reloadConfig() {
 		boolean wasEnabled = isEnabled();
-		
-        if (wasEnabled) 
-        	setEnabled(false);
-        
-        for (Arena arena : arenas) {
-            arena.forceEnd();
-        }
-        plugin.reloadConfig();
-        config = plugin.getConfig();
-        initialize();
-        
-        if (wasEnabled) 
-        	setEnabled(true);
+
+		if (wasEnabled)
+			setEnabled(false);
+
+		for (Arena arena : arenas) {
+			arena.forceEnd();
+		}
+		plugin.reloadConfig();
+		config = plugin.getConfig();
+		initialize();
+
+		if (wasEnabled)
+			setEnabled(true);
 	}
 
 	/**
