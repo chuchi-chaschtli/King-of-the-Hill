@@ -73,35 +73,36 @@ public class RewardManager {
 	@SuppressWarnings("deprecation")
 	public void giveKillstreakRewards(Player p) {
 		PlayerStats stats = arena.getStats(p);
-		ConfigurationSection s = plugin.getConfig().getConfigurationSection(arena.getName() + ".prizes.killstreaks");
+		ConfigurationSection s = prizes.getConfigurationSection("killstreaks");
 		
 		if (s.getKeys(false).contains(String.valueOf(stats.getKillstreak()))) {
-			List<ItemStack> items = parseItems(String.valueOf(stats.getKillstreak()));
+			List<ItemStack> items = parseKillstreakItems(String.valueOf(stats.getKillstreak()));
 
 			for (ItemStack is : items) {
 				if (is.getTypeId() == KotH.ECONOMY_ID)
 					continue;
 				p.getInventory().addItem(is);
 			}
+			p.updateInventory();
+			Messenger.tell(p, Msg.REWARDS_KILLSTREAK_RECEIVED, String.valueOf(stats.getKillstreak()));
 		}
-		Messenger.tell(p, Msg.REWARDS_KILLSTREAK_RECEIVED);
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void giveWinstreakRewards(Player p) {
 		PlayerStats stats = arena.getStats(p);
-		ConfigurationSection s = plugin.getConfig().getConfigurationSection(arena.getName() + ".prizes.winstreaks");
+		ConfigurationSection s = prizes.getConfigurationSection("winstreaks");
 		
 		if (s.getKeys(false).contains(String.valueOf(stats.getWinstreak()))) {
-			List<ItemStack> items = parseItems(String.valueOf(stats.getWinstreak()));
+			List<ItemStack> items = parseWinstreakItems(String.valueOf(stats.getWinstreak()));
 
 			for (ItemStack is : items) {
 				if (is.getTypeId() == KotH.ECONOMY_ID)
 					continue;
 				p.getInventory().addItem(is);
 			}
+			Messenger.tell(p, Msg.REWARDS_WINSTREAK_RECEIVED, String.valueOf(stats.getWinstreak()));
 		}
-		Messenger.tell(p, Msg.REWARDS_WINSTREAK_RECEIVED);
 	}
 	
 	/**

@@ -257,6 +257,9 @@ public class Arena {
 		PlayerData data = getData(p);
 		data.restoreData();
 		
+		// Reset their killstreak counter.
+		getStats(p).resetKillstreak();
+		
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {

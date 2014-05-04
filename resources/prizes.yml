@@ -3,8 +3,8 @@ completion:
   losers: dirt:4, iron_ingot
   all-players: gold_ingot:2
 killstreaks:
-  3: iron_sword sharpness:3
-  6: diamond_helmet, diamond_leggings
+  '3': iron_sword sharpness:3
+  '6': diamond_helmet, diamond_leggings
 winstreaks:
-  2: diamond:5, gold_ingot:2
-  5: obsidian:20, wool:14:5
+  '2': diamond:5, gold_ingot:2
+  '5': obsidian:20, wool:14:5
