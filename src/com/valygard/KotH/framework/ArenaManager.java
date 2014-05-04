@@ -267,6 +267,26 @@ public class ArenaManager {
 		loadArena(name);
 		return true;
 	}
+	
+	/**
+	 * Reload the config.
+	 */
+	public void reloadConfig() {
+		boolean wasEnabled = isEnabled();
+		
+        if (wasEnabled) 
+        	setEnabled(false);
+        
+        for (Arena arena : arenas) {
+            arena.forceEnd();
+        }
+        plugin.reloadConfig();
+        config = plugin.getConfig();
+        initialize();
+        
+        if (wasEnabled) 
+        	setEnabled(true);
+	}
 
 	/**
 	 * Load all class-related stuff.

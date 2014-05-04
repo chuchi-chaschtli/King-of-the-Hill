@@ -35,8 +35,7 @@ public class ConfigCmd implements Command {
 		}
 		
 		if (args[0].startsWith("reload")) {
-			am.getPlugin().reloadConfig();
-			am.initialize();
+			am.reloadConfig();
 			Messenger.tell(sender, "Config-file reloaded.");
 			Messenger.info("Config-file reloaded.");
 		}
