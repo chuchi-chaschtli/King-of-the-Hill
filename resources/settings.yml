@@ -20,6 +20,7 @@ allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
 track-stats: true
+time-tracking-cycle: 3
 entry-fee: 0.00
 quit-charge: $50
 use-scoreboard: true

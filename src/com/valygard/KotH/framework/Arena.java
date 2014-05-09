@@ -359,6 +359,9 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
+			
+			// Start adding seconds to their time-spent in the arena.
+			getStats(p).startTiming();
 
 			if (!redPlayers.contains(p) && !bluePlayers.contains(p))
 				balanceTeams(p);

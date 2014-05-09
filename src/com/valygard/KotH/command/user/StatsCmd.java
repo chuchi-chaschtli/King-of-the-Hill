@@ -60,30 +60,35 @@ public class StatsCmd implements Command {
 		String kdr		= "Your KDR is" + makeString(stats, stats.getKills(), stats.getDeaths());
 		String wlr		= "Your WLR is" + makeString(stats, stats.getWins(), stats.getLosses());
 		
+		// Streaks
 		String killstreak = (stats.getKillstreak() > 0 ? "You are on a" + makeString(stats.getKillstreak()) + "killstreak." : "");
 		String winstreak  = (stats.getWinstreak() > 0 ? "You are on a" + makeString(stats.getWinstreak()) + "winstreak." : "");
 		
-		StringBuilder foo = new StringBuilder();
-		foo.append(ChatColor.YELLOW).append(args[0]).append(":").append(ChatColor.RESET);
-		foo.append("\n");
-		foo.append("You").append(" ").append("have").append(kills)
-				.append(deaths);
-		foo.append("\n");
-		foo.append("You").append(" ").append("have").append(wins)
-				.append(losses).append(draws);
+		// Pretty up the time spent in the arena.
+		String timespent  = "You have spent " + ChatColor.YELLOW + stats.getTimeSpent() + ChatColor.RESET + " playing the arena.";
 		
+		StringBuilder foo = new StringBuilder();
+		foo.append(ChatColor.YELLOW).append(args[0]).append(":")
+				.append(ChatColor.RESET);
+		foo.append("\n").append("You have").append(kills).append(deaths);
+		foo.append("\n").append("You have").append(wins).append(losses)
+				.append(draws);
+
 		foo.append("\n").append(" ");
 		foo.append("\n").append(kdr);
 		foo.append("\n").append(wlr);
-		
+
 		foo.append("\n").append(" ");
 		foo.append("\n").append(killstreak);
 		foo.append("\n").append(winstreak);
-		
+
+		foo.append("\n").append(" ");
+		foo.append("\n").append(timespent);
+
 		Messenger.tell(p, Msg.STATS, foo.toString());
 		return true;
 	}
-	
+
 	private String makeString(int i) {
 		return " " + ChatColor.DARK_GREEN + String.valueOf(i) + ChatColor.RESET + " ";
 	}

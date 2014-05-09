@@ -8,10 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.util.TimeUtil;
 
 /**
  * @author Anand
@@ -35,6 +38,9 @@ public class PlayerStats {
 	
 	// kill-death ratio, win-loss ratio.
 	private double kdr, wlr;
+	
+	// Time spent in the arena
+	private int timespent;
 	
 	// Directory where stats are stored.
 	private File dir;
@@ -88,6 +94,8 @@ public class PlayerStats {
 				
 				this.killstreak = config.getInt(path + "killstreak");
 				this.winstreak	= config.getInt(path + "winstreak");
+				
+				this.timespent	= config.getInt(path + "time-spent");
 			} catch (Exception e) {
 				Messenger.severe("Stats reset for player '" + player.getName() + "'.");
 				e.printStackTrace();
@@ -132,6 +140,8 @@ public class PlayerStats {
 		config.set(path + "killstreak", killstreak);
 		config.set(path + "winstreak", winstreak);
 		
+		config.set(path + "time-spent", timespent);
+		
 		try {
 			config.save(file);
 		} catch (IOException e) {
@@ -154,6 +164,7 @@ public class PlayerStats {
 		wlr 		= 0;
 		killstreak  = 0;
 		winstreak	= 0;
+		timespent	= 0;
 		
 		saveStats();
 	}
@@ -297,6 +308,35 @@ public class PlayerStats {
 		saveStats();
 	}
 	
+	/**
+	 * Add time to the player's time spent in the arena.
+	 * 
+	 * @param timeToAdd
+	 */
+	public void addTime(int timeToAdd) {
+		timespent += timeToAdd;
+		saveStats();
+	}
+	
+	/**
+	 * Every x (configurable) seconds, add time to the player. The problem is
+	 * that this can get to be a very heavy task at low integers; saving time
+	 * for 20 players or more every second (persay) could get very tedious, so
+	 * by default the time interval is 10 seconds.
+	 */
+	public void startTiming() {
+		final int i = arena.getSettings().getInt("time-tracking-cycle");
+		Bukkit.getScheduler().runTaskTimer(arena.getPlugin(), new BukkitRunnable() {
+			public void run() {
+				if (!arena.isRunning()) {
+					cancel();
+					return;
+				}
+				addTime(i);
+			}
+		}, 20 * i , 20 * i);
+	}
+	
 	public File getPlayerFile() {
 		return file;
 	}
@@ -343,6 +383,14 @@ public class PlayerStats {
 	
 	public int getWinstreak() {
 		return winstreak;
+	}
+	
+	public int getRawTimeSpent() {
+		return timespent;
+	}
+	
+	public String getTimeSpent() {
+		return TimeUtil.formatIntoHHMMSS(timespent);
 	}
 	
 	public boolean isTracking() {
