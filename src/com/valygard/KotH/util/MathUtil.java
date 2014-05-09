@@ -6,57 +6,27 @@ package com.valygard.KotH.util;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class MathUtil {
 	/**
-	 * Gets the remainder of two integers; the first is divided by the second.
+	 * Get the square of a number.
 	 * 
-	 * @param dividend the first number
-	 * @param divisor the second number
-	 * @deprecated obsolete, may find use later.
-	 * @return
-	 */
-	public static int getRemainder(int dividend, int divisor) {
-		return getRemainder(dividend, divisor);
-	}
-	
-	/**
-	 * We can also get the remainder of two doubles.
-	 * 
-	 * @param dividend the first number
-	 * @param divisor the second number
-	 * @deprecated obsolete, may find use later.
-	 * @return
-	 */
-	public static double getRemainder(double dividend, double divisor) {
-		if (divisor == 0) {
-			return 0.0;
-		}
-		
-		double quotient = dividend / divisor;
-		return (dividend > divisor ? dividend - (quotient * divisor) : 0.0);
-	}
-
-	/**
-	 * Sometimes we want to get the square of a number. This is commonly used
-	 * in distance, such as getting the distance from the hill to it's boundary.
-	 * 
-	 * @param x the first number.
+	 * @param x a double
 	 * @return
 	 */
 	public static double getSquare(double x) {
 		return x * x;
 	}
-	
+
 	/**
-	 * Checks if a specified number is a multiple of the factor. We do this
-	 * by forking a lot; so we specify the amount of loops it takes. The more
+	 * Checks if a specified number is a multiple of the factor. We do this by
+	 * forking a lot; so we specify the amount of loops it takes. The more
 	 * loops, the more time and more laggy it gets.
 	 * 
 	 * @param loops the amount of forks.
-	 * @param factor the baseline number
-	 * @param number the number we are checking is a multiple of the factor.
+	 * @param factor the baseline integer
+	 * @param number the integer we are checking is a multiple of the factor.
 	 * @return
 	 */
 	public static boolean isMultiple(int loops, int factor, int number) {
@@ -68,13 +38,13 @@ public class MathUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Checks if a specified number is a multiple of the factor. We loop through
 	 * factor times.
 	 * 
-	 * @param factor the baseline
-	 * @param number the number we are checking is a multiple of the factor.
+	 * @param factor the baseline integer
+	 * @param number the integer we are checking is a multiple of the factor.
 	 * @return
 	 */
 	public static boolean isMultiple(int factor, int number) {
