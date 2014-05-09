@@ -51,22 +51,29 @@ public class StatsCmd implements Command {
 		
 		// Some variables
 		String kills 	= makeString(stats.getKills()) + "kills and";
-		String deaths	= makeString(stats.getDeaths()) + "deaths.";
-		String wins		= makeString(stats.getWins()) + "wins,";
-		String losses	= makeString(stats.getLosses()) + "losses and";
-		String draws	= makeString(stats.getDraws()) + "draws.";
-		
+		String deaths 	= makeString(stats.getDeaths()) + "deaths.";
+		String wins 	= makeString(stats.getWins()) + "wins,";
+		String losses 	= makeString(stats.getLosses()) + "losses and";
+		String draws 	= makeString(stats.getDraws()) + "draws.";
+
 		// This insures that the double is formatted.
-		String kdr		= "Your KDR is" + makeString(stats, stats.getKills(), stats.getDeaths());
-		String wlr		= "Your WLR is" + makeString(stats, stats.getWins(), stats.getLosses());
-		
+		String kdr = "Your KDR is"
+				+ makeString(stats, stats.getKills(), stats.getDeaths());
+		String wlr = "Your WLR is"
+				+ makeString(stats, stats.getWins(), stats.getLosses());
+
 		// Streaks
-		String killstreak = (stats.getKillstreak() > 0 ? "You are on a" + makeString(stats.getKillstreak()) + "killstreak." : "");
-		String winstreak  = (stats.getWinstreak() > 0 ? "You are on a" + makeString(stats.getWinstreak()) + "winstreak." : "");
-		
+		String killstreak 	= (stats.getKillstreak() > 0 ? "You are on a"
+				+ makeString(stats.getKillstreak()) + "killstreak." : "");
+		String winstreak 	= (stats.getWinstreak() > 0 ? "You are on a"
+				+ makeString(stats.getWinstreak()) + "winstreak." : "");
+
 		// Pretty up the time spent in the arena.
-		String timespent  = "You have spent " + ChatColor.YELLOW + stats.getTimeSpent() + ChatColor.RESET + " playing the arena.";
-		
+		String timespent = "You have spent " + ChatColor.YELLOW
+				+ stats.getTimeSpent() + ChatColor.RESET + " in " + args[0]
+				+ ".";
+
+		// Append all the information into a string builder.
 		StringBuilder foo = new StringBuilder();
 		foo.append(ChatColor.YELLOW).append(args[0]).append(":")
 				.append(ChatColor.RESET);
