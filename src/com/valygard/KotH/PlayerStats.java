@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.util.TimeUtil;
@@ -41,6 +42,7 @@ public class PlayerStats {
 	
 	// Time spent in the arena
 	private int timespent;
+	private BukkitTask task;
 	
 	// Directory where stats are stored.
 	private File dir;
@@ -327,19 +329,20 @@ public class PlayerStats {
 	public void startTiming() {
 		if (!tracking)
 			return;
-		
+
 		final int i = arena.getSettings().getInt("time-tracking-cycle");
-		Bukkit.getScheduler().runTaskTimer(arena.getPlugin(), new BukkitRunnable() {
-			public void run() {
-				if (!arena.isRunning()) {
-					cancel();
-					return;
-				}
-				addTime(i);
-			}
-		}, 20 * i , 20 * i);
+		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
+				new BukkitRunnable() {
+					public void run() {
+						if (!arena.isRunning()) {
+							task.cancel();
+							return;
+						}
+						addTime(i);
+					}
+				}, 20 * i, 20 * i);
 	}
-	
+
 	public File getPlayerFile() {
 		return file;
 	}
