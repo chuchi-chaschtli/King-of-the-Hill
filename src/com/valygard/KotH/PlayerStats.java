@@ -325,6 +325,9 @@ public class PlayerStats {
 	 * by default the time interval is 10 seconds.
 	 */
 	public void startTiming() {
+		if (!tracking)
+			return;
+		
 		final int i = arena.getSettings().getInt("time-tracking-cycle");
 		Bukkit.getScheduler().runTaskTimer(arena.getPlugin(), new BukkitRunnable() {
 			public void run() {
