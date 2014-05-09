@@ -36,7 +36,7 @@ public class SetHillCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;
 		
-		Arena arena = am.getArenaWithPlayer(p);
+		Arena arena = am.getArenaWithName(args[0]);
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);
 			return false;
