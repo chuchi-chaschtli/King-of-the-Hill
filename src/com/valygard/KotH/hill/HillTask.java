@@ -68,8 +68,8 @@ public class HillTask {
 						|| arena.getRedTeam().size() <= 0) {
 					
 					manager.setStatus(utils.getHillRotations());
-					arena.forceEnd();
 					task.cancel();
+					arena.forceEnd();
 				}
 			}
 		}, 20, 20);

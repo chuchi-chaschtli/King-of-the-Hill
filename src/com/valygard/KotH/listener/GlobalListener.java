@@ -187,10 +187,22 @@ public class GlobalListener implements Listener {
 		if (arena == null)
 			return;
 		
-		if (!arena.getSettings().getBoolean("secluded-chat"))
+		if (!arena.getPlayersInArena().contains(p))
 			return;
 		
-		if (!arena.getPlayersInArena().contains(p))
+		if (arena.getSettings().getBoolean("team-only-chat")) {
+			// Eliminate default message
+			e.setCancelled(true);
+			
+			for (Player player : arena.getTeam(p)) {
+				player.sendMessage(getChatFormat(p, e.getMessage()));
+				e.setCancelled(true);
+			}
+			// Do not go further, because secluded chat is just a broader version of team-only chat.
+			return;
+		}
+		
+		if (!arena.getSettings().getBoolean("secluded-chat"))
 			return;
 
 		// Eliminate default message
