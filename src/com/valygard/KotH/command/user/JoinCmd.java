@@ -76,7 +76,7 @@ public class JoinCmd implements Command {
 			return true;
 		}
 		
-		if (!p.hasPermission("koth.arenas." + arena.getName()) && !p.hasPermission("koth.user.join")) {
+		if (!p.hasPermission("koth.arenas." + arena.getName())) {
 			Messenger.tell(p, Msg.ARENA_NO_PERMISSION);
 			return true;
 		}
