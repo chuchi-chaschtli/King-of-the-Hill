@@ -51,6 +51,7 @@ public enum Msg {
     CMD_VERSION("King of the Hill information: %"),
     HILLS_ADDED("You have added a hill at your location."),
 	HILLS_ONE_LEFT("There is &b1 hill&r remaining!"),
+	HILLS_DISTANCE("You are &e% blocks&r away from the hill."),
 	HILLS_ENTERED("You have entered the hill."),
 	HILLS_LEFT("You have abandoned the hill."),
 	HILLS_RESET("You have changed the location of hill &e#%."),

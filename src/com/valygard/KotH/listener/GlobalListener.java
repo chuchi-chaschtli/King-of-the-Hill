@@ -4,8 +4,11 @@
  */
 package com.valygard.KotH.listener;
 
+import java.text.DecimalFormat;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -28,6 +31,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -65,9 +69,32 @@ public class GlobalListener implements Listener {
 	// Player Events
 	// --------------------------- //
 	
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
+		
+		if (p.getItemInHand().getType() == Material.COMPASS) {
+			if (!p.getItemInHand().hasItemMeta()
+					|| !p.getItemInHand().getItemMeta().hasDisplayName()
+					|| !p.getItemInHand().getItemMeta().getDisplayName()
+							.contains("Hill Locator"))
+				return;
+			Arena arena = am.getArenaWithPlayer(p);
+			if (arena == null)
+				return;
+			
+			Location l = p.getLocation();
+			Location hill = arena.getHillUtils().getCurrentHill();
+			Location temp = new Location(hill.getWorld(), hill.getBlockX(), l.getY(), hill.getBlockZ());
+			
+			DecimalFormat df = new DecimalFormat("#.##");
+			if (arena.getHillManager().containsPlayer(p))
+				Messenger.tell(p, "You are in the hill.");
+			else
+				Messenger.tell(p, Msg.HILLS_DISTANCE, df.format(l.distance(temp)));
+			e.setCancelled(true);
+			return;
+		}
 
 		Block b = e.getClickedBlock();
 		if (b == null)
@@ -175,8 +202,16 @@ public class GlobalListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onTeleport(PlayerTeleportEvent e) {
+		// Block essentials and world edit compass teleportation.
+		if (am.getArenaWithPlayer(e.getPlayer()) != null
+				&& e.getPlayer().getItemInHand().getType() == Material.COMPASS)
+			e.setCancelled(true);
+	}
 
-	@EventHandler (priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		
@@ -337,6 +372,8 @@ public class GlobalListener implements Listener {
 			ac.giveItems(p);
 		else
 			arena.giveRandomClass(p);
+		
+		arena.giveCompass(p);
 	}
 
 	@EventHandler

@@ -56,6 +56,9 @@ public class HillManager {
 		}
 
 		if (utils.isFirstHill() && status == 1) {
+			for (Player p : arena.getPlayersInArena()) {
+				arena.giveCompass(p);
+			}
 			status = 2;
 			return;
 		}
@@ -63,8 +66,6 @@ public class HillManager {
 		if (!utils.isSwitchTime()) {
 			return;
 		}
-		
-		arena.createFirework(utils.getNextHill());
 
 		Messenger.announce(arena, Msg.HILLS_SWITCHED);
 
@@ -74,6 +75,9 @@ public class HillManager {
 
 		// Now, finally, change the status.
 		status++;
+		arena.resetCompass();
+		if (arena.getSettings().getBoolean("lightning-strike"))
+			utils.getCurrentHill().getWorld().strikeLightningEffect(utils.getCurrentHill());
 	}
 	
 	/**

@@ -1,11 +1,10 @@
 name: King of the Hill
 main: com.valygard.KotH.KotH
-version: 1.0.3
+version: 1.0.5
 website: http://valygard.com
 author: AoH_Ruthless
 description: >
-  A Minecraft minigame aimed at simulating the popular gametype 
-  King of the Hill, as seen in various combative games.
+  A Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.
 softdepend: [Vault]
 
 commands:
@@ -29,7 +28,8 @@ permissions:
       koth.user.pickclass: true
       koth.user.pickteam: true
       koth.user.signs: true
-      
+      koth.arenas: true
+      koth.classes: true
   koth.user.arenastats:
     default: false
     description: View your stats for an arena.
@@ -66,8 +66,6 @@ permissions:
     default: op
     children:
       koth.user: true
-      koth.classes: true
-      koth.arenas: true
       koth.setup.addarena: true
       koth.setup.removearena: true
       koth.setup.config: true

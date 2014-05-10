@@ -6,6 +6,7 @@ secluded-chat: true
 arena-time: 900
 hill-clock: 60
 hill-radius: 5
+strike-lightning: true
 score-to-win: 150
 indestructible-weapons: true
 indestructible-armor: true
@@ -23,3 +24,4 @@ time-tracking-cycle: 3
 entry-fee: 0.00
 quit-charge: $50
 use-scoreboard: true
+use-compasses: true

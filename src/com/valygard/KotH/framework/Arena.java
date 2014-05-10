@@ -22,12 +22,15 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.valygard.KotH.ArenaClass;
@@ -540,6 +543,11 @@ public class Arena {
 		loser.clear();
 	}
 	
+	/**
+	 * Spawn a firework on a location.
+	 * 
+	 * @param loc
+	 */
 	public void createFirework(Location loc) {
 		final Firework firework = loc.getWorld().spawn(loc, Firework.class);
 		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
@@ -573,6 +581,35 @@ public class Arena {
 				firework.detonate();
 			}
 		}, 20 * random.nextInt(3) + 2);
+	}
+	
+	/**
+	 * Give a compass to a player. This compass targets the current hill.
+	 * 
+	 * @param p
+	 */
+	public void giveCompass(Player p) {
+		if (!settings.getBoolean("use-compasses"))
+			return;
+		
+		ItemStack compass = new ItemStack(Material.COMPASS);
+		ItemMeta im = compass.getItemMeta();
+		im.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Hill Locator");
+		compass.setItemMeta(im);
+		p.getInventory().addItem(new ItemStack[]{compass});
+		p.setCompassTarget(hillUtils.getCurrentHill());
+	}
+	
+	/**
+	 * When the hill changes, change the compass target to the new hill.
+	 */
+	public void resetCompass() {
+		if (!settings.getBoolean("use-compasses"))
+			return;
+		
+		for (Player p : arenaPlayers) {
+			p.setCompassTarget(hillUtils.getCurrentHill());
+		}
 	}
 
 	/**
