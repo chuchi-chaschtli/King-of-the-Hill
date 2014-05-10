@@ -402,16 +402,18 @@ public class Arena {
 		
 		// Set the winner, to be declared and given different rewards.
 		winner = getWinnerByScore();
-		if (winner.equals(redPlayers)) {
-			if (redPlayers.size() <= 0)
-				winner = bluePlayers;
-		}
-		if (winner.equals(bluePlayers)) {
-			if (bluePlayers.size() <= 0) {
+		if (winner != null) {
+			if (winner.equals(redPlayers)) {
 				if (redPlayers.size() <= 0)
-					winner = null;
-				else
-					winner = redPlayers;
+					winner = bluePlayers;
+			}
+			if (winner.equals(bluePlayers)) {
+				if (bluePlayers.size() <= 0) {
+					if (redPlayers.size() <= 0)
+						winner = null;
+					else
+						winner = redPlayers;
+				}
 			}
 		}
 
