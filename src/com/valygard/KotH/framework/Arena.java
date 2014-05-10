@@ -78,7 +78,7 @@ public class Arena {
 	// Player types
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
 			bluePlayers;
-	
+
 	// Get the winner later
 	private Set<Player> winner = new HashSet<Player>();
 
@@ -96,24 +96,24 @@ public class Arena {
 
 	// Is the arena ready to be used?
 	private boolean ready;
-	
+
 	// Player stuff
 	private ScoreboardManager scoreboard;
 	private InventoryManager invManager;
 	private RewardManager rewards;
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private PlayerStats stats;
-	
+
 	// Economymanager
 	private EconomyManager em;
-	
+
 	// AbilityListener
 	private AbilityListener abilityListener;
 
 	// --------------------------- //
 	// constructor
 	// --------------------------- //
-	
+
 	/**
 	 * Our primary constructor.
 	 * 
@@ -122,17 +122,18 @@ public class Arena {
 	 */
 	public Arena(KotH plugin, String arenaName) {
 		// General stuff
-		this.plugin = plugin;
-		this.arenaName = arenaName;
+		this.plugin 		= plugin;
+		this.arenaName 		= arenaName;
 
 		// Settings from config
 		this.config 		= plugin.getConfig();
 		this.settings 		= config.getConfigurationSection("arenas." 
-				+ arenaName + ".settings");
-		this.warps 			= config.getConfigurationSection("arenas." + arenaName + ".warps");
-		
+				+ arenaName	+ ".settings");
+		this.warps 			= config.getConfigurationSection("arenas." 
+				+ arenaName + ".warps");
+
 		this.world 			= Bukkit.getWorld(settings.getString("world"));
-		
+
 		this.minPlayers 	= settings.getInt("min-players");
 		this.maxPlayers 	= settings.getInt("max-players");
 
@@ -158,36 +159,41 @@ public class Arena {
 
 		// Is the arena ready to be used?
 		this.ready 			= false;
+
+		// Economy
+		this.em 			= plugin.getEconomyManager();
 		
-		this.em				= plugin.getEconomyManager();
-		
-		// Misc.
+		// Scoreboard
 		this.scoreboard 	= new ScoreboardManager(this);
-		this.invManager 	= new InventoryManager(this);
-		this.rewards		= new RewardManager(this, config.getConfigurationSection("arenas." + arenaName));
 		
-		this.abilityListener= new AbilityListener(plugin);
+		// Rewards
+		this.invManager 	= new InventoryManager(this);
+		this.rewards 		= new RewardManager(this,
+				config.getConfigurationSection("arenas." + arenaName));
+
+		// Arena abilities
+		this.abilityListener = new AbilityListener(plugin);
 	}
-	
-	
+
 	// --------------------------- //
 	// New methods in refactoring
 	// --------------------------- //
 
 	/**
 	 * Add a player to the arena.
+	 * 
 	 * @param p the player
 	 */
 	public void addPlayer(Player p) {
 		// Sanity-checks
-		
+
 		ArenaJoinEvent event = new ArenaJoinEvent(this, p);
 		plugin.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			Messenger.tell(p, Msg.MISC_NO_ACCESS);
 			return;
 		}
-		
+
 		if (!enabled) {
 			Messenger.tell(p, Msg.ARENA_DISABLED);
 			return;
@@ -197,9 +203,9 @@ public class Arena {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
 			return;
 		}
-		
+
 		data.add(new PlayerData(p));
-		
+
 		if (running) {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_RUNNING);
 			Messenger.tell(p, Msg.JOIN_ARENA_SPECTATOR);
@@ -207,7 +213,7 @@ public class Arena {
 			p.teleport(spec);
 			return;
 		}
-		
+
 		try {
 			invManager.storeInventory(p);
 		} catch (IOException e) {
@@ -236,6 +242,7 @@ public class Arena {
 
 	/**
 	 * Remove a player from the arena.
+	 * 
 	 * @param p the player
 	 * @param end checks if the arena has been terminated.
 	 */
@@ -243,58 +250,60 @@ public class Arena {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
-		}		
+		}
 		ArenaLeaveEvent event = new ArenaLeaveEvent(this, p);
 		plugin.getServer().getPluginManager().callEvent(event);
-		
+
 		invManager.clearInventory(p);
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
-		
+
 		// Remove all their pets and landmines.
 		abilityListener.removeEntities(p);
 		abilityListener.removeLandmines(p);
-		
+
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
 		data.restoreData();
-		
+
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
-		
+
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {
-				rewards.givePrizes(p, winner != null ? winner.contains(p) : false);
+				rewards.givePrizes(p, winner != null ? winner.contains(p)
+						: false);
 				rewards.giveWinstreakRewards(p);
-			} else { 
+			} else {
 				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
 				// Add a loss.
 				getStats(p).increment("losses");
-				
+
 				// Take a fine for quitting.
 				String fee = settings.getString("quit-charge");
 				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-					Messenger.warning("Quit-charge setting for arena '" + arenaName + "' is incorrect!");
+					Messenger.warning("Quit-charge setting for arena '"
+							+ arenaName + "' is incorrect!");
 					fee = String.valueOf(0.00);
 				}
 				if (fee.startsWith("$"))
 					fee = fee.substring(1);
-				
+
 				em.withdraw(p, Double.parseDouble(fee));
 			}
 		}
-		
+
 		if (!end) {
 			if (arenaPlayers.contains(p))
 				arenaPlayers.remove(p);
 		}
-		
+
 		if (bluePlayers.contains(p))
 			bluePlayers.remove(p);
-		
+
 		if (redPlayers.contains(p))
 			redPlayers.remove(p);
 
@@ -309,14 +318,16 @@ public class Arena {
 				endArena();
 		}
 	}
-	
+
 	/**
 	 * Start an arena that is currently in 'lobby' mode.
-	 * @return
+	 * 
+	 * @return true if the arena started; false otherwise
 	 */
 	public boolean startArena() {
 		// Just some checks
-		if (running || lobbyPlayers.isEmpty() || lobbyPlayers.size() < minPlayers) {
+		if (running || lobbyPlayers.isEmpty()
+				|| lobbyPlayers.size() < minPlayers) {
 			return false;
 		}
 
@@ -326,8 +337,9 @@ public class Arena {
 		if (event.isCancelled()) {
 			return false;
 		}
-		
-		// Assign class before adding player to arenaPlayers to bypass change-class-in-arena node.
+
+		// Assign class before adding player to arenaPlayers to bypass
+		// change-class-in-arena node.
 		for (Player p : lobbyPlayers) {
 			if (getClass(p) == null) {
 				giveRandomClass(p);
@@ -362,7 +374,7 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
-			
+
 			// Start adding seconds to their time-spent in the arena.
 			getStats(p).startTiming();
 
@@ -390,8 +402,9 @@ public class Arena {
 	}
 
 	/**
-	 * End a running arena.
-	 * @return
+	 * End a running arena and cleanup after.
+	 * 
+	 * @return true if the arena successfully ended; false otherwise
 	 */
 	public boolean endArena() {
 		// Sanity-checks.
@@ -402,7 +415,7 @@ public class Arena {
 		// Fire the event.
 		ArenaEndEvent event = new ArenaEndEvent(this);
 		plugin.getServer().getPluginManager().callEvent(event);
-		
+
 		// Set the winner, to be declared and given different rewards.
 		winner = getWinnerByScore();
 		if (winner != null) {
@@ -455,14 +468,15 @@ public class Arena {
 
 	/**
 	 * Move a player to the spectator location.
-	 * @param p 
+	 * 
+	 * @param p the player to be a spectator
 	 */
 	public void setSpectator(Player p) {
 		p.teleport(spec);
 		specPlayers.add(p);
 		Messenger.tell(p, Msg.SPEC_JOIN);
 	}
-	
+
 	/**
 	 * Forcibly remove a player from the arena. We do this sparingly when it is
 	 * known that the only outcome is by cheating.
@@ -492,15 +506,15 @@ public class Arena {
 			redPlayers.add(p);
 			team = "red";
 		}
-		Messenger.tell(p, Msg.MISC_TEAM_JOINED, ChatColor.valueOf(team.toUpperCase()) + team);
+		Messenger.tell(p, Msg.MISC_TEAM_JOINED,
+				ChatColor.valueOf(team.toUpperCase()) + team);
 	}
-
 
 	/**
 	 * Check if the score necessary to win has been reached. The winning score
 	 * is configurable.
 	 * 
-	 * @return
+	 * @return true if the score has been reached
 	 */
 	public boolean scoreReached() {
 		int winScore = settings.getInt("score-to-win");
@@ -512,65 +526,78 @@ public class Arena {
 	 */
 	public void declareWinner() {
 		Set<Player> loser;
-		if (winner == null) { 
+		if (winner == null) {
 			Messenger.announce(this, Msg.ARENA_DRAW);
 			for (Player p : arenaPlayers) {
 				getStats(p).increment("draws");
 			}
 			loser = null;
 			return;
-		}
-		else if (winner.equals(redPlayers)) {
+		} else if (winner.equals(redPlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
 			loser = bluePlayers;
 		} else if (winner.equals(bluePlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
-			loser = redPlayers;	
-		} else loser = null;
-		
+			loser = redPlayers;
+		} else
+			loser = null;
+
 		for (Player p : winner) {
 			createFirework(p.getLocation());
 			getStats(p).increment("wins");
 		}
-		
-		if (loser == null) return;
-		
+
+		if (loser == null)
+			return;
+
 		for (Player p : loser) {
 			getStats(p).increment("losses");
 		}
 		loser.clear();
 	}
-	
+
 	/**
 	 * Spawn a firework on a location.
 	 * 
-	 * @param loc
+	 * @param loc the location to launch the firework
 	 */
 	public void createFirework(Location loc) {
 		final Firework firework = loc.getWorld().spawn(loc, Firework.class);
 		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
-		
+
 		Random random = new Random();
-		
+
 		int red = random.nextInt(256);
-		int green = random.nextInt(256); 
+		int green = random.nextInt(256);
 		int blue = random.nextInt(256);
-		
+
 		Type type = null;
 		int i = random.nextInt(5);
 		switch (i) {
-		case 0: type = Type.BALL; 		break;
-		case 1: type = Type.BALL_LARGE; break;
-		case 2: type = Type.BURST;		break;
-		case 3: type = Type.CREEPER;	break;
-		case 4: type = Type.STAR;		break;
+		case 0:
+			type = Type.BALL;
+			break;
+		case 1:
+			type = Type.BALL_LARGE;
+			break;
+		case 2:
+			type = Type.BURST;
+			break;
+		case 3:
+			type = Type.CREEPER;
+			break;
+		case 4:
+			type = Type.STAR;
+			break;
 		}
 
-		data.addEffects(FireworkEffect.builder()
+		data.addEffects(FireworkEffect
+				.builder()
 				.withColor(Color.fromRGB(red, green, blue))
-				.withFade(Color.fromRGB(green, blue * 3 / 5 + 6, red * 5 / 6 + 2))
+				.withFade(
+						Color.fromRGB(green, blue * 3 / 5 + 6, red * 5 / 6 + 2))
 				.with(type).build());
 		firework.setFireworkMeta(data);
 		Vector dir = new Vector(0, 10, 0);
@@ -582,31 +609,32 @@ public class Arena {
 			}
 		}, 20 * random.nextInt(3) + 2);
 	}
-	
+
 	/**
 	 * Give a compass to a player. This compass targets the current hill.
 	 * 
-	 * @param p
+	 * @param p the player to give a compass to
 	 */
 	public void giveCompass(Player p) {
 		if (!settings.getBoolean("use-compasses"))
 			return;
-		
+
 		ItemStack compass = new ItemStack(Material.COMPASS);
 		ItemMeta im = compass.getItemMeta();
-		im.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Hill Locator");
+		im.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD
+				+ "Hill Locator");
 		compass.setItemMeta(im);
-		p.getInventory().addItem(new ItemStack[]{compass});
+		p.getInventory().addItem(new ItemStack[] { compass });
 		p.setCompassTarget(hillUtils.getCurrentHill());
 	}
-	
+
 	/**
 	 * When the hill changes, change the compass target to the new hill.
 	 */
 	public void resetCompass() {
 		if (!settings.getBoolean("use-compasses"))
 			return;
-		
+
 		for (Player p : arenaPlayers) {
 			p.setCompassTarget(hillUtils.getCurrentHill());
 		}
@@ -617,8 +645,8 @@ public class Arena {
 	 * the ArenaClass map in the ArenaManager, and then after a series of checks
 	 * give the player their desired class.
 	 * 
-	 * @param p
-	 * @param classname
+	 * @param p the player who chose a class
+	 * @param classname the class chosen
 	 */
 	public void pickClass(Player p, String classname) {
 		ArenaClass arenaClass = plugin.getArenaManager().getClasses()
@@ -643,14 +671,14 @@ public class Arena {
 		setArenaClass(p, arenaClass);
 		arenaClass.giveItems(p);
 	}
-	
+
 	/**
 	 * Compile the different classes as a linkedlist, in which one is randomly
 	 * selected. While the player does not have permission for a class, pull out
 	 * another one. If they don't have access to any classes, remove them from
 	 * the arena.
 	 * 
-	 * @param p
+	 * @param p a player to give a class
 	 */
 	public void giveRandomClass(Player p) {
 		Random random = new Random();
@@ -671,14 +699,14 @@ public class Arena {
 		pickClass(p, className);
 	}
 
-
 	// --------------------------- //
 	// Getters
 	// --------------------------- //
 
 	/**
 	 * Get the main class.
-	 * @return
+	 * 
+	 * @return the main class
 	 */
 	public KotH getPlugin() {
 		return plugin;
@@ -687,7 +715,7 @@ public class Arena {
 	/**
 	 * Get the name of the arena as-per config.
 	 * 
-	 * @return
+	 * @return the arena name
 	 */
 	public String getName() {
 		return arenaName;
@@ -696,7 +724,7 @@ public class Arena {
 	/**
 	 * Get the world the arena is located in.
 	 * 
-	 * @return
+	 * @return the arena world
 	 */
 	public World getWorld() {
 		return world;
@@ -705,7 +733,7 @@ public class Arena {
 	/**
 	 * Get the settings of the arena, located in the config.
 	 * 
-	 * @return
+	 * @return the settings of an arena
 	 */
 	public ConfigurationSection getSettings() {
 		return settings;
@@ -714,7 +742,7 @@ public class Arena {
 	/**
 	 * Get important arena warps.
 	 * 
-	 * @return
+	 * @return the list of locations
 	 */
 	public ConfigurationSection getWarps() {
 		return warps;
@@ -723,8 +751,8 @@ public class Arena {
 	/**
 	 * Get a location based on our Location parser in our ConfigUtil.
 	 * 
-	 * @param path
-	 * @return
+	 * @param path a config path
+	 * @return the location from the path
 	 */
 	public Location getLocation(String path) {
 		return parseLocation(warps, path, world);
@@ -734,8 +762,8 @@ public class Arena {
 	 * Get the location of a hill, which is a sub-category of the warps and as
 	 * such, requires a different method.
 	 * 
-	 * @param path
-	 * @return
+	 * @param path a config path
+	 * @return the hill location from the path
 	 */
 	public Location getHillLocation(String path) {
 		return parseLocation(warps.getConfigurationSection("hills"), path,
@@ -743,10 +771,10 @@ public class Arena {
 	}
 
 	/**
-	 * Set an important location.
+	 * Set an important location in the warps sub-section of an arena.
 	 * 
-	 * @param path
-	 * @param loc
+	 * @param path a config path
+	 * @param loc the location to be set
 	 */
 	public void setLocation(String path, Location loc) {
 		ConfigUtil.setLocation(warps, path, loc);
@@ -755,8 +783,8 @@ public class Arena {
 	/**
 	 * Get the respective spawns of a player based on his/her team.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return the player's spawnpoint
 	 */
 	public Location getSpawn(Player p) {
 		if (redPlayers.contains(p))
@@ -769,7 +797,7 @@ public class Arena {
 	/**
 	 * The location of the lobby.
 	 * 
-	 * @return
+	 * @return the lobby warp
 	 */
 	public Location getLobby() {
 		try {
@@ -783,7 +811,7 @@ public class Arena {
 	/**
 	 * Change the location of the lobby.
 	 * 
-	 * @param lobby
+	 * @param lobby the new spawnpoint
 	 */
 	public void setLobby(Location lobby) {
 		this.lobby = lobby;
@@ -794,7 +822,7 @@ public class Arena {
 	/**
 	 * Get the spectator location.
 	 * 
-	 * @return
+	 * @return the spec warp
 	 */
 	public Location getSpec() {
 		try {
@@ -808,7 +836,7 @@ public class Arena {
 	/**
 	 * Change the spectator warp.
 	 * 
-	 * @param spec
+	 * @param spec the new spawnpoint
 	 */
 	public void setSpec(Location spec) {
 		this.spec = spec;
@@ -819,7 +847,7 @@ public class Arena {
 	/**
 	 * Get the location of the red spawn.
 	 * 
-	 * @return
+	 * @returnthe red warp
 	 */
 	public Location getRedSpawn() {
 		try {
@@ -833,7 +861,7 @@ public class Arena {
 	/**
 	 * Change the locus of the red spawn.
 	 * 
-	 * @param red
+	 * @param red the new spawnpoint
 	 */
 	public void setRedSpawn(Location red) {
 		this.red = red;
@@ -844,7 +872,7 @@ public class Arena {
 	/**
 	 * Get the blue spawn location.
 	 * 
-	 * @return
+	 * @return the blue warp
 	 */
 	public Location getBlueSpawn() {
 		try {
@@ -858,7 +886,7 @@ public class Arena {
 	/**
 	 * Change the blue spawn location.
 	 * 
-	 * @param blue
+	 * @param blue the new spawnpoint
 	 */
 	public void setBlueSpawn(Location blue) {
 		this.blue = blue;
@@ -869,7 +897,7 @@ public class Arena {
 	/**
 	 * Get all players currently playing.
 	 * 
-	 * @return
+	 * @return both the red and the blue players
 	 */
 	public Set<Player> getPlayersInArena() {
 		return Collections.unmodifiableSet(arenaPlayers);
@@ -878,7 +906,7 @@ public class Arena {
 	/**
 	 * Get all the players that are playing but on the red team.
 	 * 
-	 * @return
+	 * @return the players on the red team
 	 */
 	public Set<Player> getRedTeam() {
 		return Collections.unmodifiableSet(redPlayers);
@@ -887,7 +915,7 @@ public class Arena {
 	/**
 	 * Get all the players that are playing but on the blue team.
 	 * 
-	 * @return
+	 * @return the players on the blue team
 	 */
 	public Set<Player> getBlueTeam() {
 		return Collections.unmodifiableSet(bluePlayers);
@@ -896,7 +924,7 @@ public class Arena {
 	/**
 	 * Get all the players in the queue to join an arena.
 	 * 
-	 * @return
+	 * @return an unmodifiable set of the players in the lobby.
 	 */
 	public Set<Player> getPlayersInLobby() {
 		return Collections.unmodifiableSet(lobbyPlayers);
@@ -905,7 +933,7 @@ public class Arena {
 	/**
 	 * Get all the players watching an arena.
 	 * 
-	 * @return
+	 * @return the players watching an arena.
 	 */
 	public Set<Player> getSpectators() {
 		return Collections.unmodifiableSet(specPlayers);
@@ -914,7 +942,7 @@ public class Arena {
 	/**
 	 * Check if the arena is in progress.
 	 * 
-	 * @return
+	 * @return true if enabled
 	 */
 	public boolean isRunning() {
 		return running;
@@ -923,7 +951,7 @@ public class Arena {
 	/**
 	 * Change the progress status.
 	 * 
-	 * @param running
+	 * @param running a boolean
 	 */
 	public void setRunning(boolean running) {
 		this.running = running;
@@ -932,7 +960,7 @@ public class Arena {
 	/**
 	 * Check if the arena is enabled AND if the whole plugin is enabled.
 	 * 
-	 * @return
+	 * @return true if enabled
 	 */
 	public boolean isEnabled() {
 		return enabled && plugin.getConfig().getBoolean("global.enabled");
@@ -941,7 +969,7 @@ public class Arena {
 	/**
 	 * Set whether or not the arena is enabled.
 	 * 
-	 * @param enabled
+	 * @param enabled a boolean
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -951,8 +979,8 @@ public class Arena {
 	 * Get the player's stored data; this includes weapons, armor, health, and
 	 * more.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return null if no data, otherwise return the player's data
 	 */
 	public PlayerData getData(Player p) {
 		for (PlayerData pd : data) {
@@ -963,9 +991,11 @@ public class Arena {
 	}
 
 	/**
-	 * To check if an arena has a player, we check if the player has stored data.
-	 * @param p
-	 * @return
+	 * To check if an arena has a player, we check if the player has stored
+	 * data.
+	 * 
+	 * @param p the player
+	 * @return true if the player has data; false otherwise
 	 */
 	public boolean hasPlayer(Player p) {
 		return getData(p) != null;
@@ -974,7 +1004,7 @@ public class Arena {
 	/**
 	 * Get the start timer class which initiates the start of the arena.
 	 * 
-	 * @return
+	 * @return the start timer
 	 */
 	public AutoStartTimer getStartTimer() {
 		return startTimer;
@@ -984,7 +1014,7 @@ public class Arena {
 	 * Get the end timer, which runs from the beginning of the match, and when
 	 * it hits 0, the arena stops.
 	 * 
-	 * @return
+	 * @return the end timer
 	 */
 	public AutoEndTimer getEndTimer() {
 		return endTimer;
@@ -993,7 +1023,7 @@ public class Arena {
 	/**
 	 * Get the time at which the arena will run, in seconds.
 	 * 
-	 * @return
+	 * @return the amount of time in the arena
 	 */
 	public int getLength() {
 		return settings.getInt("arena-time");
@@ -1002,7 +1032,7 @@ public class Arena {
 	/**
 	 * Get the class which manages our hill switching.
 	 * 
-	 * @return
+	 * @return the hill manager.
 	 */
 	public HillManager getHillManager() {
 		return hillManager;
@@ -1011,7 +1041,7 @@ public class Arena {
 	/**
 	 * Get the HillUtils class.
 	 * 
-	 * @return
+	 * @return the utilities class for the Hills.
 	 */
 	public HillUtils getHillUtils() {
 		return hillUtils;
@@ -1020,7 +1050,7 @@ public class Arena {
 	/**
 	 * Get the class responsible for telling the manager when to switch a hill.
 	 * 
-	 * @return
+	 * @return an instance of the HillTask
 	 */
 	public HillTask getHillTimer() {
 		return hillTimer;
@@ -1028,9 +1058,9 @@ public class Arena {
 
 	/**
 	 * Our winner is defined as whichever team has the higher score. If there is
-	 * none, then we return null to symbolize a draw.
+	 * none, then we return null to mark a draw.
 	 * 
-	 * @return
+	 * @return the team that won by score alone.
 	 */
 	public Set<Player> getWinnerByScore() {
 		// If there are players on both teams.
@@ -1043,19 +1073,21 @@ public class Arena {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get the victor.
-	 * @return
+	 * 
+	 * @return the team that won.
 	 */
 	public Set<Player> getWinner() {
 		return winner;
 	}
-	
+
 	/**
 	 * Set the victor.
-	 * @param newWinner
-	 * @return
+	 * 
+	 * @param newWinner a team
+	 * @return the new victors of the arena.
 	 */
 	public Set<Player> setWinner(Set<Player> newWinner) {
 		winner = newWinner;
@@ -1065,7 +1097,7 @@ public class Arena {
 	/**
 	 * Get the opposite team of the winner.
 	 * 
-	 * @return
+	 * @return the team that lost.
 	 */
 	public Set<Player> getLoser() {
 		if (winner == null)
@@ -1076,12 +1108,12 @@ public class Arena {
 			return redPlayers;
 		return null;
 	}
-	
+
 	/**
 	 * Get a player's team.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return the player's team; null if the player has no team.
 	 */
 	public Set<Player> getTeam(Player p) {
 		if (redPlayers.contains(p))
@@ -1090,12 +1122,13 @@ public class Arena {
 			return bluePlayers;
 		return null;
 	}
-	
+
 	/**
 	 * Get the team against a player.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return the set of players on an opposing team; null if the player isn't
+	 *         on a team.
 	 */
 	public Set<Player> getOpposingTeam(Player p) {
 		if (getTeam(p).equals(null))
@@ -1110,18 +1143,18 @@ public class Arena {
 	/**
 	 * Check if the player is waiting to join an arena.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return true if the player is in the lobby.
 	 */
 	public boolean inLobby(Player p) {
 		return lobbyPlayers.contains(p);
 	}
-	
+
 	/**
 	 * Check if a player is spectating.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p the player
+	 * @return true if the player is spectating an arena.
 	 */
 	public boolean isSpectating(Player p) {
 		return specPlayers.contains(p);
@@ -1130,7 +1163,7 @@ public class Arena {
 	/**
 	 * The arena is ready to be used when all locations are defined.
 	 * 
-	 * @return
+	 * @return true if no missing warps; otherwise false.
 	 */
 	public boolean isReady() {
 		ready = false;
@@ -1146,8 +1179,8 @@ public class Arena {
 	/**
 	 * Set the arena to be ready when all locations are defined.
 	 * 
-	 * @param ready
-	 * @return
+	 * @param ready a boolean
+	 * @return the parameter given
 	 */
 	public boolean setReady(boolean ready) {
 		this.ready = ready;
@@ -1157,7 +1190,7 @@ public class Arena {
 	/**
 	 * Get our scoreboard class.
 	 * 
-	 * @return
+	 * @return the ScoreboardManager
 	 */
 	public ScoreboardManager getScoreboard() {
 		return scoreboard;
@@ -1166,17 +1199,24 @@ public class Arena {
 	/**
 	 * Get the rewards class.
 	 * 
-	 * @return
+	 * @return the rewards class
 	 */
 	public RewardManager getRewards() {
 		return rewards;
 	}
-	
+
+	/**
+	 * Get the stats of a player for an arena.
+	 * 
+	 * @param p the player
+	 * @return the player's stats
+	 */
 	public PlayerStats getStats(Player p) {
 		try {
 			stats = new PlayerStats(p, this);
 		} catch (IOException e) {
-			Messenger.severe("Could not get the stats of player '" + p.getName() +"'!");
+			Messenger.severe("Could not get the stats of player '"
+					+ p.getName() + "'!");
 			e.printStackTrace();
 		}
 		return stats;
@@ -1186,8 +1226,8 @@ public class Arena {
 	 * If the player has not chosen a team, place them in their desired choice.
 	 * Else, override their previous choice.
 	 * 
-	 * @param p
-	 * @param s
+	 * @param p a player
+	 * @param team the team name
 	 */
 	public void chooseTeam(Player p, String team) {
 		if (team.equalsIgnoreCase("red"))
@@ -1199,8 +1239,8 @@ public class Arena {
 	/**
 	 * Get the ArenaClass based on the Player data.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p a player
+	 * @return the player's class
 	 */
 	public ArenaClass getClass(Player p) {
 		PlayerData data = getData(p);
@@ -1210,8 +1250,8 @@ public class Arena {
 	/**
 	 * Set the arena class of the player.
 	 * 
-	 * @param p
-	 * @param arenaClass
+	 * @param p the player
+	 * @param arenaClass an ArenaClass instance
 	 */
 	public void setArenaClass(Player p, ArenaClass arenaClass) {
 		PlayerData data = getData(p);
