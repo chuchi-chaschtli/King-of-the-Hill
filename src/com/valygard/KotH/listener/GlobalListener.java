@@ -31,7 +31,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -201,14 +200,6 @@ public class GlobalListener implements Listener {
 			player.sendMessage(getChatFormat(p, e.getMessage()));
 			e.setCancelled(true);
 		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onTeleport(PlayerTeleportEvent e) {
-		// Block essentials and world edit compass teleportation.
-		if (am.getArenaWithPlayer(e.getPlayer()) != null
-				&& e.getPlayer().getItemInHand().getType() == Material.COMPASS)
-			e.setCancelled(true);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
