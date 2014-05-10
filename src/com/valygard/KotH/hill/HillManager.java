@@ -76,8 +76,6 @@ public class HillManager {
 		// Now, finally, change the status.
 		status++;
 		arena.resetCompass();
-		if (arena.getSettings().getBoolean("lightning-strike"))
-			utils.getCurrentHill().getWorld().strikeLightningEffect(utils.getCurrentHill());
 	}
 	
 	/**
