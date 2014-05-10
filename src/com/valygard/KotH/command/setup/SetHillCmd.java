@@ -54,8 +54,11 @@ public class SetHillCmd implements Command {
 			am.saveConfig();
 		}
 		
+		double x = p.getLocation().getX() + 0.5;
+		double z = p.getLocation().getZ() + 0.5;
+		Location l = new Location(p.getWorld(), x, p.getLocation().getBlockY(), z);
+		
 		ConfigurationSection s = warps.getConfigurationSection("hills");
-		Location l = new Location(p.getWorld(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
 		if (args.length == 1) {
 			if (s == null) {
 				arena.getWarps().createSection("hills");

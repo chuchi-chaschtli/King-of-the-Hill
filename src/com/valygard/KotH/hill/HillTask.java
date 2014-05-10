@@ -51,12 +51,10 @@ public class HillTask {
 				Set<Player> dominant = manager.getDominantTeam();
 				if (dominant != null) {
 					if (dominant.equals(arena.getRedTeam())) {
-						manager.setHillBoundary();
 						setRedScore(redScore + 1);
 					}
 
 					else if (dominant.equals(arena.getBlueTeam())) {
-						manager.setHillBoundary();
 						setBlueScore(blueScore + 1);
 					}
 				}

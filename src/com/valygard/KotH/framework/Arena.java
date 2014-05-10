@@ -263,7 +263,7 @@ public class Arena {
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {
-				rewards.givePrizes(p, winner.contains(p));
+				rewards.givePrizes(p, winner != null ? winner.contains(p) : false);
 				rewards.giveWinstreakRewards(p);
 			} else { 
 				// Else tell the player that they missed out.
