@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.command.setup;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -48,24 +49,23 @@ public class SetHillCmd implements Command {
 		}
 		
 		ConfigurationSection warps = arena.getWarps();
-		
 		if (warps == null) {
 			warps = am.getConfig().createSection("arenas." + args[0] + ".warps");
-			am.getPlugin().saveConfig();
+			am.saveConfig();
 		}
 		
 		ConfigurationSection s = warps.getConfigurationSection("hills");
-		
+		Location l = new Location(p.getWorld(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
 		if (args.length == 1) {
 			if (s == null) {
 				arena.getWarps().createSection("hills");
-				arena.getPlugin().saveConfig();
+				am.saveConfig();
 				ConfigUtil.setLocation(s, String.valueOf(1), p.getLocation());
 			} else {
 				for (int i = 0; i <= s.getKeys(false).size(); i++) {
 					// Sanity Checks	
 					if (i == 0 && s.getString(String.valueOf(1)) == null) {
-						ConfigUtil.setLocation(s, String.valueOf(1), p.getLocation());
+						ConfigUtil.setLocation(s, String.valueOf(1), l);
 						Messenger.tell(p, Msg.HILLS_ADDED);
 						break;
 					}
@@ -73,12 +73,12 @@ public class SetHillCmd implements Command {
 					if (s.getKeys(false).contains(String.valueOf(i + 1)))
 						continue;
 
-					ConfigUtil.setLocation(s, String.valueOf(i + 1), p.getLocation());
+					ConfigUtil.setLocation(s, String.valueOf(i + 1), l);
 
 					if (s.getString(String.valueOf(i)).equals(s.getString(String.valueOf(i + 1)))) {
 						Messenger.tell(p, "There is already a hill at this location.");
 						s.set(String.valueOf(i + 1), null);
-						arena.getPlugin().saveConfig();
+						am.saveConfig();
 						break;
 					}
 
@@ -89,14 +89,14 @@ public class SetHillCmd implements Command {
 		} else {
 			int number = Integer.parseInt(args[1]);
 			if (s.getString(String.valueOf(number)) != null) {
-				ConfigUtil.setLocation(s, String.valueOf(number), p.getLocation());
+				ConfigUtil.setLocation(s, String.valueOf(number), l);
 				Messenger.tell(p, Msg.HILLS_RESET, String.valueOf(number));
+				am.saveConfig();
 			} else {
 				Messenger.tell(p, "There is no hill with the specified number.");
 				return true;
 			}
 		}
-		am.saveConfig();
 		am.reloadArena(arena);
 		am.getMissingWarps(arena, p);
 		
