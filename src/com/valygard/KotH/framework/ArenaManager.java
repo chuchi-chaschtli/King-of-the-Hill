@@ -293,7 +293,8 @@ public class ArenaManager {
 			setEnabled(false);
 
 		for (Arena arena : arenas) {
-			reloadArena(arena);
+			if (arena.isRunning())
+				arena.forceEnd();
 		}
 		plugin.reloadConfig();
 		config = plugin.getConfig();
