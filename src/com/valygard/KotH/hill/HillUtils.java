@@ -107,8 +107,12 @@ public class HillUtils {
 		ConfigurationSection section = arena.getWarps()
 				.getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		if (status > hills.size())
+		if (status > hills.size()) {
+			if (status % hills.size() == 0) {
+				return arena.getHillLocation(String.valueOf(hills.size()));
+			}
 			return arena.getHillLocation(String.valueOf(status % hills.size()));
+		}
 		return arena.getHillLocation(String.valueOf(status));
 	}
 
