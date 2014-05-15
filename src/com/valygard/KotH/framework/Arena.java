@@ -149,7 +149,7 @@ public class Arena {
 		this.enabled 		= settings.getBoolean("enabled", true);
 
 		// Timers
-		this.startTimer 	= new AutoStartTimer(this, 30);
+		this.startTimer 	= new AutoStartTimer(this, settings.getInt("arena-auto-start"));
 		this.endTimer 		= new AutoEndTimer(this, settings.getInt("arena-time"));
 
 		// Hills

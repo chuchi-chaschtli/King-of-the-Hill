@@ -5,6 +5,7 @@ max-players: 16
 team-only-chat: true
 secluded-chat: true
 arena-time: 900
+arena-auto-start: 50
 hill-clock: 60
 hill-radius: 5
 score-to-win: 150
