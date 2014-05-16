@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.event;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
@@ -49,8 +50,17 @@ public class ArenaScoreEvent extends Event implements Cancellable {
     	return manager;
     }
     
-    public Set<Player> getScorer() {
+    public Set<Player> getTeamWhichScored() {
     	return manager.getDominantTeam();
+    }
+    
+    public Set<Player> getPlayersInHill() {
+    	Set<Player> result = new HashSet<Player>();
+    	for (Player p : arena.getPlayersInArena()) {
+    		if (manager.containsPlayer(p))
+    			result.add(p);
+    	}
+    	return result;
     }
     
     public Set<Player> getOpposingTeam() {
