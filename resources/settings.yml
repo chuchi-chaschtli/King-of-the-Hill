@@ -8,7 +8,8 @@ arena-time: 900
 arena-auto-start: 50
 hill-clock: 60
 hill-radius: 5
-score-to-win: 150
+score-to-win: 250
+minimum-score: 90
 indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false

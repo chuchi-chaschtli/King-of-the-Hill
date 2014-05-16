@@ -1063,7 +1063,10 @@ public class Arena {
 	 * @return the team that won by score alone.
 	 */
 	public Set<Player> getWinnerByScore() {
-		// If there are players on both teams.
+		int minimum = settings.getInt("minimum-score");
+		if (hillTimer.getBlueScore() < minimum && hillTimer.getRedScore() < minimum) {
+			return null;
+		}
 		if (hillTimer.getBlueScore() > hillTimer.getRedScore()) {
 			winner = bluePlayers;
 			return winner;
