@@ -42,6 +42,7 @@ import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
 import com.valygard.KotH.PlayerStats;
 import com.valygard.KotH.economy.EconomyManager;
+import com.valygard.KotH.event.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
@@ -330,9 +331,9 @@ public class GlobalListener implements Listener {
 			if (stats != null) {
 				stats.increment("kills");
 				arena.getRewards().giveKillstreakRewards(killer);
-			}
+			}	
+			new ArenaPlayerDeathEvent(arena, p, killer);
 		}
-
 		if (arena.getSettings().getBoolean("one-life")) {
 			arena.removePlayer(p, false);
 		}

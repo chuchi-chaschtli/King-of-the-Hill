@@ -44,6 +44,7 @@ import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaPlayerJoinEvent;
+import com.valygard.KotH.event.ArenaPlayerKickEvent;
 import com.valygard.KotH.event.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
 import com.valygard.KotH.hill.HillManager;
@@ -482,11 +483,18 @@ public class Arena {
 	 * known that the only outcome is by cheating.
 	 * 
 	 * @param p the player.
+	 * @return true if the player was kicked, false if the event was cancelled.
 	 */
-	public void kickPlayer(Player p) {
+	public boolean kickPlayer(Player p) {
+		ArenaPlayerKickEvent event = new ArenaPlayerKickEvent(this, p);
+		if (event.isCancelled()) {
+			return false;
+		}
+		
 		removePlayer(p, false);
 		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
 		Messenger.announce(this, p.getName() + " has been caught cheating!");
+		return true;
 	}
 
 	/**
