@@ -13,6 +13,7 @@ minimum-score: 90
 indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false
+safe-respawn-time: 3
 friendly-fire: false
 food-change: false
 one-life: false

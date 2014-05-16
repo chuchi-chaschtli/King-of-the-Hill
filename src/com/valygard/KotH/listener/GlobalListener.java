@@ -378,6 +378,9 @@ public class GlobalListener implements Listener {
 			arena.giveRandomClass(p);
 		
 		arena.giveCompass(p);
+		
+		int safe = arena.getSettings().getInt("safe-respawn-time");
+		p.setNoDamageTicks(safe * 20);
 	}
 
 	@EventHandler
