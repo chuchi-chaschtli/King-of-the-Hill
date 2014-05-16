@@ -455,6 +455,10 @@ public class GlobalListener implements Listener {
 		case "players":
 		case "info":
 		case "stats":
+		case "enable":
+		case "disable":
+		case "start":
+		case "end":
 			if (arena == null) {
 				Messenger.tell(p, Msg.SIGN_INVALID);
 				break;
