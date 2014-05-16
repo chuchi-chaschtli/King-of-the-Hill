@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
  */
 public class PlayerData {
 	private Player player;
+	
 	private ItemStack[] contents;
 	private ItemStack head, chest, legs, feet;
 	private Location loc = null;
@@ -30,6 +31,7 @@ public class PlayerData {
 	private float exp;
 	private GameMode mode = null;
 	private Collection<PotionEffect> potions;
+	private boolean flying;
 	
 	// Although it isn't necessary data, this is the fitting place for the player's class.
 	private ArenaClass arenaClass;
@@ -56,6 +58,8 @@ public class PlayerData {
 		this.health		= player.getHealth();
 		this.level		= player.getLevel();
 		this.exp		= player.getExp();
+		
+		this.flying		= player.isFlying();
 		
 		this.arenaClass = null;
 	}
@@ -85,6 +89,9 @@ public class PlayerData {
 		player.setGameMode(mode);
 		player.addPotionEffects(potions);
 		player.updateInventory();
+		
+		// In case they are no longer allowed to fly, even if they were flying they cannot anymore.
+		player.setFlying(flying == false ? false : player.getAllowFlight() ? true : false);
 		
 		setArenaClass(null);
 	}
@@ -184,6 +191,10 @@ public class PlayerData {
 
 	public void setMode(GameMode mode) {
 		this.mode = mode;
+	}
+	
+	public boolean isFlying() {
+		return flying;
 	}
 	
     public ArenaClass getArenaClass() {
