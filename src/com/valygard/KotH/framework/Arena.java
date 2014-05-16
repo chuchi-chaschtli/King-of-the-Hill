@@ -43,8 +43,8 @@ import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaEndEvent;
-import com.valygard.KotH.event.ArenaJoinEvent;
-import com.valygard.KotH.event.ArenaLeaveEvent;
+import com.valygard.KotH.event.ArenaPlayerJoinEvent;
+import com.valygard.KotH.event.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
@@ -187,7 +187,7 @@ public class Arena {
 	public void addPlayer(Player p) {
 		// Sanity-checks
 
-		ArenaJoinEvent event = new ArenaJoinEvent(this, p);
+		ArenaPlayerJoinEvent event = new ArenaPlayerJoinEvent(this, p);
 		plugin.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			Messenger.tell(p, Msg.MISC_NO_ACCESS);
@@ -251,7 +251,7 @@ public class Arena {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
 		}
-		ArenaLeaveEvent event = new ArenaLeaveEvent(this, p);
+		ArenaPlayerLeaveEvent event = new ArenaPlayerLeaveEvent(this, p);
 		plugin.getServer().getPluginManager().callEvent(event);
 
 		invManager.clearInventory(p);
