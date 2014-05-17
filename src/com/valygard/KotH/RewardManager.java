@@ -27,6 +27,9 @@ public class RewardManager {
 	// The section where all the prizes are.
 	private ConfigurationSection prizes;
 	
+	// If true, the arena will give rewards.
+	private boolean enabled;
+	
 	/**
 	 * Our constructor.
 	 * 
@@ -39,6 +42,8 @@ public class RewardManager {
 		
 		this.prizes  = ConfigUtil.makeSection(section, "prizes");
 		
+		this.enabled	= arena.getSettings().getBoolean("give-prizes");
+		
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml", prizes);
 	}
 
@@ -46,9 +51,13 @@ public class RewardManager {
 	 * Give prizes to a player. This method only gives prizes at arena end.
 	 * 
 	 * @param p the player.
+	 * @return true if prizes were given, false otherwise.
 	 */
 	@SuppressWarnings("deprecation")
-	public void givePrizes(Player p, boolean winner) {
+	public boolean givePrizes(Player p, boolean winner) {
+		if (!enabled) {
+			return false;
+		}
 		List<ItemStack> items = new ArrayList<ItemStack>();
 
 		items = parseItems(winner ? "winners" : "losers");
@@ -68,15 +77,21 @@ public class RewardManager {
 		}
 		p.updateInventory();
 		Messenger.tell(p, Msg.REWARDS_GAINED);
+		return true;
 	}
 	
 	/**
 	 * Give killstreak rewards to a player in the arena.
 	 * 
 	 * @param p the player
+	 * @return true if prizes were given, false otherwise.
 	 */
 	@SuppressWarnings("deprecation")
-	public void giveKillstreakRewards(Player p) {
+	public boolean giveKillstreakRewards(Player p) {
+		if (!enabled) {
+			return false;
+		}
+		
 		String classname = arena.getClass(p).getLowercaseName();
 		PlayerStats stats = arena.getStats(p);
 		ConfigurationSection s = prizes.getConfigurationSection("killstreaks");
@@ -104,16 +119,22 @@ public class RewardManager {
 			}
 			p.updateInventory();
 			Messenger.tell(p, Msg.REWARDS_KILLSTREAK_RECEIVED, String.valueOf(stats.getKillstreak()));
+			return true;
 		}
+		return false;
 	}
 	
 	/**
 	 * Give prize rewards to players who have won several games in a row.
 	 * 
 	 * @param p the player
+	 * @return true if prizes were given, false otherwise.
 	 */
 	@SuppressWarnings("deprecation")
-	public void giveWinstreakRewards(Player p) {
+	public boolean giveWinstreakRewards(Player p) {
+		if (!enabled) {
+			return false;
+		}
 		PlayerStats stats = arena.getStats(p);
 		ConfigurationSection s = prizes.getConfigurationSection("winstreaks");
 		
@@ -126,7 +147,9 @@ public class RewardManager {
 				p.getInventory().addItem(is);
 			}
 			Messenger.tell(p, Msg.REWARDS_WINSTREAK_RECEIVED, String.valueOf(stats.getWinstreak()));
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -202,5 +225,14 @@ public class RewardManager {
 	 */
 	public Arena getArena() {
 		return arena;
+	}
+	
+	/**
+	 * Get whether or not the arena will give out prizes.
+	 * 
+	 * @return true if prizes are enabled, false otherwise.
+	 */
+	public boolean isEnabled() {
+		return enabled;
 	}
 }
