@@ -19,13 +19,19 @@
 
 	<organization>
 		<name>AoH_Ruthless</name>
-		<url>https://github.com/AoHRuthless/king-of-the-hill</url>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill</url>
 	</organization>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/AoHRuthless/king-of-the-hill/issues</url>
+		<url>github.com/AoHRuthless/King-of-the-Hill/issues</url>
 	</issueManagement>
+
+	<scm>
+		<connection>scm:git:git://github.com:AoHRuthless/King-of-the-Hill.git</connection>
+		<url>http://github.com/AoHRuthless/King-of-the-Hill</url>
+		<developerConnection>AoHRuthless</developerConnection>
+	</scm>
 
 	<!-- Build -->
 
@@ -56,9 +62,9 @@
 			<url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
 		</repository>
 	</repositories>
-	
+
 	<!-- Dependencies -->
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
