@@ -114,8 +114,8 @@ public class ConfigUtil {
         String y = twoPlaces(location.getY());
         String z = twoPlaces(location.getZ());
 
-        String yaw = twoPlaces(location.getYaw(),   true);
-        String pit = twoPlaces(location.getPitch(), true);
+        String yaw = twoPlaces(location.getYaw());
+        String pit = twoPlaces(location.getPitch());
 
         String world = location.getWorld().getName();
 
@@ -127,13 +127,7 @@ public class ConfigUtil {
         config.set(path, grim.toString());
     }
     
-    private static String twoPlaces(double value, boolean force) {
-        return force ? DF_FORCE.format(value) : DF_NORMAL.format(value);
-    }
-
     private static String twoPlaces(double value) {
-        return twoPlaces(value, false);
+        return new DecimalFormat("#.##").format(value);
     }
-    private static final DecimalFormat DF_NORMAL = new DecimalFormat("0.##");
-    private static final DecimalFormat DF_FORCE  = new DecimalFormat("0.0#");
 }
