@@ -124,53 +124,54 @@ public class Arena {
 	 */
 	public Arena(KotH plugin, String arenaName) {
 		// General stuff
-		this.plugin 		= plugin;
-		this.arenaName 		= arenaName;
+		this.plugin = plugin;
+		this.arenaName = arenaName;
 
 		// Settings from config
-		this.config 		= plugin.getConfig();
-		this.settings 		= config.getConfigurationSection("arenas." 
-				+ arenaName	+ ".settings");
-		this.warps 			= config.getConfigurationSection("arenas." 
-				+ arenaName + ".warps");
+		this.config = plugin.getConfig();
+		this.settings = config.getConfigurationSection("arenas." + arenaName
+				+ ".settings");
+		this.warps = config.getConfigurationSection("arenas." + arenaName
+				+ ".warps");
 
-		this.world 			= Bukkit.getWorld(settings.getString("world"));
+		this.world = Bukkit.getWorld(settings.getString("world"));
 
-		this.minPlayers 	= settings.getInt("min-players");
-		this.maxPlayers 	= settings.getInt("max-players");
+		this.minPlayers = settings.getInt("min-players");
+		this.maxPlayers = settings.getInt("max-players");
 
 		// The different groups a player can be in.
-		this.arenaPlayers 	= new HashSet<Player>();
-		this.lobbyPlayers 	= new HashSet<Player>();
-		this.specPlayers 	= new HashSet<Player>();
-		this.redPlayers 	= new HashSet<Player>();
-		this.bluePlayers 	= new HashSet<Player>();
+		this.arenaPlayers = new HashSet<Player>();
+		this.lobbyPlayers = new HashSet<Player>();
+		this.specPlayers = new HashSet<Player>();
+		this.redPlayers = new HashSet<Player>();
+		this.bluePlayers = new HashSet<Player>();
 
 		// Boolean values.
-		this.running 		= false;
-		this.enabled 		= settings.getBoolean("enabled", true);
+		this.running = false;
+		this.enabled = settings.getBoolean("enabled", true);
 
 		// Timers
-		this.startTimer 	= new AutoStartTimer(this, settings.getInt("arena-auto-start"));
-		this.endTimer 		= new AutoEndTimer(this, settings.getInt("arena-time"));
+		this.startTimer = new AutoStartTimer(this,
+				settings.getInt("arena-auto-start"));
+		this.endTimer = new AutoEndTimer(this, settings.getInt("arena-time"));
 
 		// Hills
-		this.hillUtils 		= new HillUtils(this);
-		this.hillManager 	= new HillManager(this);
-		this.hillTimer 		= new HillTask(this);
+		this.hillUtils = new HillUtils(this);
+		this.hillManager = new HillManager(this);
+		this.hillTimer = new HillTask(this);
 
 		// Is the arena ready to be used?
-		this.ready 			= false;
+		this.ready = false;
 
 		// Economy
-		this.em 			= plugin.getEconomyManager();
-		
+		this.em = plugin.getEconomyManager();
+
 		// Scoreboard
-		this.scoreboard 	= new ScoreboardManager(this);
-		
+		this.scoreboard = new ScoreboardManager(this);
+
 		// Rewards
-		this.invManager 	= new InventoryManager(this);
-		this.rewards 		= new RewardManager(this,
+		this.invManager = new InventoryManager(this);
+		this.rewards = new RewardManager(this,
 				config.getConfigurationSection("arenas." + arenaName));
 
 		// Arena abilities
@@ -491,7 +492,7 @@ public class Arena {
 		if (event.isCancelled()) {
 			return false;
 		}
-		
+
 		removePlayer(p, false);
 		p.kickPlayer("BANNED FOR LIFE! No but seriously, don't cheat again");
 		Messenger.announce(this, p.getName() + " has been caught cheating!");
@@ -611,7 +612,7 @@ public class Arena {
 		firework.setFireworkMeta(data);
 		Vector dir = new Vector(0, 10, 0);
 		firework.setVelocity(dir.multiply(11 * 0.35));
-		
+
 		for (Player p : arenaPlayers) {
 			playSound(p);
 		}
@@ -622,7 +623,7 @@ public class Arena {
 			}
 		}, 20 * random.nextInt(3) + 2);
 	}
-	
+
 	/**
 	 * Play the classic note sound that everybody loves on a player.
 	 * 
@@ -804,6 +805,10 @@ public class Arena {
 	 * @param loc the location to be set
 	 */
 	public void setLocation(String path, Location loc) {
+		if (loc.getBlock() != null) {
+			loc = loc.getWorld().getHighestBlockAt(loc).getLocation()
+					.add(0, 1, 0);
+		}
 		ConfigUtil.setLocation(warps, path, loc);
 	}
 
@@ -1091,7 +1096,8 @@ public class Arena {
 	 */
 	public Set<Player> getWinnerByScore() {
 		int minimum = settings.getInt("minimum-score");
-		if (hillTimer.getBlueScore() < minimum && hillTimer.getRedScore() < minimum) {
+		if (hillTimer.getBlueScore() < minimum
+				&& hillTimer.getRedScore() < minimum) {
 			return null;
 		}
 		if (hillTimer.getBlueScore() > hillTimer.getRedScore()) {
