@@ -5,6 +5,8 @@
 package com.valygard.KotH.listener;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,6 +38,8 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.massivecraft.factions.entity.UPlayer;
+import com.massivecraft.factions.entity.UPlayerColls;
 import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
@@ -58,6 +62,9 @@ public class GlobalListener implements Listener {
 	private KotH plugin;
 	private ArenaManager am;
 	private EconomyManager em;
+	
+	// Factions power
+	private Map<Player, Double> power = new HashMap<Player, Double>();
 
 	public GlobalListener(KotH plugin) {
 		this.plugin = plugin;
@@ -338,6 +345,13 @@ public class GlobalListener implements Listener {
 			arena.removePlayer(p, false);
 		}
 
+		if (plugin.getServer().getPluginManager().getPlugin("Factions") != null) {
+			if (arena.getSettings().getBoolean("prevent-power-loss")) {
+				UPlayer uplayer = UPlayerColls.get().getForWorld(p.getWorld().getName()).get(p.getName());
+				power.put(p, uplayer.getPower());
+			}
+		}
+
 		e.getDrops().clear();
 		e.setDeathMessage(null);
 		
@@ -378,6 +392,13 @@ public class GlobalListener implements Listener {
 			arena.giveRandomClass(p);
 		
 		arena.giveCompass(p);
+		
+		// We don't have to check if factions is null because the power map will only contain the player if there is Factions.
+		if (power.containsKey(p)) {
+			UPlayer uplayer = UPlayerColls.get().getForWorld(p.getWorld().getName()).get(p.getName());
+			uplayer.setPower(power.get(p));
+			power.remove(p);
+		}
 		
 		int safe = arena.getSettings().getInt("safe-respawn-time");
 		p.setNoDamageTicks(safe * 20);
