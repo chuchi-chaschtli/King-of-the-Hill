@@ -10,6 +10,7 @@
 	<name>King of the Hill</name>
 	<url>http://dev.bukkit.org/server-mods/king-of-the-hill/</url>
 	<description>King of the Hill is a Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.</description>
+	<inceptionYear>2013</inceptionYear>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jm-version>${project.version}</jm-version>
@@ -24,18 +25,19 @@
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>github.com/AoHRuthless/King-of-the-Hill/issues</url>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill/issues</url>
 	</issueManagement>
 
 	<scm>
 		<connection>scm:git:git://github.com:AoHRuthless/King-of-the-Hill.git</connection>
-		<url>http://github.com/AoHRuthless/King-of-the-Hill</url>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill</url>
 		<developerConnection>AoHRuthless</developerConnection>
 	</scm>
 
 	<!-- Build -->
 
 	<build>
+		<finalName>King of the Hill</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
@@ -77,6 +79,7 @@
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>1.2.31</version>
+			<optional>true</optional>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
