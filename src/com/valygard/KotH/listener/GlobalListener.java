@@ -338,6 +338,7 @@ public class GlobalListener implements Listener {
 			if (stats != null) {
 				stats.increment("kills");
 				arena.getRewards().giveKillstreakRewards(killer);
+				arena.playSound(killer);
 			}	
 			new ArenaPlayerDeathEvent(arena, p, killer);
 		}

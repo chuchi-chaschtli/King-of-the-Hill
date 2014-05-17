@@ -23,6 +23,7 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -610,12 +611,30 @@ public class Arena {
 		firework.setFireworkMeta(data);
 		Vector dir = new Vector(0, 10, 0);
 		firework.setVelocity(dir.multiply(11 * 0.35));
+		
+		for (Player p : arenaPlayers) {
+			playSound(p);
+		}
 
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 			public void run() {
 				firework.detonate();
 			}
 		}, 20 * random.nextInt(3) + 2);
+	}
+	
+	/**
+	 * Play the classic note sound that everybody loves on a player.
+	 * 
+	 * @param p the player to play the note pling to.
+	 * @return true if the sound was played.
+	 */
+	public boolean playSound(Player p) {
+		if (settings.getBoolean("play-sounds")) {
+			p.playSound(p.getLocation(), Sound.NOTE_PLING, 3F, 3F);
+			return true;
+		}
+		return false;
 	}
 
 	/**

@@ -29,3 +29,4 @@ entry-fee: 0.00
 quit-charge: $50
 use-scoreboard: true
 use-compasses: true
+play-sounds: true

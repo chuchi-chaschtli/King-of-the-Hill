@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.time;
 
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.valygard.KotH.KotH;
@@ -113,6 +114,14 @@ public class AutoEndTimer {
 			else if (remaining == intervals[index]) {
 				String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
                 Messenger.announce(arena, Msg.ARENA_AUTO_END, timeLeft);
+                
+                for (Player p : arena.getPlayersInArena()) {
+                	arena.playSound(p);
+                }
+                for (Player p : arena.getSpectators()) {
+                	arena.playSound(p);
+                }
+                
                 index--;
             }
 		}

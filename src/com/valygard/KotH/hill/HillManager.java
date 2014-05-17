@@ -76,6 +76,13 @@ public class HillManager {
 		// Now, finally, change the status.
 		status++;
 		arena.resetCompass();
+		
+        for (Player p : arena.getPlayersInArena()) {
+        	arena.playSound(p);
+        }
+        for (Player p : arena.getSpectators()) {
+        	arena.playSound(p);
+        }
 	}
 	
 	/**

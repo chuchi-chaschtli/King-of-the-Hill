@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.time;
 
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.valygard.KotH.KotH;
@@ -118,6 +119,11 @@ public class AutoStartTimer {
 			// Warn players in the arena how many seconds are remaining.
 			else if (remaining == intervals[index]) {
                 Messenger.announce(arena, Msg.ARENA_AUTO_START, String.valueOf(remaining));
+                
+                for (Player p : arena.getPlayersInLobby()) {
+                	arena.playSound(p);
+                }
+                
                 index--;
             }
 		}	
