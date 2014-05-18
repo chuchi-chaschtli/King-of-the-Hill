@@ -50,9 +50,9 @@ public class ScoreboardManager {
 		
 		sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
 		
-		red 		= sidebar.getScore(ChatColor.DARK_RED + "[Red Team]");
-		blue 		= sidebar.getScore(ChatColor.DARK_BLUE + "[Blue Team]");
-		timeLeft 	= sidebar.getScore(ChatColor.YELLOW + "Time left -");
+		red 		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
+		blue 		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
+		timeLeft 	= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.YELLOW + "Time left -"));
 		
 		// teams
 		redteam 	= scoreboard.registerNewTeam("red");
