@@ -100,7 +100,7 @@ public class HillUtils {
 		if (isFirstHill())
 			return null;
 		
-		return getHill(current - 1);
+		return getHill(current- 1);
 	}
 	
 	public Location getHill(int status) {

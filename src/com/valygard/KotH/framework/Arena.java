@@ -435,8 +435,9 @@ public class Arena {
 				}
 			}
 		}
-
 		declareWinner();
+		
+		hillManager.removeBeacon();
 
 		for (Player p : arenaPlayers)
 			removePlayer(p, true);
@@ -664,7 +665,7 @@ public class Arena {
 			return;
 
 		for (Player p : arenaPlayers) {
-			p.setCompassTarget(hillUtils.getCurrentHill());
+			p.setCompassTarget(hillUtils.getNextHill() != null ? hillUtils.getNextHill() : null);
 		}
 	}
 
