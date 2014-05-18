@@ -17,6 +17,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.massivecraft.factions.Factions;
+import com.massivecraft.mcore.MCore;
 import com.valygard.KotH.command.CommandManager;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
@@ -57,8 +59,9 @@ public class KotH extends JavaPlugin {
 		// Load all arenas and classes
 		am.initialize();
 		
-		// Load vault
+		// Load dependencies
 		loadVault();
+		loadFactions();
 
 		// Load the messages file.
 		loadMessagesFile();
@@ -127,6 +130,31 @@ public class KotH extends JavaPlugin {
             Messenger.warning("Vault found, but no economy plugin detected ... Economy rewards will not function!");
         }
     }
+	
+	private void loadFactions() {
+		Factions factions = (Factions) getServer().getPluginManager()
+				.getPlugin("Factions");
+		if (factions == null) {
+			return;
+		}
+
+		MCore mcore = (MCore) getServer().getPluginManager().getPlugin("MCore");
+
+		if (mcore == null) {
+			Messenger.severe("You are missing MCore! Factions support and Factions itself will not function!");
+			return;
+		}
+
+		String fVersion = factions.getDescription().getVersion();
+		String mVersion = mcore.getDescription().getVersion();
+
+		if ((fVersion.startsWith("2.4") && mVersion.startsWith("7.2"))
+				|| (fVersion.equals("2.3.1") && mVersion.startsWith("7.1"))) {
+			Messenger.info("A compatible Factions and MCore has been found! You may use Factions support!");
+		} else {
+			Messenger.warning("Your MCore and Factions are incompatible!");
+		}
+	}
 
 	/**
 	 * The idea for this was not created by me (AoH_Ruthless).
