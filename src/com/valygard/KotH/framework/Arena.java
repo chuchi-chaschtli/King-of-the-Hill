@@ -407,9 +407,10 @@ public class Arena {
 	/**
 	 * End a running arena and cleanup after.
 	 * 
+	 * @param restarting whether or not the arena should launch fireworks.
 	 * @return true if the arena successfully ended; false otherwise
 	 */
-	public boolean endArena() {
+	public boolean endArena(boolean restarting) {
 		// Sanity-checks.
 		if (!running || !enabled) {
 			return false;
@@ -435,7 +436,7 @@ public class Arena {
 				}
 			}
 		}
-		declareWinner();
+		declareWinner(restarting);
 		
 		hillManager.removeBeacon();
 
@@ -453,6 +454,17 @@ public class Arena {
 
 		return true;
 	}
+	
+	/**
+	 * We do not always need to check if a server is reloading or restarting to
+	 * end an arena. By default, we will assume the server is not being
+	 * restarted.
+	 * 
+	 * @return true if the arena successfully ended; false otherwise.
+	 */
+	public boolean endArena() {
+		return endArena(false);
+	}
 
 	/**
 	 * Force an arena to begin.
@@ -464,10 +476,20 @@ public class Arena {
 
 	/**
 	 * Forcibly end an arena.
+	 * 
+	 * @param is the server restarting?
+	 */
+	public void forceEnd(boolean restarting) {
+		endTimer.halt();
+		endArena(restarting);
+	}
+
+	/**
+	 * Assume that the arena is not going under a server reload or restart is
+	 * safe, because we only need to check for it in the onDisable().
 	 */
 	public void forceEnd() {
-		endTimer.halt();
-		endArena();
+		forceEnd(false);
 	}
 
 	/**
@@ -534,8 +556,10 @@ public class Arena {
 
 	/**
 	 * Declare one team as victorious based on which set has a higher score.
+	 * 
+	 * @param restarting whether or not the arena should create fireworks.
 	 */
-	public void declareWinner() {
+	public void declareWinner(boolean restarting) {
 		Set<Player> loser;
 		if (winner == null) {
 			Messenger.announce(this, Msg.ARENA_DRAW);
@@ -556,7 +580,8 @@ public class Arena {
 			loser = null;
 
 		for (Player p : winner) {
-			createFirework(p.getLocation());
+			if (!restarting)
+				createFirework(p.getLocation());
 			getStats(p).increment("wins");
 		}
 
@@ -665,7 +690,8 @@ public class Arena {
 			return;
 
 		for (Player p : arenaPlayers) {
-			p.setCompassTarget(hillUtils.getNextHill() != null ? hillUtils.getNextHill() : null);
+			p.setCompassTarget(hillUtils.getNextHill() != null ? hillUtils
+					.getNextHill() : null);
 		}
 	}
 

@@ -76,7 +76,7 @@ public class KotH extends JavaPlugin {
 			if (arena.isRunning()) {
 				for (Player p : arena.getPlayersInArena())
 					arena.getScoreboard().removePlayer(p);
-				arena.forceEnd();
+				arena.forceEnd(true);
 			}
 		}
 	}
