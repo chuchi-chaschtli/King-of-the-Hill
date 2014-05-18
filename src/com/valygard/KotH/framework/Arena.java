@@ -437,8 +437,6 @@ public class Arena {
 			}
 		}
 		declareWinner(restarting);
-		
-		hillManager.removeBeacon();
 
 		for (Player p : arenaPlayers)
 			removePlayer(p, true);
@@ -451,6 +449,8 @@ public class Arena {
 		redPlayers.clear();
 		bluePlayers.clear();
 		specPlayers.clear();
+		
+		hillManager.cleanup();
 
 		return true;
 	}
@@ -512,6 +512,7 @@ public class Arena {
 	 */
 	public boolean kickPlayer(Player p) {
 		ArenaPlayerKickEvent event = new ArenaPlayerKickEvent(this, p);
+		plugin.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			return false;
 		}

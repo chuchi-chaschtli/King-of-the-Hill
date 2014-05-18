@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.Messenger;
@@ -77,8 +78,11 @@ public class HillManager {
 			Messenger.announce(arena, Msg.HILLS_ONE_LEFT);
 		}
 		removeBeacon();
-		if (utils.getNextHill() != null)
+		if (utils.getNextHill() != null) {
 			createBeacon(utils.getNextHill());
+		} else {
+			createBeacon(utils.getHill(status));
+		}
 		arena.resetCompass();
 		
 		// Now, finally, change the status.
@@ -267,5 +271,17 @@ public class HillManager {
 		}
 		Block b = utils.getCurrentHill().getBlock();
 		b.setType(Material.AIR);
+	}
+
+	/**
+	 * Clean up all beacons.
+	 */
+	public void cleanup() {
+		ConfigurationSection s = arena.getWarps().getConfigurationSection("hills");
+		for (String str : s.getKeys(false)) {
+			Location l = arena.getHillLocation(str);
+			if (l.getBlock() != null)
+				l.getBlock().setType(Material.AIR);
+		}
 	}
 }
