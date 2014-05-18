@@ -74,7 +74,7 @@ public class AutoStartTimer {
 	private class Timer extends BukkitRunnable {
 		private int remaining;
 		private int index;
-		private int[] intervals = new int[]{1, 2, 3, 5, 10, 15, 30};
+		private int[] intervals = new int[]{1, 2, 3, 5, 10, 15, 30, 45};
 
 		private Timer(int seconds) {
 			this.remaining = seconds;

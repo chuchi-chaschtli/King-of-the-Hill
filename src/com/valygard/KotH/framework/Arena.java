@@ -236,11 +236,14 @@ public class Arena {
 		p.getInventory().setArmorContents(null);
 		p.setGameMode(GameMode.SURVIVAL);
 		Messenger.tell(p, Msg.JOIN_ARENA, arenaName);
-
-		// If the minimum quota is reached, and already not in countdown, start
-		// a countdown.
-		if (lobbyPlayers.size() >= minPlayers)
+		
+		if (lobbyPlayers.size() >= minPlayers) {
+			if (settings.getInt("arena-auto-start") > 45) {
+				Messenger.announce(this, Msg.ARENA_AUTO_START,
+						String.valueOf(settings.getInt("arena-auto-start")));
+			}
 			startTimer.startTimer();
+		}
 	}
 
 	/**
