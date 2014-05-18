@@ -69,7 +69,7 @@ public class StatsCmd implements Command {
 				+ makeString(stats.getWinstreak()) + "winstreak." : "");
 
 		// Pretty up the time spent in the arena.
-		String timespent = "You have spent " + ChatColor.YELLOW
+		String timespent = "You have spent" + ChatColor.YELLOW
 				+ stats.getTimeSpent() + ChatColor.RESET + " in " + args[0]
 				+ ".";
 

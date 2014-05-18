@@ -336,7 +336,7 @@ public class PlayerStats {
 	}
 	
 	public String getTimeSpent() {
-		return TimeUtil.formatIntoHHMMSS(timespent);
+		return TimeUtil.formatIntoSentence(timespent);
 	}
 	
 	public boolean isTracking() {
