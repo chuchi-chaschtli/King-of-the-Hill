@@ -148,14 +148,11 @@ public class PlayerStats {
 		
 		switch (path) {
 		case "kills":
-			Bukkit.broadcastMessage("1.2");
 			kills += 1;
 			config.set(s, kills);
-			Bukkit.broadcastMessage(String.valueOf(kills));
 			
 			killstreak += 1;
 			config.set(s, killstreak);
-			Bukkit.broadcastMessage(String.valueOf(killstreak));
 			break;
 		case "deaths":
 			deaths += 1;
@@ -188,9 +185,7 @@ public class PlayerStats {
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
 		}
-		Bukkit.broadcastMessage("1.4");
 		saveFile();
-		Bukkit.broadcastMessage("1.9");
 		// Recalculate the ratios of the kdr and wlr.
 		recalibrate();
 	}

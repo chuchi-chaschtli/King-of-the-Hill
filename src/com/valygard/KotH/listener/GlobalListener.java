@@ -334,9 +334,7 @@ public class GlobalListener implements Listener {
 					+ ChatColor.RESET + " has killed you.");
 			
 			plugin.getServer().getPluginManager().callEvent(new ArenaPlayerDeathEvent(arena, p, killer));
-			Bukkit.broadcastMessage("1");
 			arena.getStats(killer).increment("kills");
-			Bukkit.broadcastMessage("2");
 			arena.getRewards().giveKillstreakRewards(killer);
 			arena.playSound(killer);
 		}
