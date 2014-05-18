@@ -44,7 +44,6 @@ import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
-import com.valygard.KotH.PlayerStats;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
@@ -334,14 +333,14 @@ public class GlobalListener implements Listener {
 			Messenger.tell(p, ChatColor.YELLOW + killer.getName()
 					+ ChatColor.RESET + " has killed you.");
 			
-			PlayerStats stats = arena.getStats(killer);
-			if (stats != null) {
-				stats.increment("kills");
-				arena.getRewards().giveKillstreakRewards(killer);
-				arena.playSound(killer);
-			}	
-			new ArenaPlayerDeathEvent(arena, p, killer);
+			plugin.getServer().getPluginManager().callEvent(new ArenaPlayerDeathEvent(arena, p, killer));
+			Bukkit.broadcastMessage("1");
+			arena.getStats(killer).increment("kills");
+			Bukkit.broadcastMessage("2");
+			arena.getRewards().giveKillstreakRewards(killer);
+			arena.playSound(killer);
 		}
+		
 		if (arena.getSettings().getBoolean("one-life")) {
 			arena.removePlayer(p, false);
 		}
@@ -356,9 +355,7 @@ public class GlobalListener implements Listener {
 		e.getDrops().clear();
 		e.setDeathMessage(null);
 		
-		PlayerStats stats = arena.getStats(p);
-		if (stats != null)
-			stats.increment("deaths");
+		arena.getStats(p).increment("deaths");
 		
 		if (!arena.getSettings().getBoolean("drop-xp"))
 			e.setDroppedExp(0);

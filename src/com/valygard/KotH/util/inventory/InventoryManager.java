@@ -163,6 +163,7 @@ public class InventoryManager {
 	/**
 	 * Clears a player's armor contents as well as their regular inventory.
 	 */
+	@SuppressWarnings("deprecation")
 	public void clearInventory(Player p) {
 		PlayerInventory inv = p.getInventory();
 		inv.clear();
@@ -178,5 +179,6 @@ public class InventoryManager {
 				i.clear();
 			}
 		}
+		p.updateInventory();
 	}
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,6 +51,10 @@ public class PlayerStats {
 	// File in the directory, which is player-specific.
 	private File file;
 	
+	// Config
+	private YamlConfiguration config;
+	private String path;
+	
 	// Only track stats if enabled in the arena-settings.
 	private boolean tracking;
 	
@@ -77,134 +82,55 @@ public class PlayerStats {
 		
 		// Create disk YAML file
 		this.file	= new File(dir, player.getUniqueId() + ".yml");
+		this.config = YamlConfiguration.loadConfiguration(file);	
+		this.path 	= "arenas." + name + ".";
 		
-		YamlConfiguration config = new YamlConfiguration();
-		String path = "arenas." + name + ".";
 		if (file.exists()) {
-			// If the file exists, try to load it.
-			try {
-				config.load(file);
-				this.kills		= config.getInt(path + "kills");
-				this.deaths		= config.getInt(path + "deaths");
-				
-				this.wins		= config.getInt(path + "wins");
-				this.losses 	= config.getInt(path + "losses");
-				this.draws 	 	= config.getInt(path + "draws");
-				
-				this.kdr		= calculateRatio(kills, deaths);
-				this.wlr		= calculateRatio(wins, losses);
-				
-				this.killstreak = config.getInt(path + "killstreak");
-				this.winstreak	= config.getInt(path + "winstreak");
-				
-				this.timespent	= config.getInt(path + "time-spent");
-			} catch (Exception e) {
-				Messenger.severe("Stats reset for player '" + player.getName() + "'.");
-				e.printStackTrace();
-				resetStats();
-			}
+			loadFile();
+			this.kills		= config.getInt(path + "kills");
+			this.deaths		= config.getInt(path + "deaths");
+
+			this.wins		= config.getInt(path + "wins");
+			this.losses 	= config.getInt(path + "losses");
+			this.draws 	 	= config.getInt(path + "draws");
+
+			this.kdr		= calculateRatio(kills, deaths);
+			this.wlr		= calculateRatio(wins, losses);
+
+			this.killstreak = config.getInt(path + "killstreak");
+			this.winstreak	= config.getInt(path + "winstreak");
+
+			this.timespent	= config.getInt(path + "time-spent");
 		}
 		config.set("player", player.getName());
-		
-		config.set(path + "kdr", kdr);
-		config.set(path + "wlr", wlr);
-		config.save(file);
-	}
 
-	/**
-	 * Saves the player's stats. If the arena is tracking stats, try to load the
-	 * file and save all statistics.
-	 */
-	public void saveStats() {
-		if (!tracking) {
-			return;
-		}
-		
-		YamlConfiguration config = new YamlConfiguration();
-		try {
-			config.load(file);
-		} catch (Exception e) {
-			Messenger.severe("Could not load stats for player '" + player.getName() + "'.");
-			e.printStackTrace();
-			return;
-		}
-		
-		String path = "arenas." + name + ".";
-		config.set(path + "kills", kills);
-		config.set(path + "deaths", deaths);
 		config.set(path + "kdr", kdr);
-		
-		config.set(path + "wins", wins);
-		config.set(path + "losses", losses);
-		config.set(path + "draws", draws);
 		config.set(path + "wlr", wlr);
-		
-		config.set(path + "killstreak", killstreak);
-		config.set(path + "winstreak", winstreak);
-		
-		config.set(path + "time-spent", timespent);
-		
-		try {
-			config.save(file);
-		} catch (IOException e) {
-			Messenger.severe("Could not save stats for player '" + player.getName() + "'.");
-			e.printStackTrace();
-			return;
-		}
-	}
-	
-	/**
-	 * If we ever want to, reset the arena statistics for the player and save.
-	 */
-	public void resetStats() {
-		kills   	= 0;
-		deaths	 	= 0;
-		kdr 		= 0;
-		wins 		= 0;
-		losses		= 0;
-		draws	 	= 0;
-		wlr 		= 0;
-		killstreak  = 0;
-		winstreak	= 0;
-		timespent	= 0;
-		
-		saveStats();
+		saveFile();
 	}
 	
 	/**
 	 * At the end of every arena, reset a player's killstreak.
 	 */
 	public void resetKillstreak() {
-		YamlConfiguration config = new YamlConfiguration();
-		try {
-			config.load(file);
-		} catch (Exception e) {
-			Messenger.severe("Could not reset killstreak for player '" + player.getName() + "'.");
-			return;
-		}
+		loadFile();
 		String s = "arenas." + name + ".killstreak";
 		
 		killstreak = 0;
 		config.set(s, killstreak);
-		saveStats();
+		saveFile();
 	}
 	
 	/**
 	 * Reset the winstreak for a player.
 	 */
 	public void resetWinstreak() {
-		YamlConfiguration config = new YamlConfiguration();
-		try {
-			config.load(file);
-		} catch (Exception e) {
-			Messenger.severe("Could not reset winstreak for player '" + player.getName() + "'.");
-			return;
-		}
+		loadFile();
 		String s = "arenas." + name + ".winstreak";
 		
 		winstreak = 0;
 		config.set(s, winstreak);
-		saveStats();
+		saveFile();
 	}
 	
 	/**
@@ -217,24 +143,19 @@ public class PlayerStats {
 		if (!tracking) {
 			return;
 		}
-		
-		YamlConfiguration config = new YamlConfiguration();
-		try {
-			config.load(file);
-		} catch (Exception e) {
-			Messenger.severe("Could not load stats for player '" + player.getName() + "'.");
-			return;
-		}
-		
-		String s = "arenas." + name + "." + path;
+		loadFile();
+		String s = this.path + path;
 		
 		switch (path) {
 		case "kills":
+			Bukkit.broadcastMessage("1.2");
 			kills += 1;
 			config.set(s, kills);
+			Bukkit.broadcastMessage(String.valueOf(kills));
 			
 			killstreak += 1;
 			config.set(s, killstreak);
+			Bukkit.broadcastMessage(String.valueOf(killstreak));
 			break;
 		case "deaths":
 			deaths += 1;
@@ -267,7 +188,9 @@ public class PlayerStats {
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
 		}
-		
+		Bukkit.broadcastMessage("1.4");
+		saveFile();
+		Bukkit.broadcastMessage("1.9");
 		// Recalculate the ratios of the kdr and wlr.
 		recalibrate();
 	}
@@ -294,20 +217,13 @@ public class PlayerStats {
 	 * ratios. It then saves the ratios to the configuration file.
 	 */
 	public void recalibrate() {
-		YamlConfiguration config = new YamlConfiguration();
-		try {
-			config.load(file);
-		} catch (Exception e) {
-			Messenger.severe("Could not load stats for player '" + player.getName() + "'.");
-			return;
-		}
 		
 		kdr = calculateRatio(kills, deaths);
 		config.set("arenas." + name + ".kdr", kdr);
 		
 		wlr = calculateRatio(wins, losses);
 		config.set("arenas." + name + ".wlr", wlr);
-		saveStats();
+		saveFile();
 	}
 	
 	/**
@@ -316,8 +232,10 @@ public class PlayerStats {
 	 * @param timeToAdd
 	 */
 	public void addTime(int timeToAdd) {
+		loadFile();
 		timespent += timeToAdd;
-		saveStats();
+		config.set(path + "time-spent", timespent);
+		saveFile();
 	}
 	
 	/**
@@ -342,6 +260,28 @@ public class PlayerStats {
 					}
 				}, 20 * i, 20 * i);
 	}
+	
+	private void saveFile() {
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			Messenger.severe("Could not save stats for player '" + player.getName() + "'.");
+			e.printStackTrace();
+		}
+	}
+	
+	private void loadFile() {
+		try {
+			config.load(file);
+		} catch (IOException | InvalidConfigurationException e) {
+			Messenger.severe("Could not load stats for player '"
+					+ player.getName() + "'.");
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
 
 	public File getPlayerFile() {
 		return file;
