@@ -38,7 +38,6 @@ public class ConfigUtil {
         }
     }
 
-    @SuppressWarnings("deprecation")
 	private static void process(Plugin plugin, String resource, ConfigurationSection section, boolean addOnlyIfEmpty, boolean removeObsolete) {
         try {
             YamlConfiguration defaults = new YamlConfiguration();
