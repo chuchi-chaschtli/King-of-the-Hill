@@ -114,12 +114,13 @@ public class ScoreboardManager {
 	/**
 	 * Removes the scoreboard by deleting it for all players.
 	 */
-    public void reset() {
+    public void unregister() {
     	for (Player p : Bukkit.getOnlinePlayers()) {
     		if (p.getScoreboard().equals(scoreboard))
     			removePlayer(p);
     	}
     	scoreboard.clearSlot(DisplaySlot.SIDEBAR);
+    	scoreboard.getObjectives().clear();
     }
     
     /**
