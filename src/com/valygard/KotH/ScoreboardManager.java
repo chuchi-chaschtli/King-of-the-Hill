@@ -115,7 +115,7 @@ public class ScoreboardManager {
 	 * Removes the scoreboard by deleting it for all players.
 	 */
     public void unregister() {
-    	for (Player p : Bukkit.getOnlinePlayers()) {
+    	for (Player p : arena.getPlayersInArena()) {
     		if (p.getScoreboard().equals(scoreboard))
     			removePlayer(p);
     	}
