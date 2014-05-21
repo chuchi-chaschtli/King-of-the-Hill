@@ -90,7 +90,11 @@ public class GlobalListener implements Listener {
 				return;
 			
 			Location l = p.getLocation();
-			Location hill = arena.getHillUtils().getCurrentHill();
+			Location hill = p.getCompassTarget();
+			if (hill == null) {
+				Messenger.tell(p, "Your compass cannot find the hill!");
+				return;
+			}
 			Location temp = new Location(hill.getWorld(), hill.getBlockX(), l.getY(), hill.getBlockZ());
 			
 			DecimalFormat df = new DecimalFormat("#.##");
