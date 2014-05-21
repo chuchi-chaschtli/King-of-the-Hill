@@ -130,6 +130,14 @@ public class HillUtils {
 	 * @return true / false
 	 */
 	public boolean isLastHill() {
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
+		Set<String> hills = section.getKeys(false);
+		
+		if (hills.size() == 1) {
+			return (arena.getEndTimer().getRemaining() <= arena.getSettings().getInt("hill-clock"));
+		}
+		
 		return (getRotationsLeft() <= 0);
 	}
 
