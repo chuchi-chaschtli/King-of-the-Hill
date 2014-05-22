@@ -275,9 +275,9 @@ public class AbilityListener implements Listener {
 			return;
 		
 		for (Location l : landmines.get(p.getUniqueId())) {
-			l.getBlock().setType(null);
-			landmines.remove(p.getUniqueId());
+			l.getBlock().setType(Material.AIR);
 		}
+		landmines.remove(p.getUniqueId());
 	}
 	
 	public void removeEntities(Player p) {
