@@ -54,7 +54,7 @@ public class Messenger {
 			
 			FileWriter fw = new FileWriter(file, true);	  
 			PrintWriter pw = new PrintWriter(fw);
-			pw.println(time + " [PlayerCombat] [" + level.toUpperCase() + "] : " + msg);
+			pw.println(time + " [KotH] [" + level.toUpperCase() + "] : " + msg);
 			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
