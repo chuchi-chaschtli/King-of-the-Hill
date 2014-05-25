@@ -5,9 +5,12 @@
 package com.valygard.KotH;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
@@ -32,6 +35,7 @@ public class PlayerData {
 	private GameMode mode = null;
 	private Collection<PotionEffect> potions;
 	private boolean flying;
+	private Set<Player> blind;
 	
 	// Although it isn't necessary data, this is the fitting place for the player's class.
 	private ArenaClass arenaClass;
@@ -60,6 +64,13 @@ public class PlayerData {
 		this.exp		= player.getExp();
 		
 		this.flying		= player.isFlying();
+		
+		this.blind		= new HashSet<Player>();
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (!p.canSee(player)) {
+				blind.add(p);
+			}
+		}
 		
 		this.arenaClass = null;
 	}
@@ -91,7 +102,12 @@ public class PlayerData {
 		player.updateInventory();
 		
 		// In case they are no longer allowed to fly, even if they were flying they cannot anymore.
-		player.setFlying(flying == false ? false : player.getAllowFlight() ? true : false);
+		player.setFlying(!flying ? false : player.getAllowFlight());
+		
+		for (Player p : blind) {
+			p.hidePlayer(player);
+		}
+		blind.clear();
 		
 		setArenaClass(null);
 	}
