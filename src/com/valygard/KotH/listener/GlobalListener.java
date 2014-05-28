@@ -75,7 +75,7 @@ public class GlobalListener implements Listener {
 	// Player Events
 	// --------------------------- //
 	
-	@EventHandler (priority = EventPriority.HIGH)
+	@EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		
@@ -190,7 +190,7 @@ public class GlobalListener implements Listener {
 		p.setExhaustion(0F);
 	}
 	
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onAsyncChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 		
@@ -363,7 +363,7 @@ public class GlobalListener implements Listener {
 			e.setDroppedExp(0);
 	}
 	
-	@EventHandler (priority = EventPriority.HIGHEST)
+	@EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onArenaRespawn(PlayerRespawnEvent e) {
 		Player p = e.getPlayer();
 		Arena arena = am.getArenaWithPlayer(p);
