@@ -31,6 +31,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -40,6 +41,7 @@ import com.valygard.KotH.ArenaAbilities;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.Messenger;
 import com.valygard.KotH.Msg;
+import com.valygard.KotH.event.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.util.UUIDUtil;
@@ -304,6 +306,51 @@ public class AbilityListener implements Listener {
 							.valueOf(zombies.get(p.getUniqueId())) : String
 							.valueOf(0));
 		}
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onPlayerDeath(PlayerDeathEvent e) {
+		Player p = e.getEntity();
+		Player owner;
+		switch (p.getKiller().getType()) {
+		case ZOMBIE:
+			Zombie z = (Zombie) p.getKiller();
+			owner = ArenaAbilities.getPlayerWithZombie(z);
+			if (owner == null)
+				return;
+			break;
+		case WOLF:
+			Wolf wolf = (Wolf) p.getKiller();
+			owner = ArenaAbilities.getPlayerWithWolf(wolf);
+			if (owner == null)
+				return;
+			break;
+		case FIREBALL:
+			Fireball f = (Fireball) p.getKiller();
+			if (f.getShooter() instanceof Player) {
+				Player shooter = (Player) f.getShooter();
+				if (f.hasMetadata(shooter.getName())) {
+					owner = shooter; 
+					break;
+				}
+				return;
+			}
+			return;
+		default:
+			return;
+		}
+		Arena arena = am.getArenaWithPlayer(owner);
+		if (arena == null || !arena.hasPlayer(p)) {
+			return;
+		}
+		
+		Messenger.tell(p, ChatColor.YELLOW + owner.getName()
+				+ ChatColor.RESET + " has killed you with an arena ability.");
+		
+		plugin.getServer().getPluginManager().callEvent(new ArenaPlayerDeathEvent(arena, p, owner));
+		arena.getStats(owner).increment("kills");
+		arena.getRewards().giveKillstreakRewards(owner);
+		arena.playSound(owner);
 	}
 	
 	
