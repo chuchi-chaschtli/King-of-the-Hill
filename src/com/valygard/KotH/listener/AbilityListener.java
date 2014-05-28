@@ -166,7 +166,7 @@ public class AbilityListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onProjectileHit(ProjectileHitEvent e) {
 		Projectile p = e.getEntity();
@@ -175,16 +175,19 @@ public class AbilityListener implements Listener {
 			for (Player player : f.getWorld().getPlayers()) {
 				if (!f.hasMetadata(player.getName()))
 					continue;
-				
+
 				f.setIsIncendiary(false);
 				f.setFireTicks(0);
 				f.setYield(0F);
 				for (Entity entity : f.getNearbyEntities(3.2, 3.2, 3.2)) {
 					if (entity instanceof LivingEntity) {
 						LivingEntity le = (LivingEntity) entity;
-						
-						double distance = f.getLocation().distance(le.getLocation());
-						le.damage(distance <= 0 ? le.getMaxHealth() / 3.07692308 : Math.min(1 / distance * 6.4 + 0.75, le.getMaxHealth() / 4.5));
+
+						double distance = f.getLocation().distance(
+								le.getLocation());
+						le.damage(distance < 0.371 ? 0.325 * le.getMaxHealth()
+								: Math.min(6.4 / distance + 0.75,
+										0.224 * le.getMaxHealth()));
 					}
 				}
 				break;
