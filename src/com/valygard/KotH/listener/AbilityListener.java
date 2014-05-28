@@ -16,8 +16,12 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Horse;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -27,8 +31,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.ArenaAbilities;
 import com.valygard.KotH.KotH;
@@ -79,6 +85,14 @@ public class AbilityListener implements Listener {
 			return;
 		
 		switch (p.getItemInHand().getType()) {
+		// Shoot a fireball.
+		case MAGMA_CREAM:
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.MAGMA_CREAM)});
+			Messenger.tell(p, Msg.ABILITY_FIREBALL_SHOOT);
+			
+			Fireball f = (Fireball) p.launchProjectile(Fireball.class);
+			f.setMetadata(p.getName(), new FixedMetadataValue(plugin, "KotH"));
+			break;
 		// If the player's hand item is a bone, spawn a wolf.
 		case BONE:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.BONE)});
@@ -149,6 +163,31 @@ public class AbilityListener implements Listener {
 				landmines.put(player.getUniqueId(), locs);
 				
 				e.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onProjectileHit(ProjectileHitEvent e) {
+		Projectile p = e.getEntity();
+		if (p instanceof Fireball) {
+			Fireball f = (Fireball) p;
+			for (Player player : f.getWorld().getPlayers()) {
+				if (!f.hasMetadata(player.getName()))
+					continue;
+				
+				f.setIsIncendiary(false);
+				f.setFireTicks(0);
+				f.setYield(0F);
+				for (Entity entity : f.getNearbyEntities(3.2, 3.2, 3.2)) {
+					if (entity instanceof LivingEntity) {
+						LivingEntity le = (LivingEntity) entity;
+						
+						double distance = f.getLocation().distance(le.getLocation());
+						le.damage(distance <= 0 ? le.getMaxHealth() / 3.07692308 : Math.min(1 / distance * 6.4 + 0.75, le.getMaxHealth() / 4.5));
+					}
+				}
+				break;
 			}
 		}
 	}

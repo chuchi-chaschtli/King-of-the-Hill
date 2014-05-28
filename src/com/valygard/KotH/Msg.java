@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  *
  */
 public enum Msg {
+	ABILITY_FIREBALL_SHOOT("You have shot a fireball!"),
 	ABILITY_LANDMINE_EXPLODE("You triggered a landmine that &e%&r placed."),
 	ABILITY_LANDMINE_PLACE("You have placed a landmine!"),
 	ABILITY_HORSE_SPAWNED("You have spawned a customized horse!"),
