@@ -146,15 +146,18 @@ public class AbilityListener implements Listener {
 				
 				// Create explosion if the triggerer is the player who placed it or on the opposite team.
 				if (player.equals(p)) {
-					ArenaAbilities.boom(p);
 					Messenger.tell(p, "You triggered your own landmine!");
 				} else if (!arena.getTeam(player).equals(arena.getTeam(p))) {
-					ArenaAbilities.boom(p);
+					arena.getStats(player).increment("kills");
 					Messenger.tell(p, Msg.ABILITY_LANDMINE_EXPLODE, player.getName());
 					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has triggered your landmine.");
 				} else {
 					e.setCancelled(false);
 					return;
+				}
+				ArenaAbilities.boom(p);
+				if (p.isDead()) {
+					arena.getStats(p).increment("deaths");
 				}
 				e.getClickedBlock().setType(Material.AIR);
 				
