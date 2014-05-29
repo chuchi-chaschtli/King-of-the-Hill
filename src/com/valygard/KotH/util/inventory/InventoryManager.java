@@ -5,7 +5,6 @@
 package com.valygard.KotH.util.inventory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +49,12 @@ public class InventoryManager {
 	 * @param p
 	 * @throws IOException
 	 */
-	@SuppressWarnings("deprecation")
 	public void storeInventory(Player p) throws IOException {
 		ItemStack[] items = p.getInventory().getContents();
 		ItemStack[] armor = p.getInventory().getArmorContents();
 
 		UUID uuid = UUIDUtil.getUUID(p);
-		
+
 		this.items.put(uuid, items);
 		this.armor.put(uuid, armor);
 
@@ -72,98 +70,98 @@ public class InventoryManager {
 		clearInventory(p);
 		p.updateInventory();
 	}
-	
+
 	/**
 	 * Restore the player's inventory back to them.
-	 * @throws FileNotFoundException
+	 * 
 	 * @throws IOException
-	 * @throws InvalidConfigurationException 
+	 * @throws InvalidConfigurationException
 	 */
-	public void restoreInventory(Player p) throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public void restoreInventory(Player p) throws IOException,
+			InvalidConfigurationException {
 		UUID uuid = UUIDUtil.getUUID(p);
-		
+
 		// Grab disk file
 		File file = new File(dir, uuid.toString());
-		
+
 		// Try to grab the items from memory first
-        ItemStack[] items = this.items.remove(p);
-        ItemStack[] armor = this.armor.remove(p);
-        
-        // If we can't restore from memory, restore from file
-        if (items == null || armor == null) {
-            YamlConfiguration config = new YamlConfiguration();
-            config.load(file);
-            
-            // Get the items and armor lists
-            List<?> itemsList = config.getList("items");
-            List<?> armorList = config.getList("armor");
-            
-            // Turn the lists into arrays
-            items = itemsList.toArray(new ItemStack[itemsList.size()]);
-            armor = armorList.toArray(new ItemStack[armorList.size()]);
-        }
-        
-        // Set the player inventory contents
-        p.getInventory().setContents(items);
-        p.getInventory().setArmorContents(armor);
-        
-        // Delete the file
-        file.delete();
+		ItemStack[] items = this.items.remove(p);
+		ItemStack[] armor = this.armor.remove(p);
+
+		// If we can't restore from memory, restore from file
+		if (items == null || armor == null) {
+			YamlConfiguration config = new YamlConfiguration();
+			config.load(file);
+
+			// Get the items and armor lists
+			List<?> itemsList = config.getList("items");
+			List<?> armorList = config.getList("armor");
+
+			// Turn the lists into arrays
+			items = itemsList.toArray(new ItemStack[itemsList.size()]);
+			armor = armorList.toArray(new ItemStack[armorList.size()]);
+		}
+
+		// Set the player inventory contents
+		p.getInventory().setContents(items);
+		p.getInventory().setArmorContents(armor);
+
+		// Delete the file
+		file.delete();
 	}
-	
-    public static boolean hasEmptyInventory(Player p) {
-        ItemStack[] inventory = p.getInventory().getContents();
-        ItemStack[] armor     = p.getInventory().getArmorContents();
-        
-        // For inventory, check for null
-        for (ItemStack stack : inventory) {
-            if (stack != null)
-                return false;
-        }
-        
-        // For armor, check for air
-        for (ItemStack stack : armor) {
-            if (stack.getType() != Material.AIR)
-                return false;
-        }
-        
-        return true;
-    }
-    
-    public static boolean restoreFromFile(KotH plugin, Player p) {
-        try {
-        	UUID uuid = p.getUniqueId();
-        	
-            File dir = new File(plugin.getDataFolder(), "inventories");
-            File file = new File(dir, uuid.toString());
-            YamlConfiguration config = new YamlConfiguration();
-            config.load(file);
-            
-            // Get the items and armor lists
-            List<?> itemsList = config.getList("items");
-            List<?> armorList = config.getList("armor");
-            
-            // Turn the lists into arrays
-            ItemStack[] items = itemsList.toArray(new ItemStack[itemsList.size()]);
-            ItemStack[] armor = armorList.toArray(new ItemStack[armorList.size()]);
-            
-            // Set the player inventory contents
-            p.getInventory().setContents(items);
-            p.getInventory().setArmorContents(armor);
-            
-            // Delete files
-            file.delete();
-            
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+
+	public static boolean hasEmptyInventory(Player p) {
+		ItemStack[] inventory = p.getInventory().getContents();
+		ItemStack[] armor = p.getInventory().getArmorContents();
+
+		// For inventory, check for null
+		for (ItemStack stack : inventory) {
+			if (stack != null)
+				return false;
+		}
+
+		// For armor, check for air
+		for (ItemStack stack : armor) {
+			if (stack.getType() != Material.AIR)
+				return false;
+		}
+
+		return true;
+	}
+
+	public static boolean restoreFromFile(KotH plugin, Player p) {
+		UUID uuid = p.getUniqueId();
+
+		File dir = new File(plugin.getDataFolder(), "inventories");
+		File file = new File(dir, uuid.toString());
+		YamlConfiguration config = new YamlConfiguration();
+		try {
+			config.load(file);
+		} catch (IOException | InvalidConfigurationException e) {
+			return false;
+		}
+
+		// Get the items and armor lists
+		List<?> itemsList = config.getList("items");
+		List<?> armorList = config.getList("armor");
+
+		// Turn the lists into arrays
+		ItemStack[] items = itemsList.toArray(new ItemStack[itemsList.size()]);
+		ItemStack[] armor = armorList.toArray(new ItemStack[armorList.size()]);
+
+		// Set the player inventory contents
+		p.getInventory().setContents(items);
+		p.getInventory().setArmorContents(armor);
+
+		// Delete files
+		file.delete();
+
+		return true;
+	}
 
 	/**
 	 * Clears a player's armor contents as well as their regular inventory.
 	 */
-	@SuppressWarnings("deprecation")
 	public void clearInventory(Player p) {
 		PlayerInventory inv = p.getInventory();
 		inv.clear();
