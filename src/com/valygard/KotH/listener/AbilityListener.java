@@ -148,7 +148,6 @@ public class AbilityListener implements Listener {
 				if (player.equals(p)) {
 					Messenger.tell(p, "You triggered your own landmine!");
 				} else if (!arena.getTeam(player).equals(arena.getTeam(p))) {
-					arena.getStats(player).increment("kills");
 					Messenger.tell(p, Msg.ABILITY_LANDMINE_EXPLODE, player.getName());
 					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has triggered your landmine.");
 				} else {
@@ -158,6 +157,9 @@ public class AbilityListener implements Listener {
 				ArenaAbilities.boom(p);
 				if (p.isDead()) {
 					arena.getStats(p).increment("deaths");
+					if (!p.equals(player)) {
+						arena.getStats(player).increment("kills");
+					}
 				}
 				e.getClickedBlock().setType(Material.AIR);
 				
