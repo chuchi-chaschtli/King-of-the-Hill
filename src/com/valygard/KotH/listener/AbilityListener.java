@@ -159,7 +159,10 @@ public class AbilityListener implements Listener {
 					arena.getStats(p).increment("deaths");
 					if (!p.equals(player)) {
 						arena.getStats(player).increment("kills");
+						arena.getRewards().giveKillstreakRewards(player);
+						arena.playSound(player);
 					}
+					plugin.getServer().getPluginManager().callEvent(new ArenaPlayerDeathEvent(arena, p, player));
 				}
 				e.getClickedBlock().setType(Material.AIR);
 				
@@ -353,9 +356,11 @@ public class AbilityListener implements Listener {
 				+ ChatColor.RESET + " has killed you with an arena ability.");
 		
 		plugin.getServer().getPluginManager().callEvent(new ArenaPlayerDeathEvent(arena, p, owner));
-		arena.getStats(owner).increment("kills");
-		arena.getRewards().giveKillstreakRewards(owner);
-		arena.playSound(owner);
+		if (!p.equals(owner)) {
+			arena.getStats(owner).increment("kills");
+			arena.getRewards().giveKillstreakRewards(owner);
+			arena.playSound(owner);
+		}
 	}
 	
 	
