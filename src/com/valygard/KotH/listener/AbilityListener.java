@@ -156,6 +156,7 @@ public class AbilityListener implements Listener {
 				}
 				ArenaAbilities.boom(p);
 				if (p.isDead()) {
+					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has been slain by your landmine.");
 					arena.getStats(p).increment("deaths");
 					if (!p.equals(player)) {
 						arena.getStats(player).increment("kills");
