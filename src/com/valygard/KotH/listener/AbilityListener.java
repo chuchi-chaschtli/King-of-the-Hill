@@ -88,7 +88,7 @@ public class AbilityListener implements Listener {
 		
 		switch (p.getItemInHand().getType()) {
 		// Shoot a fireball.
-		case MAGMA_CREAM:
+		case FIREBALL:
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.MAGMA_CREAM)});
 			Messenger.tell(p, Msg.ABILITY_FIREBALL_SHOOT);
 			
