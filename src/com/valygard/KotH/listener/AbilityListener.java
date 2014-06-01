@@ -89,7 +89,7 @@ public class AbilityListener implements Listener {
 		switch (p.getItemInHand().getType()) {
 		// Shoot a fireball.
 		case FIREBALL:
-			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.FIREBALL)});
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.FIREBALL, 1)});
 			Messenger.tell(p, Msg.ABILITY_FIREBALL_SHOOT);
 			
 			Fireball f = (Fireball) p.launchProjectile(Fireball.class);
@@ -99,7 +99,7 @@ public class AbilityListener implements Listener {
 			break;
 		// If the player's hand item is a bone, spawn a wolf.
 		case BONE:
-			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.BONE)});
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.BONE, 1)});
 			ArenaAbilities.spawnWolf(plugin, p);
 			Messenger.tell(p, Msg.ABILITY_WOLF_SPAWNED);
 			
@@ -110,7 +110,7 @@ public class AbilityListener implements Listener {
 			break;
 		// Spawn a zombie on a player.
 		case ROTTEN_FLESH:
-			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.ROTTEN_FLESH)});
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.ROTTEN_FLESH, 1)});
 			ArenaAbilities.spawnZombie(plugin, p, arena.getTeam(p), arena.getOpposingTeam(p));
 			Messenger.tell(p, Msg.ABILITY_ZOMBIE_SPAWNED);
 			
@@ -278,6 +278,13 @@ public class AbilityListener implements Listener {
 		
 		// Players the zombie can attack.
 		LinkedList<Player> attackable = new LinkedList<Player>(arena.getOpposingTeam(p));
+		
+		if (attackable.size() <= 0) {
+			Messenger.tell(p, "Your zombie," + z.getCustomName() + "was removed because there are no players for it to attack.");
+			z.remove();
+			return;
+		}
+		
 		Random random = new Random();
 		Player opponent = attackable.get(random.nextInt(attackable.size()));
 		
