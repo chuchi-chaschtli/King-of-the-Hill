@@ -97,7 +97,7 @@ public class ArenaAbilities {
 		zombificus.setCustomNameVisible(true);
 
 		// Much more health to make Zombificus feared.
-		zombificus.setMaxHealth(zombificus.getMaxHealth() * 2.5);
+		zombificus.setMaxHealth(zombificus.getMaxHealth() * 1.8);
 		zombificus.setHealth(zombificus.getMaxHealth());
 
 		// Add a tag so we know who the zombie belongs to.
