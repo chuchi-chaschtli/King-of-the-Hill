@@ -320,6 +320,9 @@ public class AbilityListener implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 		Player owner;
+		if (p.getKiller() == null) {
+			return;
+		}
 		switch (p.getKiller().getType()) {
 		case ZOMBIE:
 			Zombie z = (Zombie) p.getKiller();
