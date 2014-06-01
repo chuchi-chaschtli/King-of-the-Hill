@@ -149,14 +149,16 @@ public class AbilityListener implements Listener {
 				// Create explosion if the triggerer is the player who placed it or on the opposite team.
 				if (player.equals(p)) {
 					Messenger.tell(p, "You triggered your own landmine!");
-				} else if (!arena.getTeam(player).equals(arena.getTeam(p))) {
+				} else if (!arena.getTeam(player).equals(arena.getTeam(p)) || arena.getSettings().getBoolean("friendly-fire")) {
 					Messenger.tell(p, Msg.ABILITY_LANDMINE_EXPLODE, player.getName());
 					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has triggered your landmine.");
 				} else {
 					e.setCancelled(false);
 					return;
 				}
+				
 				ArenaAbilities.boom(p);
+				
 				if (p.isDead()) {
 					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has been slain by your landmine.");
 					arena.getStats(p).increment("deaths");
@@ -193,18 +195,32 @@ public class AbilityListener implements Listener {
 				}
 			}
 			
-			if (tmp == null) {
+			Arena arena = am.getArenaWithPlayer(tmp);
+			if (tmp == null || arena == null) {
 				return;
 			}
 
-			for (Entity entity : f.getNearbyEntities(3.2, 3.2, 3.2)) {
+			for (Entity entity : f.getNearbyEntities(3.5, 3.5, 3.5)) {
 				if (entity instanceof LivingEntity) {
 					LivingEntity le = (LivingEntity) entity;
+					
+					if (le.equals(tmp) || arena.getTeam(tmp).contains(le)) {
+						if (!arena.getSettings().getBoolean("friendly-fire"))
+							continue;
+					}
+					
+					if (le instanceof Player) {
+						if (!arena.hasPlayer((Player) le)) {
+							continue;
+						} else {
+							Messenger.tell((Player) le, Msg.ABILITY_FIREBALL_HIT, tmp.getName());
+						}
+					}
 
 					double distance = f.getLocation()
 							.distance(le.getLocation());
 					le.damage(distance < 0.371 ? 0.325 * le.getMaxHealth()
-							: Math.min(6.4 / distance + 0.75,
+							: Math.min(6.4 / distance + 0.6,
 									0.224 * le.getMaxHealth()));
 				}
 			}
