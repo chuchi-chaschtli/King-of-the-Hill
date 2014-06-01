@@ -72,11 +72,12 @@ public class HillManager {
 			return;
 		}
 
-		Messenger.announce(arena, Msg.HILLS_SWITCHED);
-
 		if (utils.getRotationsLeft() == 1) {
 			Messenger.announce(arena, Msg.HILLS_ONE_LEFT);
+		} else {
+			Messenger.announce(arena, Msg.HILLS_SWITCHED);
 		}
+		
 		removeBeacon();
 		if (utils.getNextHill() != null) {
 			createBeacon(utils.getNextHill());
