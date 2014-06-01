@@ -122,13 +122,14 @@ public class AbilityListener implements Listener {
 		// Spawn a horse.
 		case HAY_BLOCK:
 			// If a player already has a horse, remove it then spawn a new one.
-			if (p.getVehicle() != null && p.getVehicle() instanceof Horse) {
+			if (p.getVehicle() != null) {
 				p.getVehicle().remove();
 			}
 			
-			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK)});
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK, 1)});
 			ArenaAbilities.spawnHorse(p);
 			Messenger.tell(p, Msg.ABILITY_HORSE_SPAWNED);
+			e.setCancelled(true);
 			break;
 		default:
 			break;
