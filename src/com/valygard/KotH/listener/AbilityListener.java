@@ -34,6 +34,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -128,6 +129,7 @@ public class AbilityListener implements Listener {
 			
 			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.HAY_BLOCK, 1)});
 			ArenaAbilities.spawnHorse(p);
+			p.getVehicle().setMetadata(p.getName(), new FixedMetadataValue(plugin, "KotH"));
 			Messenger.tell(p, Msg.ABILITY_HORSE_SPAWNED);
 			e.setCancelled(true);
 			break;
@@ -260,6 +262,16 @@ public class AbilityListener implements Listener {
 			if (!p.hasPermission("koth.admin.placeblocks"))
 				e.setCancelled(true);
 			break;
+		}
+	}
+	
+	@EventHandler (priority = EventPriority.HIGH)
+	public void onVehicleExit(VehicleExitEvent e) {
+		if (e.getExited() instanceof Player) {
+			Player p = (Player) e.getExited();
+			if (e.getVehicle().hasMetadata(p.getName())) {
+				e.getVehicle().remove();
+			}
 		}
 	}
 	
