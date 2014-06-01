@@ -341,22 +341,26 @@ public class AbilityListener implements Listener {
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
-		Player owner;
+		Player owner = null;
+		
 		if (p.getKiller() == null) {
 			return;
 		}
+		
 		switch (p.getKiller().getType()) {
 		case ZOMBIE:
 			Zombie z = (Zombie) p.getKiller();
 			owner = ArenaAbilities.getPlayerWithZombie(z);
-			if (owner == null)
+			if (owner == null) {
 				return;
+			}
 			break;
 		case WOLF:
 			Wolf wolf = (Wolf) p.getKiller();
-			owner = ArenaAbilities.getPlayerWithWolf(wolf);
-			if (owner == null)
+			owner = (Player) wolf.getOwner();
+			if (owner == null) {
 				return;
+			}
 			break;
 		case FIREBALL:
 			Fireball f = (Fireball) p.getKiller();
