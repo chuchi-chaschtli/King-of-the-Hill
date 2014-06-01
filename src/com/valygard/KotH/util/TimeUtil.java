@@ -23,9 +23,28 @@ public class TimeUtil {
 		int seconds = remainder % 60;
 		int hours = (secs / 3600) % 24;
 
-		return new StringBuilder().append(hours < 10 ? "0" : "").append(hours)
-				.append(minutes < 10 ? "0" : "").append(minutes).append(":")
-				.append(seconds < 10 ? "0" : "").append(seconds).toString();
+		StringBuilder foo = new StringBuilder();
+		
+		if (hours < 10 && hours > 0) {
+			foo.append("0");
+		}
+		if (hours > 0) {
+			foo.append(hours + ":");
+		}
+		
+		if (minutes < 10 && minutes > 0) {
+			foo.append("0");
+		}
+		if (minutes > 0) {
+			foo.append(minutes + ":");
+		}
+		
+		if (seconds < 10) {
+			foo.append("0");
+		}
+		foo.append(seconds);
+		
+		return foo.toString();
 	}
 
 	/**
