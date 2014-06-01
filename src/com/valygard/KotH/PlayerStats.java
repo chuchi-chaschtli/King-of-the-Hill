@@ -95,7 +95,7 @@ public class PlayerStats {
 			this.draws 	 	= config.getInt(path + "draws");
 
 			this.kdr		= calculateRatio(kills, deaths);
-			this.wlr		= calculateRatio(wins, losses);
+			this.wlr		= calculateRatio(wins, draws + losses);
 
 			this.killstreak = config.getInt(path + "killstreak");
 			this.winstreak	= config.getInt(path + "winstreak");
@@ -152,35 +152,35 @@ public class PlayerStats {
 			config.set(s, kills);
 			
 			killstreak += 1;
-			config.set(s, killstreak);
+			config.set(this.path + "killstreak", killstreak);
 			break;
 		case "deaths":
 			deaths += 1;
 			config.set(s, deaths);
 			
 			killstreak = 0;
-			config.set(s, killstreak);
+			config.set(this.path + "killstreak", killstreak);
 			break;
 		case "wins":
 			wins += 1;
 			config.set(s, wins);
 			
 			winstreak += 1;
-			config.set(s, winstreak);
+			config.set(this.path + "winstreak", winstreak);
 			break;
 		case "losses":
 			losses += 1;
 			config.set(s, losses);
 			
 			winstreak = 0;
-			config.set(s, winstreak);
+			config.set(this.path + "winstreak", winstreak);
 			break;
 		case "draws":
 			draws += 1;
 			config.set(s, draws);
 			
 			winstreak = 0;
-			config.set(s, winstreak);
+			config.set(this.path + "winstreak", winstreak);
 			break;
 		default:
 			throw new IllegalArgumentException("Expected: kills, deaths, wins, losses, or draws");
@@ -212,11 +212,12 @@ public class PlayerStats {
 	 * ratios. It then saves the ratios to the configuration file.
 	 */
 	public void recalibrate() {
+		loadFile();
 		
 		kdr = calculateRatio(kills, deaths);
 		config.set("arenas." + name + ".kdr", kdr);
 		
-		wlr = calculateRatio(wins, losses);
+		wlr = calculateRatio(wins, draws + losses);
 		config.set("arenas." + name + ".wlr", wlr);
 		saveFile();
 	}
@@ -242,7 +243,7 @@ public class PlayerStats {
 	public void startTiming() {
 		if (!tracking)
 			return;
-
+		
 		final int i = arena.getSettings().getInt("time-tracking-cycle");
 		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
 				new BukkitRunnable() {
