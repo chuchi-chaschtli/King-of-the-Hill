@@ -271,7 +271,9 @@ public class HillManager {
 			return;
 		}
 		Block b = utils.getCurrentHill().getBlock();
-		b.setType(Material.AIR);
+		if (b != null) {
+			b.setType(Material.AIR);
+		}
 	}
 
 	/**
