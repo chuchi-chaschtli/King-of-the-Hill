@@ -89,10 +89,12 @@ public class AbilityListener implements Listener {
 		switch (p.getItemInHand().getType()) {
 		// Shoot a fireball.
 		case FIREBALL:
-			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.MAGMA_CREAM)});
+			p.getInventory().removeItem(new ItemStack[] {new ItemStack(Material.FIREBALL)});
 			Messenger.tell(p, Msg.ABILITY_FIREBALL_SHOOT);
 			
 			Fireball f = (Fireball) p.launchProjectile(Fireball.class);
+			f.setIsIncendiary(false);
+			f.setYield(0F);
 			f.setMetadata(p.getName(), new FixedMetadataValue(plugin, "KotH"));
 			break;
 		// If the player's hand item is a bone, spawn a wolf.
@@ -183,25 +185,28 @@ public class AbilityListener implements Listener {
 		Projectile p = e.getEntity();
 		if (p instanceof Fireball) {
 			Fireball f = (Fireball) p;
+			Player tmp = null;
 			for (Player player : f.getWorld().getPlayers()) {
-				if (!f.hasMetadata(player.getName()))
-					continue;
-
-				f.setIsIncendiary(false);
-				f.setFireTicks(0);
-				f.setYield(0F);
-				for (Entity entity : f.getNearbyEntities(3.2, 3.2, 3.2)) {
-					if (entity instanceof LivingEntity) {
-						LivingEntity le = (LivingEntity) entity;
-
-						double distance = f.getLocation().distance(
-								le.getLocation());
-						le.damage(distance < 0.371 ? 0.325 * le.getMaxHealth()
-								: Math.min(6.4 / distance + 0.75,
-										0.224 * le.getMaxHealth()));
-					}
+				if (f.hasMetadata(player.getName())) {
+					tmp = player;
+					break;
 				}
-				break;
+			}
+			
+			if (tmp == null) {
+				return;
+			}
+
+			for (Entity entity : f.getNearbyEntities(3.2, 3.2, 3.2)) {
+				if (entity instanceof LivingEntity) {
+					LivingEntity le = (LivingEntity) entity;
+
+					double distance = f.getLocation()
+							.distance(le.getLocation());
+					le.damage(distance < 0.371 ? 0.325 * le.getMaxHealth()
+							: Math.min(6.4 / distance + 0.75,
+									0.224 * le.getMaxHealth()));
+				}
 			}
 		}
 	}
