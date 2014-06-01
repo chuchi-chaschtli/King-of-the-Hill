@@ -21,12 +21,16 @@ public class ArenaEndEvent extends Event {
     private Arena arena;
     
     private Set<Player> winner, loser;
+    private int winScore;
     
     public ArenaEndEvent(Arena arena) {
         this.arena = arena;
         
         this.winner = arena.getWinner();
         this.loser  = arena.getLoser();
+        
+		this.winScore 	= (winner == arena.getRedTeam() ? arena.getHillTimer()
+				.getRedScore() : arena.getHillTimer().getBlueScore());
     }
     
     public Arena getArena() {
@@ -41,11 +45,19 @@ public class ArenaEndEvent extends Event {
         return handlers;
     }
     
+    public void setWinner(Set<Player> newWinner) {
+    	arena.setWinner(newWinner);
+    }
+    
     public Set<Player> getWinner() {
     	return winner;
     }
     
     public Set<Player> getLoser() {
     	return loser;
+    }
+    
+    public int getWinScore() {
+    	return winScore;
     }
 }
