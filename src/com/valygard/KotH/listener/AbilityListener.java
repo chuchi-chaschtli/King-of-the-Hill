@@ -219,9 +219,9 @@ public class AbilityListener implements Listener {
 
 					double distance = f.getLocation()
 							.distance(le.getLocation());
-					le.damage(distance < 0.371 ? 0.325 * le.getMaxHealth()
-							: Math.min(6.4 / distance + 0.6,
-									0.224 * le.getMaxHealth()));
+					le.damage(distance < 0.391 ? 0.6 * le.getMaxHealth()
+							: Math.min(7.6 / distance + 1.2,
+									0.4 * le.getMaxHealth()));
 				}
 			}
 		}
