@@ -403,7 +403,8 @@ public class Arena {
 		// Set running to true.
 		running = true;
 
-		Messenger.announce(this, Msg.ARENA_START);
+		Messenger.announce(this, Msg.ARENA_START);	
+		playSound(Sound.WITHER_DEATH, 0.382F, 0.1F);
 		return true;
 	}
 
@@ -440,6 +441,7 @@ public class Arena {
 			}
 		}
 		declareWinner(restarting);
+		playSound(Sound.BURP, 1F, 1F);
 
 		for (Player p : arenaPlayers)
 			removePlayer(p, true);
@@ -661,8 +663,36 @@ public class Arena {
 	 * @return true if the sound was played.
 	 */
 	public boolean playSound(Player p) {
+		return playSound(p, Sound.NOTE_PLING, 3F, 1.2F);
+	}
+	
+	/**
+	 * Play a sound to all players in the arena.
+	 * 
+	 * @param s the sound to play.
+	 */
+	public void playSound(Sound s, float vol, float pitch) {
+		Set<Player> players = new HashSet<Player>();
+		players.addAll(arenaPlayers);
+		players.addAll(lobbyPlayers);
+		players.addAll(specPlayers);
+		for (Player p : players) {
+			playSound(p, s, vol, pitch);
+		}
+	}
+	
+	/**
+	 * Play any sound to a player at a specified volume.
+	 * 
+	 * @param p the player to play the sound.
+	 * @param s the sound.
+	 * @param vol the volume
+	 * @param pitch the pitch
+	 * @return whether or not the sound was played.
+	 */
+	public boolean playSound(Player p, Sound s, float vol, float pitch) {
 		if (settings.getBoolean("play-sounds")) {
-			p.playSound(p.getLocation(), Sound.NOTE_PLING, 3F, 3F);
+			p.playSound(p.getLocation(), s, vol, pitch);
 			return true;
 		}
 		return false;
