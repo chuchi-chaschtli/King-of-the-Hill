@@ -48,15 +48,7 @@ public class ChooseTeamCmd implements Command {
 		}
 		
 		String team = args[0].toLowerCase();
-		
-		switch (team) {
-		case "red":
-		case "blue":
-			arena.chooseTeam(p, team);
-			break;
-		default:
-			return false;
-		}
+		arena.chooseTeam(p, team.startsWith("blue") ? "blue" : "red");
 		
 		Messenger.tell(p, Msg.MISC_TEAM_JOINED, ChatColor.valueOf(team.toUpperCase()) + team);
 		return true;
