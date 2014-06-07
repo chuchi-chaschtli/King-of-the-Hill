@@ -81,6 +81,7 @@ public enum Msg {
 	SIGN_CREATED("You have created a new &e%&r sign!"),
 	SIGN_INVALID("The &5[KotH]&r sign you just created is invalid!"),
 	SPEC_JOIN("Enjoy the view!"),
+	SPEC_ALREADY_SPECTATING("You are already watching the arena."),
 	STATS("Your stats for %"),
 	STATS_NULL("You do not have stats for this arena. Play a few games first!");
 

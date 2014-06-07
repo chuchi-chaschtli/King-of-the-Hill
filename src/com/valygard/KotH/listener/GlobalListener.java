@@ -680,10 +680,26 @@ public class GlobalListener implements Listener {
 		String cmd = ChatColor.stripColor(s.getLine(1)).toLowerCase().trim();
 		switch (cmd) {
 		case "leave":
-			Bukkit.dispatchCommand(p, "koth leave");
+			arena.removePlayer(p, false);
 			break;
 		case "join":
+			if (!arena.isReady()) {
+				Messenger.tell(p, Msg.ARENA_NOT_READY);
+				break;
+			}
+			if (arena.hasPlayer(p)) {
+				Messenger.tell(p, Msg.JOIN_ALREADY_IN_ARENA);
+				break;
+			}
+			arena.addPlayer(p);
+			break;
 		case "spectate":
+			if (arena.isSpectating(p)) {
+				Messenger.tell(p, Msg.SPEC_ALREADY_SPECTATING);
+				break;
+			}
+			arena.setSpectator(p);
+			break;
 		case "players":
 		case "stats":
 		case "info":
@@ -703,9 +719,7 @@ public class GlobalListener implements Listener {
 				break;
 			}
 
-			// Substring the line to remove the word 'team'.
-			Bukkit.dispatchCommand(p, "koth chooseteam "
-					+ cmd.substring(0, cmd.contains("red") ? 3 : 4));
+			Bukkit.dispatchCommand(p, "koth chooseteam " + cmd);
 			break;
 		default:
 			handleClassSign(s, p);
