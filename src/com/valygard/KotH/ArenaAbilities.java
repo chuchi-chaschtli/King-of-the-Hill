@@ -104,7 +104,7 @@ public class ArenaAbilities {
 		zombificus.setMetadata(p.getName(), new FixedMetadataValue(plugin,
 				"yes!"));
 	}
-
+	
 	/**
 	 * Loop through all the players in the zombie's world.
 	 * If the zombie's metadata equals any of the player's names,
@@ -225,8 +225,8 @@ public class ArenaAbilities {
 	 * 
 	 * @param p
 	 */
-	public static void boom(Player p) {
-		boom(p.getLocation());
+	public static void createExplosion(Player p) {
+		createExplosion(p.getLocation());
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class ArenaAbilities {
 	 * 
 	 * @param l
 	 */
-	public static void boom(Location l) {
+	public static void createExplosion(Location l) {
 		l.getWorld().createExplosion(l.getX(), l.getY(), l.getZ(), 4F, false,
 				false);
 	}

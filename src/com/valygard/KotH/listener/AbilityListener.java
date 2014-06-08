@@ -160,7 +160,7 @@ public class AbilityListener implements Listener {
 					return;
 				}
 				
-				ArenaAbilities.boom(p);
+				ArenaAbilities.createExplosion(p);
 				
 				if (p.isDead()) {
 					Messenger.tell(player, ChatColor.YELLOW +  p.getName() + ChatColor.RESET + " has been slain by your landmine.");
