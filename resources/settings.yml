@@ -28,6 +28,7 @@ track-stats: true
 time-tracking-cycle: 3
 entry-fee: 0.00
 quit-charge: $50
+teleport-to-end: false
 use-scoreboard: true
 use-compasses: true
 give-prizes: true

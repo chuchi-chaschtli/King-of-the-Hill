@@ -75,7 +75,7 @@ public class Arena {
 	private int maxPlayers, minPlayers;
 
 	// Arena locations
-	private Location red, blue, lobby, spec;
+	private Location red, blue, lobby, spec, end;
 
 	// Player types
 	private Set<Player> arenaPlayers, lobbyPlayers, specPlayers, redPlayers,
@@ -300,6 +300,11 @@ public class Arena {
 
 				em.withdraw(p, Double.parseDouble(fee));
 			}
+		}
+		
+		if (settings.getBoolean("teleport-to-end")) {
+			if (this.end != null)
+				p.teleport(this.end);
 		}
 
 		if (!end) {
@@ -984,6 +989,31 @@ public class Arena {
 	public void setBlueSpawn(Location blue) {
 		this.blue = blue;
 		warps.set("bluespawn", blue);
+		plugin.saveConfig();
+	}
+	
+	/**
+	 * Get the end warp location.
+	 * 
+	 * @return the blue warp
+	 */
+	public Location getEndWarp() {
+		try {
+			end = getLocation("endwarp");
+			return end;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Change the end warp location.
+	 * 
+	 * @param the new end point
+	 */
+	public void setEndWarp(Location end) {
+		this.end = end;
+		warps.set("endwarp", end);
 		plugin.saveConfig();
 	}
 

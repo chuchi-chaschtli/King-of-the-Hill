@@ -18,13 +18,13 @@ import com.valygard.KotH.framework.ArenaManager;
 
 @CommandInfo(
 		name = "setwarp", 
-		pattern = "set(warp|loc).*|arenasetwarp",
+		pattern = "(set|change)(warp|loc).*|arenasetwarp",
 		desc = "Define a warp for an arena",
 		playerOnly = true,
 		argsRequired = 0
 )
 @CommandPermission("koth.setup.setwarps")
-@CommandUsage("/koth setwarp <arena> <red|blue|lobby|spec>")
+@CommandUsage("/koth setwarp <arena> <red|blue|lobby|spec|end>")
 /**
  * @author Anand
  *
@@ -55,19 +55,22 @@ public class SetWarpCmd implements Command {
 			switch (args[1]) {
 				case "red":
 				case "redspawn":
-					arena.setLocation("redspawn", p.getLocation());
+					arena.setRedSpawn(p.getLocation());
 					break;
 				case "blue":
 				case "bluespawn":
-					arena.setLocation("bluespawn", p.getLocation());
+					arena.setBlueSpawn(p.getLocation());
 					break;
 				case "lobby":
-					arena.setLocation("lobby", p.getLocation());
+					arena.setLobby(p.getLocation());
 					break;
 				case "spec":
 				case "spectator":
-					arena.setLocation("spec", p.getLocation());
+					arena.setSpec(p.getLocation());
 					break;
+				case "end":
+				case "endwarp":
+					arena.setEndWarp(p.getLocation());
 				default:
 					return false;
 			}
