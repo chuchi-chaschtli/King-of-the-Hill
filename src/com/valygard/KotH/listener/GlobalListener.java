@@ -40,16 +40,16 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.massivecraft.factions.entity.UPlayer;
 import com.massivecraft.factions.entity.UPlayerColls;
-import com.valygard.KotH.ArenaClass;
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.Messenger;
-import com.valygard.KotH.Msg;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillUtils;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.util.ItemParser;
 import com.valygard.KotH.util.resources.UpdateChecker;
 

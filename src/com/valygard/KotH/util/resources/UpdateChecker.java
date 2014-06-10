@@ -9,7 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.Messenger;
+import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.util.resources.Updater.UpdateResult;
 import com.valygard.KotH.util.resources.Updater.UpdateType;
 

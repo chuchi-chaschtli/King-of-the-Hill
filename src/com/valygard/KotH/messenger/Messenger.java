@@ -2,7 +2,7 @@
  * Messenger.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH;
+package com.valygard.KotH.messenger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
 
 /**

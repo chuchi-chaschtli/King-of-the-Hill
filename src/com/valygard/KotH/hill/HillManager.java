@@ -14,10 +14,10 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.Messenger;
-import com.valygard.KotH.Msg;
 import com.valygard.KotH.event.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.LocationUtil;
 
 /**

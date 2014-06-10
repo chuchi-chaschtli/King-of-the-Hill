@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
-import com.valygard.KotH.Messenger;
+import com.valygard.KotH.messenger.Messenger;
 
 /**
  * @author Anand

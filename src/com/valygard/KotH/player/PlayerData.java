@@ -2,7 +2,7 @@
  * PlayerData.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH;
+package com.valygard.KotH.player;
 
 import java.util.Collection;
 import java.util.HashSet;

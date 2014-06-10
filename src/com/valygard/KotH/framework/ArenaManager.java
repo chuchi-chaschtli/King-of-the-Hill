@@ -25,12 +25,12 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 
-import com.valygard.KotH.ArenaClass;
-import com.valygard.KotH.ArenaClass.ArmorType;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
-import com.valygard.KotH.Messenger;
-import com.valygard.KotH.Msg;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.player.ArenaClass;
+import com.valygard.KotH.player.ArenaClass.ArmorType;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.ItemParser;
 

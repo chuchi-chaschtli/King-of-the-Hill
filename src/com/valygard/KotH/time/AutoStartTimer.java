@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.Messenger;
-import com.valygard.KotH.Msg;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
 
 /**
  * @author Anand

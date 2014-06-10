@@ -2,7 +2,7 @@
  * PlayerStats.java is part of King Of The Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH;
+package com.valygard.KotH.player;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.util.TimeUtil;
 
 /**

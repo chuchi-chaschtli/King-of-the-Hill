@@ -25,6 +25,8 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.listener.AbilityListener;
 import com.valygard.KotH.listener.GlobalListener;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.ConfigUtil;
 
 /**

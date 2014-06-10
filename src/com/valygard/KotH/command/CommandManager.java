@@ -17,8 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.Messenger;
-import com.valygard.KotH.Msg;
 import com.valygard.KotH.command.admin.DisableCmd;
 import com.valygard.KotH.command.admin.EnableCmd;
 import com.valygard.KotH.command.admin.ForceEndCmd;
@@ -42,6 +40,8 @@ import com.valygard.KotH.command.user.ListPlayersCmd;
 import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.user.StatsCmd;
 import com.valygard.KotH.framework.ArenaManager;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
 
 /**
  * @author Anand

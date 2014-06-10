@@ -12,6 +12,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.player.PlayerStats;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.ItemParser;
 
