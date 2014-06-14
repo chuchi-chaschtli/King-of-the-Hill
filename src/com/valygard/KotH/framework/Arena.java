@@ -189,14 +189,6 @@ public class Arena {
 	 */
 	public void addPlayer(Player p) {
 		// Sanity-checks
-
-		ArenaPlayerJoinEvent event = new ArenaPlayerJoinEvent(this, p);
-		plugin.getServer().getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			Messenger.tell(p, Msg.MISC_NO_ACCESS);
-			return;
-		}
-
 		if (!enabled) {
 			Messenger.tell(p, Msg.ARENA_DISABLED);
 			return;
@@ -204,6 +196,13 @@ public class Arena {
 
 		if (lobbyPlayers.size() >= maxPlayers) {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
+			return;
+		}
+
+		ArenaPlayerJoinEvent event = new ArenaPlayerJoinEvent(this, p);
+		plugin.getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			Messenger.tell(p, Msg.MISC_NO_ACCESS);
 			return;
 		}
 
@@ -337,8 +336,7 @@ public class Arena {
 	 */
 	public boolean startArena() {
 		// Just some checks
-		if (running || lobbyPlayers.isEmpty()
-				|| lobbyPlayers.size() < minPlayers) {
+		if (running || lobbyPlayers.size() < minPlayers) {
 			return false;
 		}
 
