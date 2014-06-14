@@ -33,6 +33,8 @@ public enum Msg {
 	ARENA_NO_PERMISSION("You do not have permission to this arena."),
 	ARENA_NOT_READY("This arena is not ready."),
 	ARENA_NULL("You must specify an existing arena."),
+	ARENA_RATE("If you liked or disliked the arena, please type &elike&r or&e dislike &rin chat."),
+	ARENA_RATE_INVALID("You have given an invalid rating to &e%."),
 	ARENA_READY("The arena is ready to be used!"),
 	ARENA_REMOVED("You have removed &e'%'."),
 	ARENA_START("The arena has begun!"),

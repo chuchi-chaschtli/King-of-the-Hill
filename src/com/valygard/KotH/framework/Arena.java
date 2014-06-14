@@ -32,8 +32,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
@@ -69,7 +71,7 @@ public class Arena {
 
 	// Configuration-important
 	private FileConfiguration config;
-	private ConfigurationSection settings, warps;
+	private ConfigurationSection settings, warps, info;
 
 	// Values to keep track of player count
 	private int maxPlayers, minPlayers;
@@ -85,7 +87,7 @@ public class Arena {
 	private Set<Player> winner = new HashSet<Player>();
 
 	// Some booleans that are configuration-critical.
-	private boolean running, enabled;
+	private boolean running, enabled, ending;
 
 	// Important timers
 	private AutoStartTimer startTimer;
@@ -106,8 +108,11 @@ public class Arena {
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
 	private PlayerStats stats;
 
-	// Economymanager
+	// Economy
 	private EconomyManager em;
+	
+	// Arena Information
+	private ArenaInfo ai;
 
 	// AbilityListener
 	private AbilityListener abilityListener;
@@ -133,6 +138,7 @@ public class Arena {
 				+ ".settings");
 		this.warps = config.getConfigurationSection("arenas." + arenaName
 				+ ".warps");
+		this.info = config.getConfigurationSection("arenas." + arenaName + ".info");
 
 		this.world = Bukkit.getWorld(settings.getString("world"));
 
@@ -149,6 +155,7 @@ public class Arena {
 		// Boolean values.
 		this.running = false;
 		this.enabled = settings.getBoolean("enabled", true);
+		this.ending	 = false;
 
 		// Timers
 		this.startTimer = new AutoStartTimer(this,
@@ -165,6 +172,9 @@ public class Arena {
 
 		// Economy
 		this.em = plugin.getEconomyManager();
+		
+		// Info
+		this.ai	= new ArenaInfo(this);
 
 		// Scoreboard
 		this.scoreboard = new ScoreboardManager(this);
@@ -251,7 +261,7 @@ public class Arena {
 	 * @param p the player
 	 * @param end checks if the arena has been terminated.
 	 */
-	public void removePlayer(Player p, boolean end) {
+	public void removePlayer(final Player p, boolean end) {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
@@ -278,9 +288,21 @@ public class Arena {
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {
+				ending = true;
 				rewards.givePrizes(p, winner != null ? winner.contains(p)
 						: false);
 				rewards.giveWinstreakRewards(p);
+				
+				// Allow players to rate arena at the end.
+				if (settings.getBoolean("arena-ratings")) {
+					p.setMetadata("canRate" + arenaName, new FixedMetadataValue(plugin, "KotH"));
+					Messenger.tell(p, Msg.ARENA_RATE);
+					scheduleTask(new Runnable() {
+						public void run() {
+							p.removeMetadata("canRate" + arenaName, plugin);
+						}
+					}, 400);
+				}
 			} else {
 				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
@@ -790,6 +812,10 @@ public class Arena {
 		Messenger.tell(p, Msg.CLASS_RANDOM);
 		pickClass(p, className);
 	}
+	
+	public void scheduleTask(Runnable r, long delay) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, r, delay);
+	}
 
 	// --------------------------- //
 	// Getters
@@ -838,6 +864,15 @@ public class Arena {
 	 */
 	public ConfigurationSection getWarps() {
 		return warps;
+	}
+	
+	/**
+	 * Get some important information about the aerna.
+	 * 
+	 * @return a configuration section representing some arena data.
+	 */
+	public ConfigurationSection getInfo() {
+		return info;
 	}
 
 	/**
@@ -1095,6 +1130,15 @@ public class Arena {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+	
+	/**
+	 * Check if the arena is ending.
+	 * 
+	 * @return true if the arena is ending.
+	 */
+	public boolean isEnding() {
+		return ending;
+	}
 
 	/**
 	 * Get the player's stored data; this includes weapons, armor, health, and
@@ -1310,6 +1354,15 @@ public class Arena {
 	public boolean setReady(boolean ready) {
 		this.ready = ready;
 		return ready;
+	}
+	
+	/**
+	 * Get our ArenaInfo instance.
+	 * 
+	 * @return a new instance of ArenaInfo
+	 */
+	public ArenaInfo getArenaInfo() {
+		return ai;
 	}
 
 	/**

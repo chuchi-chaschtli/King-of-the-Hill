@@ -194,6 +194,20 @@ public class GlobalListener implements Listener {
 	public void onAsyncChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 		
+		for (Arena a : am.getArenas()) {
+			if (a.isEnding() && p.hasMetadata("canRate" + a.getName())) {
+				if (e.getMessage().matches("dislike|hate|no|false|bad|horrible")) {
+					a.getArenaInfo().addDislike();
+					e.setCancelled(true);
+				} else if (e.getMessage().matches("like|yes|love|amazing|true|good|fun")) {
+					a.getArenaInfo().addLike();
+					e.setCancelled(true);
+				}
+				p.removeMetadata("canRate" + a.getName(), plugin);
+				return;
+			}
+		}
+		
 		Arena arena = am.getArenaWithPlayer(p);
 		if (arena == null)
 			return;

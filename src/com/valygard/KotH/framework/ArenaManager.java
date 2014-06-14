@@ -223,6 +223,9 @@ public class ArenaManager {
 		ConfigUtil.addMissingRemoveObsolete(plugin, "warps.yml",
 				makeSection(section, "warps"));
 
+		ConfigUtil.addMissingRemoveObsolete(plugin, "info.yml",
+				makeSection(section, "info"));
+
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml",
 				makeSection(section, "prizes"));
 
@@ -268,14 +271,14 @@ public class ArenaManager {
 		loadArena(name);
 		return true;
 	}
-	
+
 	/**
 	 * Reload an arena.
 	 */
 	public boolean reloadArena(Arena arena) {
 		return reloadArena(arena.getName());
 	}
-	
+
 	/**
 	 * Save the config
 	 */
