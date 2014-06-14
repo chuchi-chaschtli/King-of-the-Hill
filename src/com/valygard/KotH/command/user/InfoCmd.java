@@ -64,11 +64,21 @@ public class InfoCmd implements Command {
 			sender.sendMessage(ChatColor.BLUE + "Blue Team Score: " + arena.getHillTimer().getBlueScore());
 			sender.sendMessage(ChatColor.YELLOW + "Time Remaining: " + TimeUtil.formatIntoHHMMSS(arena.getEndTimer().getRemaining()));
 		}
-		
-		ArenaInfo ai = arena.getArenaInfo();
-		sender.sendMessage("The rating of the arena is "
-				+ (ai.getRating() >= 50.0 ? ChatColor.GREEN : ChatColor.RED)
-				+ String.valueOf(Math.ceil(ai.getRating())).substring(0, 2));
+
+		if (arena.getSettings().getBoolean("arena-ratings")) {
+			ArenaInfo ai = arena.getArenaInfo();
+			sender.sendMessage(ChatColor.GRAY
+					+ "The rating of the arena is "
+					+ (ai.getRating() >= 50.0 ? ChatColor.DARK_GREEN
+							: ChatColor.DARK_RED)
+					+ String.valueOf(Math.ceil(ai.getRating())).substring(0, 2));
+			sender.sendMessage(ChatColor.GRAY + "On average, there are "
+					+ ChatColor.AQUA + ai.getAveragePlayersPerArena()
+					+ ChatColor.GRAY + " players per arena (" + ChatColor.AQUA
+					+ ai.getTotalPlayers() + ChatColor.GRAY + " total players "
+					+ ChatColor.AQUA + "/ " + ai.getTimesPlayed()
+					+ ChatColor.GRAY + " times played " + ")");
+		}
 		return true;
 	}
 }
