@@ -474,7 +474,7 @@ public class Arena {
 		
 		for (final Player p : temp) {
 			// Allow players to rate arena at the end.
-			if (settings.getBoolean("arena-ratings")) {
+			if (settings.getBoolean("arena-stats")) {
 				p.setMetadata("canRate" + arenaName, new FixedMetadataValue(plugin, "KotH"));
 				Messenger.tell(p, Msg.ARENA_RATE);
 				scheduleTask(new Runnable() {

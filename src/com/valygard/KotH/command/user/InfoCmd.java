@@ -65,7 +65,7 @@ public class InfoCmd implements Command {
 			sender.sendMessage(ChatColor.YELLOW + "Time Remaining: " + TimeUtil.formatIntoHHMMSS(arena.getEndTimer().getRemaining()));
 		}
 
-		if (arena.getSettings().getBoolean("arena-ratings")) {
+		if (arena.getSettings().getBoolean("arena-stats")) {
 			ArenaInfo ai = arena.getArenaInfo();
 			sender.sendMessage(ChatColor.GRAY
 					+ "The rating of the arena is "

@@ -71,7 +71,7 @@ public class PlayerStats {
 		this.arena  	= arena;
 		this.name		= arena.getName();
 		
-		this.tracking	= arena.getSettings().getBoolean("track-stats");
+		this.tracking	= arena.getSettings().getBoolean("player-stats");
 		
 		this.dir	= new File(arena.getPlugin().getDataFolder(), "stats");
 		this.dir.mkdir();
