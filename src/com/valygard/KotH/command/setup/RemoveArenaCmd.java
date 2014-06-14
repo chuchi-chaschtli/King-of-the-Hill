@@ -4,7 +4,11 @@
  */
 package com.valygard.KotH.command.setup;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
@@ -27,6 +31,7 @@ import com.valygard.KotH.messenger.Msg;
  *
  */
 public class RemoveArenaCmd implements Command {
+	private Map<Player, Arena> temp = new HashMap<Player, Arena>();
 	
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
@@ -42,8 +47,25 @@ public class RemoveArenaCmd implements Command {
 			return true;
 		}
 		
-		am.removeArena(args[0]);
-		Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
+		if (sender instanceof Player) {
+			final Player p = (Player) sender;
+			if (temp.get(p) != null && temp.get(p) == arena) {
+				am.removeArena(args[0]);
+				Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
+				temp.remove(p);
+			} else {
+				Messenger.tell(p, "Are you sure you want to remove this arena? Type the command again to confirm within 10 seconds.");
+				temp.put(p, arena);
+				arena.scheduleTask(new Runnable() {
+					public void run() {
+						temp.remove(p);
+					}
+				}, 200);
+			}
+		} else {
+			am.removeArena(args[0]);
+			Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
+		}
 		return true;
 	}
 	
