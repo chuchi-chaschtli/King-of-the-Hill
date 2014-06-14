@@ -481,7 +481,7 @@ public class Arena {
 					public void run() {
 						p.removeMetadata("canRate" + arenaName, plugin);
 					}
-				}, 400);
+				}, 600);
 			}
 		}
 		temp.clear();
