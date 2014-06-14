@@ -34,7 +34,7 @@ public class ConfigCmd implements Command {
 			Messenger.info("Config-file saved.");
 		}
 		
-		if (args[0].startsWith("reload")) {
+		else if (args[0].startsWith("reload")) {
 			am.reloadConfig();
 			Messenger.tell(sender, "Config-file reloaded.");
 			Messenger.info("Config-file reloaded.");

@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
@@ -63,6 +64,11 @@ public class InfoCmd implements Command {
 			sender.sendMessage(ChatColor.BLUE + "Blue Team Score: " + arena.getHillTimer().getBlueScore());
 			sender.sendMessage(ChatColor.YELLOW + "Time Remaining: " + TimeUtil.formatIntoHHMMSS(arena.getEndTimer().getRemaining()));
 		}
+		
+		ArenaInfo ai = arena.getArenaInfo();
+		sender.sendMessage("The rating of the arena is "
+				+ (ai.getRating() >= 50.0 ? ChatColor.GREEN : ChatColor.RED)
+				+ String.valueOf(Math.ceil(ai.getRating())).substring(0, 2));
 		return true;
 	}
 }

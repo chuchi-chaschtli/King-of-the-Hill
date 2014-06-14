@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.util.ConfigUtil;
 
 /**
  * @author Anand
@@ -28,12 +29,14 @@ public class ArenaInfo {
 		this.arena = arena;
 
 		this.info = arena.getInfo();
-		this.ratings = info.getConfigurationSection("ratings");
+		this.ratings = ConfigUtil.makeSection(info, "ratings");
 
 		this.likes = ratings.getInt("likes");
 		this.dislikes = ratings.getInt("dislikes");
 
-		this.rating = calculateRating();
+		ratings.set("rating", calculateRating());
+		arena.getPlugin().saveConfig();
+		this.rating	= ratings.getDouble("rating");
 	}
 
 	/**
@@ -43,6 +46,8 @@ public class ArenaInfo {
 		likes += 1;
 		ratings.set("likes", likes);
 		calculateRating();
+		ratings.set("rating", rating);
+		arena.getPlugin().saveConfig();
 	}
 
 	/**
@@ -53,6 +58,8 @@ public class ArenaInfo {
 		dislikes += 1;
 		ratings.set("dislikes", dislikes);
 		calculateRating();
+		ratings.set("rating", rating);
+		arena.getPlugin().saveConfig();
 	}
 
 	/**
@@ -61,25 +68,47 @@ public class ArenaInfo {
 	 * @return the rating of an arena.
 	 */
 	private double calculateRating() {
-		if (dislikes <= 0) {
-			if (likes <= 0) {
-				return 0;
-			}
-			return 100;
-		}
 		DecimalFormat df = new DecimalFormat("#.##");
-		rating = Double.valueOf(df.format(likes / (dislikes + likes) * 100));
-		ratings.set("rating", rating);
-		arena.getPlugin().saveConfig();
+		if (dislikes + likes > 0)
+			rating = Double.valueOf(df.format(likes / ((dislikes + likes) * 1.0)  * 100.0));
+		else
+			rating = 0;
 		return rating;
 	}
 
 	/**
 	 * Getter method for arena instance.
 	 * 
-	 * @return
-	 */
+	 * @return the arena.
+	 */ 
 	public Arena getArena() {
 		return arena;
+	}
+	
+	/**
+	 * Get the likes of the arena.
+	 * 
+	 * @return the amount of likes.
+	 */
+	public int getLikes() {
+		return likes;
+	}
+	
+	/**
+	 * Get the dislikes of the arena.
+	 * 
+	 * @return the amount of dislikes.
+	 */
+	public int getDislikes() {
+		return dislikes;
+	}
+	
+	/**
+	 * Get the arena's rating.
+	 * 
+	 * @return the current rating of the arena.
+	 */
+	public double getRating() {
+		return rating;
 	}
 }

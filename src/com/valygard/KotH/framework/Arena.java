@@ -87,7 +87,7 @@ public class Arena {
 	private Set<Player> winner = new HashSet<Player>();
 
 	// Some booleans that are configuration-critical.
-	private boolean running, enabled, ending;
+	private boolean running, enabled;
 
 	// Important timers
 	private AutoStartTimer startTimer;
@@ -138,7 +138,7 @@ public class Arena {
 				+ ".settings");
 		this.warps = config.getConfigurationSection("arenas." + arenaName
 				+ ".warps");
-		this.info = config.getConfigurationSection("arenas." + arenaName + ".info");
+		this.info = ConfigUtil.makeSection(config.getConfigurationSection("arenas." + arenaName), "info");
 
 		this.world = Bukkit.getWorld(settings.getString("world"));
 
@@ -155,7 +155,6 @@ public class Arena {
 		// Boolean values.
 		this.running = false;
 		this.enabled = settings.getBoolean("enabled", true);
-		this.ending	 = false;
 
 		// Timers
 		this.startTimer = new AutoStartTimer(this,
@@ -261,7 +260,7 @@ public class Arena {
 	 * @param p the player
 	 * @param end checks if the arena has been terminated.
 	 */
-	public void removePlayer(final Player p, boolean end) {
+	public void removePlayer(Player p, boolean end) {
 		if (!hasPlayer(p)) {
 			Messenger.tell(p, Msg.LEAVE_NOT_PLAYING);
 			return;
@@ -288,21 +287,9 @@ public class Arena {
 		// Then give rewards, only if the arena is ending.
 		if (running) {
 			if (end) {
-				ending = true;
 				rewards.givePrizes(p, winner != null ? winner.contains(p)
 						: false);
 				rewards.giveWinstreakRewards(p);
-				
-				// Allow players to rate arena at the end.
-				if (settings.getBoolean("arena-ratings")) {
-					p.setMetadata("canRate" + arenaName, new FixedMetadataValue(plugin, "KotH"));
-					Messenger.tell(p, Msg.ARENA_RATE);
-					scheduleTask(new Runnable() {
-						public void run() {
-							p.removeMetadata("canRate" + arenaName, plugin);
-						}
-					}, 400);
-				}
 			} else {
 				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
@@ -448,7 +435,7 @@ public class Arena {
 		// Fire the event.
 		ArenaEndEvent event = new ArenaEndEvent(this);
 		plugin.getServer().getPluginManager().callEvent(event);
-
+		
 		// Set the winner, to be declared and given different rewards.
 		winner = getWinnerByScore();
 		if (winner != null) {
@@ -468,8 +455,11 @@ public class Arena {
 		declareWinner(restarting);
 		playSound(Sound.BURP, 1F, 1F);
 
-		for (Player p : arenaPlayers)
+		Set<Player> temp = new HashSet<Player>();
+		for (final Player p : arenaPlayers) {
+			temp.add(p);
 			removePlayer(p, true);
+		}
 
 		endTimer.halt();
 		running = false;
@@ -481,6 +471,20 @@ public class Arena {
 		specPlayers.clear();
 		
 		hillManager.cleanup();
+		
+		for (final Player p : temp) {
+			// Allow players to rate arena at the end.
+			if (settings.getBoolean("arena-ratings")) {
+				p.setMetadata("canRate" + arenaName, new FixedMetadataValue(plugin, "KotH"));
+				Messenger.tell(p, Msg.ARENA_RATE);
+				scheduleTask(new Runnable() {
+					public void run() {
+						p.removeMetadata("canRate" + arenaName, plugin);
+					}
+				}, 400);
+			}
+		}
+		temp.clear();
 
 		return true;
 	}
@@ -1129,15 +1133,6 @@ public class Arena {
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-	}
-	
-	/**
-	 * Check if the arena is ending.
-	 * 
-	 * @return true if the arena is ending.
-	 */
-	public boolean isEnding() {
-		return ending;
 	}
 
 	/**
