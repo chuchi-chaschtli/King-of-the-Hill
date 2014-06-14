@@ -7,6 +7,7 @@ package com.valygard.KotH.command.setup;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -54,7 +55,12 @@ public class RemoveArenaCmd implements Command {
 				Messenger.tell(sender, Msg.ARENA_REMOVED, args[0]);
 				temp.remove(p);
 			} else {
-				Messenger.tell(p, "Are you sure you want to remove this arena? Type the command again to confirm within 10 seconds.");
+				Messenger.tell(p,"Are you sure you want to remove this arena? Type "
+						+ ChatColor.YELLOW
+						+ "/koth leave "
+						+ args[0]
+						+ ChatColor.RESET
+						+ " again within 10 seconds to confirm removal.");
 				temp.put(p, arena);
 				arena.scheduleTask(new Runnable() {
 					public void run() {
