@@ -16,11 +16,16 @@ import com.valygard.KotH.framework.Arena;
 public class HillChangeEvent extends HillEvent implements Cancellable {
 	private boolean cancelled;
 
-	public HillChangeEvent(final Arena arena, Location oldHill,
-			Location nextHill) {
+	public HillChangeEvent(final Arena arena) {
 		super(arena);
 
 		this.cancelled = false;
+	}
+
+	public HillChangeEvent(final Arena arena, Location newHill) {
+		super(arena);
+
+		newHill = utils.getNextHill();
 	}
 
 	/**
@@ -39,6 +44,15 @@ public class HillChangeEvent extends HillEvent implements Cancellable {
 	 */
 	public boolean isLastHill() {
 		return utils.isLastHill();
+	}
+
+	/**
+	 * Obtain the location of the next hill.
+	 * 
+	 * @return a location
+	 */
+	public Location getLocationOfNextHill() {
+		return utils.getNextHill();
 	}
 
 	@Override
