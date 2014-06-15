@@ -4,3 +4,9 @@ ratings:
   rating: 0
 times-played: 0
 total-players: 0
+red-wins: 0
+blue-wins: 0
+draws: 0
+red-win-percentage: 0.0
+blue-win-percentage: 0.0
+draw-percentage: 0.0

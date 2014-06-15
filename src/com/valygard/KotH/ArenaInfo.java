@@ -31,6 +31,10 @@ public class ArenaInfo {
 	// Total amount of players
 	private int totalPlayers;
 
+	// Win number crunchers and percentages
+	private int rw, bw, draws;
+	private double rwp, bwp, dp;
+
 	public ArenaInfo(Arena arena) {
 		this.arena = arena;
 
@@ -42,10 +46,17 @@ public class ArenaInfo {
 
 		ratings.set("rating", calculateRating());
 		arena.getPlugin().saveConfig();
+		
 		this.rating = ratings.getDouble("rating");
 
 		this.timesPlayed = info.getInt("times-played");
 		this.totalPlayers = info.getInt("total-players");
+
+		this.rw = info.getInt("red-wins");
+		this.bw = info.getInt("blue-wins");
+		this.draws = info.getInt("draws");
+
+		crunchPercentages();
 	}
 
 	/**
@@ -102,6 +113,44 @@ public class ArenaInfo {
 		else
 			rating = 0;
 		return rating;
+	}
+
+	/**
+	 * Add a win or a draw to a specific team. If the string given is red or
+	 * blue, add a victory to the respective team. Otherwise, add a draw because
+	 * we can't recognize the real winner.
+	 * 
+	 * @param team a string
+	 */
+	public void addWinOrDraw(String team) {
+		switch (team) {
+		case "red":
+			rw += 1;
+			info.set("red-wins", rw);
+		case "blue":
+			bw += 1;
+			info.set("blue-wins", bw);
+		default:
+			draws += 1;
+			info.set("draws", draws);
+		}
+		arena.getPlugin().saveConfig();
+		crunchPercentages();
+	}
+
+	/**
+	 * Crunch some numbers to calculate the percentages of wins.
+	 */
+	private void crunchPercentages() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		rwp = Double.valueOf(df.format(100.0 * rw / timesPlayed));
+		bwp = Double.valueOf(df.format(100.0 * bw / timesPlayed));
+		dp = Double.valueOf(df.format(100.0 * draws / timesPlayed));
+
+		info.set("red-win-percentage", rwp);
+		info.set("blue-win-percentage", bwp);
+		info.set("draw-percentage", dp);
+		arena.getPlugin().saveConfig();
 	}
 
 	/**
@@ -168,5 +217,59 @@ public class ArenaInfo {
 		DecimalFormat df = new DecimalFormat("#.##");
 		return Double.valueOf(df.format(totalPlayers
 				/ (timesPlayed > 0 ? timesPlayed * 1.0 : 1.0)));
+	}
+
+	/**
+	 * Return the number of times red team has won.
+	 * 
+	 * @return an integer
+	 */
+	public int getRedWins() {
+		return rw;
+	}
+
+	/**
+	 * Return the number of times blue team has won.
+	 * 
+	 * @return an integer
+	 */
+	public int getBlueWins() {
+		return bw;
+	}
+
+	/**
+	 * Return the number of times the arena ended in a stalemate.
+	 * 
+	 * @return an integer
+	 */
+	public int getDraws() {
+		return draws;
+	}
+
+	/**
+	 * Get the overall win-percentage of the red team.
+	 * 
+	 * @return a double.
+	 */
+	public double getRedWinPercentage() {
+		return rwp;
+	}
+	
+	/**
+	 * Get the overall win-percentage of the blue team.
+	 * 
+	 * @return a double.
+	 */
+	public double getBlueWinPercentage() {
+		return bwp;
+	}
+	
+	/**
+	 * Get the overall draw percentage.
+	 * 
+	 * @return a double.
+	 */
+	public double getDrawPercentage() {
+		return dp;
 	}
 }

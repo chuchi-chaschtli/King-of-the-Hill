@@ -601,16 +601,19 @@ public class Arena {
 			for (Player p : arenaPlayers) {
 				getStats(p).increment("draws");
 			}
+			ai.addWinOrDraw("null");
 			loser = null;
 			return;
 		} else if (winner.equals(redPlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.RED
 					+ "Red team");
 			loser = bluePlayers;
+			ai.addWinOrDraw("red");
 		} else if (winner.equals(bluePlayers)) {
 			Messenger.announce(this, Msg.ARENA_VICTOR, ChatColor.BLUE
 					+ "Blue team");
 			loser = redPlayers;
+			ai.addWinOrDraw("blue");
 		} else
 			loser = null;
 

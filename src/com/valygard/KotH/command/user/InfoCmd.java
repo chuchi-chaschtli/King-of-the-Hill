@@ -47,7 +47,7 @@ public class InfoCmd implements Command {
 		
 		if (!arena.isRunning()) {
 			sender.sendMessage(arena.isEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled");
-			sender.sendMessage(arena.isRunning() ? ChatColor.RED + "The arena has started." : ChatColor.GREEN + "The arena is joinable!");
+			sender.sendMessage(arena.isRunning() ? ChatColor.RED + "The arena has started." : ChatColor.GREEN + "The arena is not in progress.");
 			sender.sendMessage(arena.isReady() ? ChatColor.GREEN + "Ready" : ChatColor.RED + "Unready");
 			
 			if (sender instanceof Player) {
@@ -57,16 +57,19 @@ public class InfoCmd implements Command {
 						+ "You have permission to join this arena."
 						: ChatColor.RED + "You do not have permission to join this arena.");
 			}
+			sender.sendMessage(" ");
 		}
 		
 		if (arena.isRunning()) {
 			sender.sendMessage(ChatColor.RED + "Red Team Score: " + arena.getHillTimer().getRedScore());
 			sender.sendMessage(ChatColor.BLUE + "Blue Team Score: " + arena.getHillTimer().getBlueScore());
 			sender.sendMessage(ChatColor.YELLOW + "Time Remaining: " + TimeUtil.formatIntoHHMMSS(arena.getEndTimer().getRemaining()));
+			sender.sendMessage(" ");
 		}
 
 		if (arena.getSettings().getBoolean("arena-stats")) {
 			ArenaInfo ai = arena.getArenaInfo();
+			
 			sender.sendMessage(ChatColor.GRAY
 					+ "The rating of the arena is "
 					+ (ai.getRating() >= 50.0 ? ChatColor.DARK_GREEN
@@ -78,6 +81,25 @@ public class InfoCmd implements Command {
 					+ ai.getTotalPlayers() + ChatColor.GRAY + " total players "
 					+ ChatColor.AQUA + "/ " + ai.getTimesPlayed()
 					+ ChatColor.GRAY + " times played " + ")");
+			sender.sendMessage(" ");
+			
+			sender.sendMessage(ChatColor.RED + "Red team has won "
+					+ ChatColor.DARK_RED + ai.getRedWins() + ChatColor.RED
+					+ " / " + ChatColor.DARK_RED + ai.getTimesPlayed()
+					+ ChatColor.RED + " times (" + ChatColor.DARK_RED
+					+ ai.getRedWinPercentage() + ChatColor.RED + "%).");
+			
+			sender.sendMessage(ChatColor.BLUE + "Blue team has won "
+					+ ChatColor.DARK_BLUE + ai.getBlueWins() + ChatColor.BLUE
+					+ " / " + ChatColor.DARK_BLUE + ai.getTimesPlayed()
+					+ ChatColor.BLUE + " times (" + ChatColor.DARK_BLUE
+					+ ai.getBlueWinPercentage() + ChatColor.BLUE + "%).");
+			
+			sender.sendMessage(ChatColor.GRAY + "There is a total of "
+					+ ChatColor.DARK_GRAY + ai.getDraws() + ChatColor.GRAY
+					+ " draws / " + ChatColor.DARK_GRAY + ai.getTimesPlayed()
+					+ ChatColor.GRAY + " (" + ChatColor.DARK_GRAY
+					+ ai.getDrawPercentage() + ChatColor.GRAY + "%).");
 		}
 		return true;
 	}
