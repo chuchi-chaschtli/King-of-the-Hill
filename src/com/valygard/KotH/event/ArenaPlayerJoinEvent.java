@@ -7,8 +7,6 @@ package com.valygard.KotH.event;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 import com.valygard.KotH.framework.Arena;
 
@@ -16,26 +14,13 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  * 
  */
-public class ArenaPlayerJoinEvent extends Event implements Cancellable {
-	private static final HandlerList handlers = new HandlerList();
+public class ArenaPlayerJoinEvent extends ArenaPlayerEvent implements Cancellable {
 	private boolean cancelled;
 
-	private Arena arena;
-	private Player player;
-
 	public ArenaPlayerJoinEvent(Arena arena, Player player) {
-		this.arena 	= arena;
-		this.player = player;
+		super(arena, player);
 		
 		this.cancelled = false;
-	}
-
-	public Arena getArena() {
-		return arena;
-	}
-
-	public Player getPlayer() {
-		return player;
 	}
 	
 	public Location getPlayerJoinOrSpec() {
@@ -44,14 +29,9 @@ public class ArenaPlayerJoinEvent extends Event implements Cancellable {
 		}
 		return arena.getLobby();
 	}
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
-		return handlers;
+	
+	public double getDistance() {
+		return player.getLocation().distance(getPlayerJoinOrSpec());
 	}
 
 	@Override

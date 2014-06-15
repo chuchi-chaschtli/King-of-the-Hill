@@ -5,8 +5,6 @@
 package com.valygard.KotH.event;
 
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 import com.valygard.KotH.framework.Arena;
 
@@ -14,18 +12,21 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  *
  */
-public class ArenaStartEvent extends Event implements Cancellable {
-	private static final HandlerList handlers = new HandlerList();
-    private Arena arena;
+public class ArenaStartEvent extends ArenaEvent implements Cancellable {
     private boolean cancelled;
     
     public ArenaStartEvent(Arena arena) {
-        this.arena = arena;
+        super(arena);
+        
         this.cancelled = false;
     }
     
-    public Arena getArena() {
-        return arena;
+    public int getPlayers() {
+    	return arena.getPlayersInLobby().size();
+    }
+    
+    public int getLength() {
+    	return arena.getLength();
     }
 
     @Override
@@ -36,13 +37,5 @@ public class ArenaStartEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-    
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-     
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 }

@@ -9,8 +9,6 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.hill.HillManager;
@@ -20,26 +18,19 @@ import com.valygard.KotH.hill.HillTask;
  * @author Anand
  *
  */
-public class ArenaScoreEvent extends Event implements Cancellable {
-	private static final HandlerList handlers = new HandlerList();
-    private Arena arena;
-    
+public class ArenaScoreEvent extends ArenaEvent implements Cancellable {
     private HillTask hill;
     private HillManager manager;
     
     private boolean cancelled;
     
     public ArenaScoreEvent(Arena arena) {
-        this.arena = arena;
+        super(arena);
        
         this.manager   = new HillManager(arena);
         this.hill 	   = new HillTask(arena);
         
         this.cancelled = false;
-    }
-    
-    public Arena getArena() {
-        return arena;
     }
     
     public HillTask getHillTimer() {
@@ -79,13 +70,5 @@ public class ArenaScoreEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-    
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-     
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 }

@@ -7,49 +7,27 @@ package com.valygard.KotH.event;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 import com.valygard.KotH.framework.Arena;
 
 /**
  * @author Anand
- *
+ * 
  */
-public class ArenaPlayerLeaveEvent extends Event {
-	private static final HandlerList handlers = new HandlerList();
-
-	private Arena arena;
-	private Player player;
-
+public class ArenaPlayerLeaveEvent extends ArenaPlayerEvent {
 	public ArenaPlayerLeaveEvent(Arena arena, Player player) {
-		this.arena  = arena;
-		this.player = player;
+		super(arena, player);
 	}
 
-	public Arena getArena() {
-		return arena;
+	public Set<Player> getTeammates() {
+		Set<Player> team = getTeamWithPlayer();
+		team.remove(player);
+		return team;
 	}
 
-	public Player getPlayer() {
-		return player;
+	public boolean isInHill() {
+		return arena.getHillUtils().getCurrentHill()
+				.distance(player.getLocation()) <= arena.getSettings().getInt(
+				"hill-radius");
 	}
-	
-	public Set<Player> getTeam() {
-		if (arena.getBlueTeam().contains(player))
-			return arena.getBlueTeam();
-		if (arena.getRedTeam().contains(player))
-			return arena.getRedTeam();
-		return null;
-	}
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
-
 }
