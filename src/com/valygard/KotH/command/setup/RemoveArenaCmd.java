@@ -57,7 +57,7 @@ public class RemoveArenaCmd implements Command {
 			} else {
 				Messenger.tell(p,"Are you sure you want to remove this arena? Type "
 						+ ChatColor.YELLOW
-						+ "/koth leave "
+						+ "/koth removearena "
 						+ args[0]
 						+ ChatColor.RESET
 						+ " again within 10 seconds to confirm removal.");
