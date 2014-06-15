@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
@@ -29,7 +30,7 @@ import com.valygard.KotH.messenger.Msg;
 		argsRequired = 0
 	)
 @CommandPermission("koth.user.listarenas")
-@CommandUsage("/koth arenas")
+@CommandUsage("/koth arenas [-r]")
 /**
  * @author Anand
  *
@@ -41,13 +42,46 @@ public class ListArenaCmd implements Command {
 		Player p = (Player) sender;
 		List<Arena> arenas = am.getPermittedArenas(p);
 		List<String> names = new ArrayList<String>();
-		for (Arena arena : arenas) {
-			names.add((arena.isReady() ? ChatColor.DARK_GREEN : ChatColor.GRAY) + arena.getName() + ChatColor.RESET + ",");
+		if (args.length == 0 || !args[0].equalsIgnoreCase("-r")) {
+			for (Arena arena : arenas) {
+				names.add((arena.isReady() ? ChatColor.DARK_GREEN
+						: ChatColor.GRAY)
+						+ arena.getName()
+						+ ChatColor.RESET
+						+ ",");
+			}
+
+			String list = KotHUtils.formatList(names, am.getPlugin());
+			Messenger.tell(p, Msg.MISC_LIST_ARENAS.format(list));
+		} else {
+			int lines = 0;
+			StringBuilder foo = new StringBuilder();
+			Messenger.tell(p, "Arenas sorted by rating:");
+			
+			for (int i = 100; i >= 0; i--) {
+				// We only want to view the top 20 arenas.
+				if (lines == 20)
+					break;
+				
+				for (Arena arena : arenas) {
+					ArenaInfo ai = arena.getArenaInfo();
+					int rating = (int) Math.round(ai.getRating());
+					
+					// Sort by descending order
+					if (rating == i) {
+						lines++;
+						foo.append("\n").append(ChatColor.RED
+								+ String.valueOf(lines) + ". "
+								+ ChatColor.YELLOW + arena.getName()
+								+ ChatColor.GRAY + " - "
+								+ (rating >= 50 ? ChatColor.DARK_GREEN
+										: ChatColor.DARK_RED) + rating
+								+ ChatColor.YELLOW + " / 100");
+					}
+				}
+			}
+			Messenger.tell(p, foo.toString());
 		}
- 
-        String list = KotHUtils.formatList(names, am.getPlugin());
-        Messenger.tell(sender, Msg.MISC_LIST_ARENAS.format(list));
-        
 		return true;
 	}
 }

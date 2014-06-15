@@ -28,17 +28,16 @@ import com.valygard.KotH.framework.Arena;
  */
 public class Messenger {
 	private static final Logger log = Logger.getLogger("Minecraft");
-	private static final KotH plugin = KotH.plugin;
 
     private static final String prefix = "[KotH] ";
 
     private Messenger() {}
     
 	public static void log(String level, String msg) {
-		if (!plugin.getConfig().getBoolean("global.logging"))
+		if (!KotH.plugin.getConfig().getBoolean("global.logging"))
 			return;
 		
-		File dataFolder = plugin.getDataFolder();
+		File dataFolder = KotH.plugin.getDataFolder();
 		try {
 			if(!dataFolder.exists()) {
 				dataFolder.mkdir();
