@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.event;
 
+import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -17,13 +18,25 @@ public class ArenaEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	
 	protected Arena arena;
+	protected World world;
+	protected String name;
 	
 	public ArenaEvent(final Arena arena) {
 		this.arena = arena;
+		this.world = arena.getWorld();
+		this.name  = arena.getName();
 	}
 	
 	public Arena getArena() {
 		return arena;
+	}
+	
+	public World getArenaWorld() {
+		return world;
+	}
+	
+	public String getArenaName() {
+		return name;
 	}
 	
 	@Override

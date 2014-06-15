@@ -27,6 +27,7 @@ import org.bukkit.plugin.PluginManager;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
+import com.valygard.KotH.event.ArenaLoadEvent;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
@@ -191,6 +192,14 @@ public class ArenaManager {
 		settings.set("world", world.getName());
 
 		Arena arena = new Arena(plugin, arenaName);
+		
+		ArenaLoadEvent e = new ArenaLoadEvent(arena);
+		plugin.getServer().getPluginManager().callEvent(e);
+		if (e.isCancelled()) {
+			arena = null;
+			return null;
+		}
+		
 		arenas.add(arena);
 		plugin.getLogger().info("Loaded arena '" + arenaName + "'");
 		return arena;
