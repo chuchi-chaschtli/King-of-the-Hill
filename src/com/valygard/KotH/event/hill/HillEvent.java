@@ -2,10 +2,11 @@
  * HillEvent.java is part of King Of The Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.hill;
 
 import org.bukkit.Location;
 
+import com.valygard.KotH.event.ArenaEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;

@@ -2,7 +2,7 @@
  * ArenaPlayerKickEvent.java is part of King Of The Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.player;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

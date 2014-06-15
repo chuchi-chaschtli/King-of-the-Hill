@@ -14,7 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.event.HillChangeEvent;
+import com.valygard.KotH.event.hill.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;

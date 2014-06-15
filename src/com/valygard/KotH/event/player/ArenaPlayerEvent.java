@@ -2,12 +2,13 @@
  * ArenaPlayerEvent.java is part of King Of The Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.player;
 
 import java.util.Set;
 
 import org.bukkit.entity.Player;
 
+import com.valygard.KotH.event.ArenaEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**

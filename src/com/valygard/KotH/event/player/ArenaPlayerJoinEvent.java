@@ -2,7 +2,7 @@
  * ArenaPlayerJoinEvent.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.player;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

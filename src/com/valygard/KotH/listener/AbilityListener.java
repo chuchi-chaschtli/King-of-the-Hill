@@ -40,7 +40,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.ArenaAbilities;
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.event.ArenaPlayerDeathEvent;
+import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;

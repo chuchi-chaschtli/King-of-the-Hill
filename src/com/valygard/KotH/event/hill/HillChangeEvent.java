@@ -2,7 +2,7 @@
  * HillChangeEvent.java is part of King of the Hill.
  * (c) 2014 Anand, All Rights Reserved.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.hill;
 
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;

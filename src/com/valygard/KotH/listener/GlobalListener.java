@@ -42,7 +42,7 @@ import com.massivecraft.factions.entity.UPlayer;
 import com.massivecraft.factions.entity.UPlayerColls;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.economy.EconomyManager;
-import com.valygard.KotH.event.ArenaPlayerDeathEvent;
+import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
