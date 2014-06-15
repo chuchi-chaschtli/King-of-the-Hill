@@ -25,7 +25,7 @@ import com.valygard.KotH.messenger.Msg;
 @CommandInfo(
 		name = "arenas", 
 		pattern = "arenas|lista.*|arenalist.*",
-		desc = "View all available arenas.",
+		desc = "View all available arenas in an unordered list or by rating.",
 		playerOnly = true,
 		argsRequired = 0
 	)
@@ -54,19 +54,29 @@ public class ListArenaCmd implements Command {
 			String list = KotHUtils.formatList(names, am.getPlugin());
 			Messenger.tell(p, Msg.MISC_LIST_ARENAS.format(list));
 		} else {
+			// Get all arenas that have ratings available.
+			List<Arena> tmp = new ArrayList<Arena>();
+			for (Arena a : arenas) {
+				if (a.getSettings().getBoolean("arena-stats"))
+					tmp.add(a);
+			}
+			arenas.clear();
+			
+			if (tmp.size() < 1) {
+				Messenger.tell(p, "There are no arenas that have enabled ratings.");
+				return false;
+			}
+			
 			int lines = 0;
 			StringBuilder foo = new StringBuilder();
-			Messenger.tell(p, "Arenas sorted by rating:");
+			foo.append("Arenas sorted by rating:");
 			
 			for (int i = 100; i >= 0; i--) {
 				// We only want to view the top 20 arenas or the maximum amount of arenas.
 				if (lines == 20 || lines >= arenas.size())
 					break;
 				
-				forA: for (Arena arena : arenas) {
-					if (!arena.getSettings().getBoolean("arena-stats")) {
-						continue forA;
-					}
+				for (Arena arena : tmp) {
 					ArenaInfo ai = arena.getArenaInfo();
 					int rating = (int) Math.round(ai.getRating());
 					
