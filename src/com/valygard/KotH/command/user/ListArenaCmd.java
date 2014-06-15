@@ -59,8 +59,8 @@ public class ListArenaCmd implements Command {
 			Messenger.tell(p, "Arenas sorted by rating:");
 			
 			for (int i = 100; i >= 0; i--) {
-				// We only want to view the top 20 arenas.
-				if (lines == 20)
+				// We only want to view the top 20 arenas or the maximum amount of arenas.
+				if (lines == 20 || lines >= arenas.size())
 					break;
 				
 				forA: for (Arena arena : arenas) {
