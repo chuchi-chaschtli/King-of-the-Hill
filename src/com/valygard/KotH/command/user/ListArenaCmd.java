@@ -63,7 +63,10 @@ public class ListArenaCmd implements Command {
 				if (lines == 20)
 					break;
 				
-				for (Arena arena : arenas) {
+				forA: for (Arena arena : arenas) {
+					if (!arena.getSettings().getBoolean("arena-stats")) {
+						continue forA;
+					}
 					ArenaInfo ai = arena.getArenaInfo();
 					int rating = (int) Math.round(ai.getRating());
 					
