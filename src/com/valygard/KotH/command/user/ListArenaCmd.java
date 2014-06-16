@@ -5,7 +5,11 @@
 package com.valygard.KotH.command.user;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +34,7 @@ import com.valygard.KotH.messenger.Msg;
 		argsRequired = 0
 	)
 @CommandPermission("koth.user.listarenas")
-@CommandUsage("/koth arenas [-r]")
+@CommandUsage("/koth arenas [-r|-tp]")
 /**
  * @author Anand
  *
@@ -42,7 +46,7 @@ public class ListArenaCmd implements Command {
 		Player p = (Player) sender;
 		List<Arena> arenas = am.getPermittedArenas(p);
 		List<String> names = new ArrayList<String>();
-		if (args.length == 0 || !args[0].equalsIgnoreCase("-r")) {
+		if (args.length == 0 || !args[0].startsWith("-")) {
 			for (Arena arena : arenas) {
 				names.add((arena.isReady() ? ChatColor.DARK_GREEN
 						: ChatColor.GRAY)
@@ -53,7 +57,8 @@ public class ListArenaCmd implements Command {
 
 			String list = KotHUtils.formatList(names, am.getPlugin());
 			Messenger.tell(p, Msg.MISC_LIST_ARENAS.format(list));
-		} else {
+		// Sort arenas by rating
+		} else if (args[0].equalsIgnoreCase("-r")){
 			// Get all arenas that have ratings available.
 			List<Arena> tmp = new ArrayList<Arena>();
 			for (Arena a : arenas) {
@@ -73,7 +78,7 @@ public class ListArenaCmd implements Command {
 			
 			for (int i = 100; i >= 0; i--) {
 				// We only want to view the top 20 arenas or the maximum amount of arenas.
-				if (lines == 20 || lines >= arenas.size())
+				if (lines == 20 || lines >= tmp.size())
 					break;
 				
 				for (Arena arena : tmp) {
@@ -94,6 +99,44 @@ public class ListArenaCmd implements Command {
 				}
 			}
 			Messenger.tell(p, foo.toString());
+		// Sort arenas by times played.
+		} else if (args[0].equalsIgnoreCase("-tp")) {
+			final Map<Arena, Integer> timesPlayed = new HashMap<Arena, Integer>();
+			for (Arena arena : arenas) {
+				if (!arena.getSettings().getBoolean("arena-stats"))
+					continue;
+				ArenaInfo ai = arena.getArenaInfo();
+				
+				timesPlayed.put(arena, ai.getTimesPlayed());
+			}
+			// Sort the map
+			List<Arena> list = new ArrayList<Arena>(timesPlayed.keySet());
+			
+			Comparator<Arena> cmp = new Comparator<Arena>() {
+			    @Override
+			    public int compare(Arena a1, Arena a2) {
+			        Integer timesPlayed1 = timesPlayed.get(a1);
+			        Integer timesPlayed2 = timesPlayed.get(a2);
+					return timesPlayed1.compareTo(timesPlayed2);
+				}
+			};
+			Collections.sort(list, Collections.reverseOrder(cmp));
+
+			Messenger.tell(p, "Arenas sorted in order of times played:");
+			p.sendMessage(" ");
+
+			int lines = 0;
+			for (Arena arena : list) {
+				if (lines == 20) {
+					break;
+				}
+				lines++;
+				p.sendMessage(ChatColor.RED + "" + lines + ". "
+						+ ChatColor.YELLOW + arena.getName() + ChatColor.GOLD
+						+ " - " + ChatColor.YELLOW
+						+ +arena.getArenaInfo().getTimesPlayed()
+						+ " times played");
+			}
 		}
 		return true;
 	}
