@@ -19,12 +19,27 @@ public class ArenaPlayerLeaveEvent extends ArenaPlayerEvent {
 		super(arena, player);
 	}
 
+	/**
+	 * Gets all teammates of the player without the player. This is unlike the
+	 * {@link #getTeamWithPlayer()} method which returns a player set including
+	 * the player.
+	 * 
+	 * @return a set of players
+	 * @see #getTeamWithPlayer()
+	 * @since v1.2.5
+	 */
 	public Set<Player> getTeammates() {
 		Set<Player> team = getTeamWithPlayer();
 		team.remove(player);
 		return team;
 	}
 
+	/**
+	 * Checks if the player is in the hill when they leave.
+	 * 
+	 * @return true if the player is in the hill, false otherwise. 
+	 * @since v1.2.5
+	 */
 	public boolean isInHill() {
 		return arena.getHillUtils().getCurrentHill()
 				.distance(player.getLocation()) <= arena.getSettings().getInt(

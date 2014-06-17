@@ -33,51 +33,57 @@ public class HillEvent extends ArenaEvent {
 	 * Gets the current hill in the arena.
 	 * 
 	 * @return a location, the center of the current hill.
+	 * @since v1.2.5
 	 */
 	public Location getCurrentHill() {
 		return utils.getCurrentHill();
 	}
 
 	/**
-	 * Get the next hill in an arena.
+	 * Gets the next hill in an arena.
 	 * 
 	 * @return a location, null if no next hill.
+	 * @since v1.2.5
 	 */
 	public Location getNextHill() {
 		return utils.getNextHill();
 	}
 
 	/**
-	 * Get the previous hill in an arena.
+	 * Gets the previous hill in an arena.
 	 * 
 	 * @return null if there was no previous hill, otherwise a location.
+	 * @since v1.2.5
 	 */
 	public Location getPreviousHill() {
 		return utils.getPreviousHill();
 	}
 
 	/**
-	 * Retrieve an already existing instance of the HillManager.
+	 * Retrieves an already existing instance of the HillManager.
 	 * 
 	 * @return HillManager
+	 * @since v1.2.5
 	 */
 	public HillManager getHillManager() {
 		return hm;
 	}
 
 	/**
-	 * Obtain an existing instance of HillUtils for modification and registry.
+	 * Obtains an existing instance of HillUtils for modification and registry.
 	 * 
 	 * @return an instance of HillUtils
+	 * @since v1.2.5
 	 */
 	public HillUtils getHillUtils() {
 		return utils;
 	}
 
 	/**
-	 * Obtain an existing instance of HillTask for modification and registry.
+	 * Obtains an existing instance of HillTask for modification and registry.
 	 * 
 	 * @return an instance of HillTask
+	 * @since v1.2.5
 	 */
 	public HillTask getTimer() {
 		return timer;

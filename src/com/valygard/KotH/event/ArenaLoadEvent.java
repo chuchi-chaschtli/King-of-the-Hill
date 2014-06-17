@@ -31,10 +31,11 @@ public class ArenaLoadEvent extends ArenaEvent implements Cancellable {
 	}
 	
 	/**
-	 * Retrieve a list of players close to an arena lobby.
+	 * Retrieves a list of players close to an arena lobby.
 	 * 
 	 * @param distance the farthest, inclusive distance away a player can be.
-	 * @return
+	 * @return a list of players.
+	 * @since v1.2.5
 	 */
 	public List<Player> getNearbyPlayers(double distance) {
 		List<Player> players = world.getPlayers();

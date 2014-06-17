@@ -21,10 +21,22 @@ public class ArenaStartEvent extends ArenaEvent implements Cancellable {
         this.cancelled = false;
     }
     
-    public int getPlayers() {
+	/**
+	 * Gets the amount of players at the start of an arena.
+	 * 
+	 * @param an integer
+	 * @since v1.2.5
+	 */
+    public int getPlayerSize() {
     	return arena.getPlayersInLobby().size();
     }
     
+	/**
+	 * Gets the length at which an arena will run for in seconds.
+	 * 
+	 * @param an integer
+	 * @since v1.2.5
+	 */
     public int getLength() {
     	return arena.getLength();
     }

@@ -26,30 +26,34 @@ public class HillChangeEvent extends HillEvent implements Cancellable {
 		super(arena);
 
 		newHill = utils.getNextHill();
+		this.cancelled = false;
 	}
 
 	/**
-	 * Get the amount of hills remaining in an arena.
+	 * Gets the amount of hills remaining in an arena.
 	 * 
 	 * @return an integer
+	 * @since v1.2.1
 	 */
 	public int getHillsLeft() {
 		return utils.getRotationsLeft();
 	}
 
 	/**
-	 * Check if there are anymore rotations.
+	 * Checks if there are anymore rotations.
 	 * 
 	 * @return a boolean value
+	 * @since v1.2.1
 	 */
 	public boolean isLastHill() {
 		return utils.isLastHill();
 	}
 
 	/**
-	 * Obtain the location of the next hill.
+	 * Obtains the location of the next hill.
 	 * 
 	 * @return a location
+	 * @since v1.2.1
 	 */
 	public Location getLocationOfNextHill() {
 		return utils.getNextHill();

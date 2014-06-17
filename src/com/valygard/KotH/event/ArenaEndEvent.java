@@ -28,18 +28,42 @@ public class ArenaEndEvent extends ArenaEvent {
 				.getRedScore() : arena.getHillTimer().getBlueScore());
     }
     
+    /**
+     * Sets the winner of an arena.
+     * 
+     * @param newWinner a Player set
+     * @since v1.2.4
+     */
     public void setWinner(Set<Player> newWinner) {
     	arena.setWinner(newWinner);
     }
-    
+   
+    /**
+     * Gets the winner of an arena.
+     * 
+     * @return a Player set, null if a draw
+     * @since v1.2.1
+     */
     public Set<Player> getWinner() {
     	return winner;
     }
     
+    /**
+     * Gets the winner of an arena.
+     * 
+     * @return a Player set, null if a draw.
+     * @since v1.2.1
+     */
     public Set<Player> getLoser() {
     	return loser;
     }
     
+    /**
+     * Gets the score of the winning team.
+     * 
+     * @return an integer
+     * @since v1.2.4
+     */
     public int getWinScore() {
     	return winScore;
     }
