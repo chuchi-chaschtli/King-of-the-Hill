@@ -35,6 +35,7 @@ public class EnableCmd implements Command {
 			am.setEnabled(true);
 		    Messenger.tell(sender, "KotH enabled.");
 		    Messenger.info("KotH has been enabled. Note: This is overriden by per-arena settings.");
+		    return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("all")) {

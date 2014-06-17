@@ -35,6 +35,7 @@ public class DisableCmd implements Command {
 			am.setEnabled(false);
 		    Messenger.tell(sender, "KotH disabled.");
 		    Messenger.info("KotH has been disabled. Note: This is overrides all per-arena settings.");
+		    return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("all")) {
