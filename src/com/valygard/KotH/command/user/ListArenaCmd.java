@@ -29,7 +29,7 @@ import com.valygard.KotH.messenger.Msg;
 @CommandInfo(
 		name = "arenas", 
 		pattern = "arenas|lista.*|arenalist.*",
-		desc = "View all available arenas in an unordered list or by rating.",
+		desc = "View all available arenas in an unordered list, by rating, or by times played.",
 		playerOnly = true,
 		argsRequired = 0
 	)
