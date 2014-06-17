@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,9 +40,11 @@ import com.valygard.KotH.command.user.ListArenaCmd;
 import com.valygard.KotH.command.user.ListPlayersCmd;
 import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.user.StatsCmd;
+import com.valygard.KotH.event.ArenaCommandEvent;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.util.StringUtils;
 
 /**
  * @author Anand
@@ -152,6 +155,13 @@ public class CommandManager implements CommandExecutor {
 		if (params.length < info.argsRequired()) {
 			Messenger.tell(sender, Msg.CMD_NOT_ENOUGH_ARGS);
 			showUsage(command, sender, true);
+			return true;
+		}
+		
+		ArenaCommandEvent ace = new ArenaCommandEvent(sender, cmd.getName() + " " + StringUtils.convertArrayToString(args));
+		Bukkit.getServer().getPluginManager().callEvent(ace);
+		if (ace.isCancelled()) {
+			Messenger.tell(sender, Msg.MISC_NO_ACCESS);
 			return true;
 		}
 
