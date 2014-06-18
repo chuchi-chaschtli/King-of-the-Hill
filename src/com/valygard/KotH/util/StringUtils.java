@@ -27,7 +27,7 @@ public class StringUtils {
 		StringBuilder sb = new StringBuilder();
 		
 		if (trimSize > array.length || trimSize < 0) {
-			throw new IllegalStateException("Invalid trim size given!");
+			throw new IllegalArgumentException("Invalid trim size given!");
 		}
 		
 		for (int i = trimSize; i < array.length; i++) {
