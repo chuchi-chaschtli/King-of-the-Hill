@@ -1,6 +1,8 @@
   Swordmaster:
     items: iron-sword damage_all:2;knockback:1, potion:8229:2, potion:8233:1
     armor: iron-boots, iron-leggings, iron-chestplate, iron-helmet
+    gui: iron-sword damage_all:2;knockback:1
   Archer:
     items: bow arrow_infinite:1;arrow_damage:1, potion:8229:3, arrow
     armor: leather-boots, leather-leggings, leather-chestplate, leather-helmet
+    gui: bow arrow_infinite:1;arrow_damage:1

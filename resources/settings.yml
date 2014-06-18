@@ -20,6 +20,7 @@ friendly-fire: false
 food-change: false
 one-life: false
 regen-health: true
+classes-gui: true
 change-class-in-arena: false
 allow-lobby-team-change: true
 circular-hill: true
