@@ -57,7 +57,7 @@ public class ChooseClassCmd implements Command {
 			return true;
 		}
 		
-		if (args.length == 0) {
+		if (args.length == 0 || args[0].matches("(unsure|idk|:/|gui).*")) {
 			if (arena.getSettings().getBoolean("classes-gui")) {
 				GUI gui = new GUI(am, p);
 				am.getPlugin().getServer().getPluginManager().registerEvents(gui, am.getPlugin());
