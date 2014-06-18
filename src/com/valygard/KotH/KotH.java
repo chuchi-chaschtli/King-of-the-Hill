@@ -214,7 +214,7 @@ public class KotH extends JavaPlugin {
 		String s = System.getProperty("line.separator");
 		
 		return "King of the Hill v" + getDescription().getVersion() + " - configuration file" + s +
-				"To report bugs, please use the bug tracker:" + s + 
+				"To report bugs, give feedback, or suggest improvements, please use the issue tracker:" + s + 
 				"<https://github.com/AoHRuthless/King-of-the-Hill/issues>" + s + s +
 				"Happy Configuring.";
 	}
