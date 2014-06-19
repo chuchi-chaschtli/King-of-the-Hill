@@ -107,6 +107,11 @@ public class SetHillCmd implements Command {
 			int number = Integer.parseInt(args[1]);
 			if (s.getString(String.valueOf(number)) != null) {
 				ConfigUtil.setLocation(s, String.valueOf(number), l);
+				
+				if (!callHillEvent(arena, p)) {
+					return false;
+				}
+				
 				Messenger.tell(p, Msg.HILLS_RESET, String.valueOf(number));
 				am.saveConfig();
 			} else {
