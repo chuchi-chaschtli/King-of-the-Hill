@@ -196,15 +196,14 @@ public class GlobalListener implements Listener {
 		
 		for (Arena a : am.getArenas()) {
 			if (p.hasMetadata("canRate" + a.getName())) {
-				if (e.getMessage().matches("dislike|hate|no|false|bad|horrible")) {
+				if (e.getMessage().equalsIgnoreCase("dislike")) {
 					a.getArenaInfo().addDislike();
 					Messenger.tell(p, Msg.ARENA_RATED, "disliked");
-					e.setCancelled(true);
-				} else if (e.getMessage().matches("like|yes|love|amazing|true|good|fun")) {
+				} else if (e.getMessage().equalsIgnoreCase("like")) {
 					a.getArenaInfo().addLike();
 					Messenger.tell(p, Msg.ARENA_RATED, "liked");
-					e.setCancelled(true);
 				}
+				e.setCancelled(true);
 				p.removeMetadata("canRate" + a.getName(), plugin);
 				return;
 			}
