@@ -295,7 +295,7 @@ public class GlobalListener implements Listener {
 			return;
 		}
 		
-		e.setCancelled(true);
+		e.setMessage("/");
 		Messenger.tell(p, Msg.MISC_CMD_NOT_ALLOWED);
 	}
 
