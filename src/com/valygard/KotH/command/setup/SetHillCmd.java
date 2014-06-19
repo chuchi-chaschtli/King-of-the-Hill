@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.command.setup;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,6 +14,7 @@ import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
 import com.valygard.KotH.command.CommandUsage;
+import com.valygard.KotH.event.hill.HillCreateEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
@@ -68,6 +70,10 @@ public class SetHillCmd implements Command {
 				for (int i = 0; i <= s.getKeys(false).size(); i++) {
 					// Sanity Checks	
 					if (i == 0 && s.getString(String.valueOf(1)) == null) {
+						if(!callHillEvent(arena, p)) {
+							return true;
+						}
+						
 						ConfigUtil.setLocation(s, String.valueOf(1), l);
 						Messenger.tell(p, Msg.HILLS_ADDED);
 						break;
@@ -77,12 +83,20 @@ public class SetHillCmd implements Command {
 						continue;
 
 					ConfigUtil.setLocation(s, String.valueOf(i + 1), l);
+					
+					if(!callHillEvent(arena, p)) {
+						return true;
+					}
 
 					if (s.getString(String.valueOf(i)).equals(s.getString(String.valueOf(i + 1)))) {
 						Messenger.tell(p, "There is already a hill at this location.");
 						s.set(String.valueOf(i + 1), null);
 						am.saveConfig();
 						break;
+					}
+					
+					if(!callHillEvent(arena, p)) {
+						return true;
 					}
 
 					Messenger.tell(p, Msg.HILLS_ADDED);
@@ -103,6 +117,16 @@ public class SetHillCmd implements Command {
 		am.reloadArena(arena);
 		am.getMissingWarps(arena, p);
 		
+		return true;
+	}
+	
+	private boolean callHillEvent(Arena arena, Player p) {
+		HillCreateEvent event = new HillCreateEvent(arena, p);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			Messenger.tell(p, Msg.MISC_NO_ACCESS);
+			return false;
+		}
 		return true;
 	}
 }
