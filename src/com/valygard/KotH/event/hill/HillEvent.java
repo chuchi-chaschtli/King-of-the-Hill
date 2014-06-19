@@ -22,6 +22,8 @@ public class HillEvent extends ArenaEvent implements Cancellable {
 	protected HillManager hm;
 	protected HillUtils utils;
 	protected HillTask timer;
+	
+	protected ConfigurationSection hills;
 
 	protected boolean cancelled;
 
@@ -31,6 +33,8 @@ public class HillEvent extends ArenaEvent implements Cancellable {
 		hm = arena.getHillManager();
 		utils = arena.getHillUtils();
 		timer = arena.getHillTimer();
+		
+		hills = arena.getWarps().getConfigurationSection("hills");
 
 		cancelled = false;
 	}
@@ -102,7 +106,7 @@ public class HillEvent extends ArenaEvent implements Cancellable {
 	 * @since 1.2.5
 	 */
 	public ConfigurationSection getHills() {
-		return arena.getWarps().getConfigurationSection("hills");
+		return hills;
 	}
 
 	@Override

@@ -5,7 +5,6 @@
 package com.valygard.KotH.event.hill;
 
 import org.bukkit.Location;
-import org.bukkit.event.Cancellable;
 
 import com.valygard.KotH.framework.Arena;
 
@@ -13,20 +12,16 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  * 
  */
-public class HillChangeEvent extends HillEvent implements Cancellable {
-	private boolean cancelled;
+public class HillChangeEvent extends HillEvent {
 
 	public HillChangeEvent(final Arena arena) {
 		super(arena);
-
-		this.cancelled = false;
 	}
 
 	public HillChangeEvent(final Arena arena, Location newHill) {
 		super(arena);
 
 		newHill = utils.getNextHill();
-		this.cancelled = false;
 	}
 
 	/**
@@ -57,15 +52,5 @@ public class HillChangeEvent extends HillEvent implements Cancellable {
 	 */
 	public Location getLocationOfNextHill() {
 		return utils.getNextHill();
-	}
-
-	@Override
-	public boolean isCancelled() {
-		return cancelled;
-	}
-
-	@Override
-	public void setCancelled(boolean cancelled) {
-		this.cancelled = cancelled;
 	}
 }
