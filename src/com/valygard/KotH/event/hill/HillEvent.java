@@ -5,6 +5,8 @@
 package com.valygard.KotH.event.hill;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.Cancellable;
 
 import com.valygard.KotH.event.ArenaEvent;
 import com.valygard.KotH.framework.Arena;
@@ -16,10 +18,12 @@ import com.valygard.KotH.hill.HillUtils;
  * @author Anand
  * 
  */
-public class HillEvent extends ArenaEvent {
+public class HillEvent extends ArenaEvent implements Cancellable {
 	protected HillManager hm;
 	protected HillUtils utils;
 	protected HillTask timer;
+
+	protected boolean cancelled;
 
 	public HillEvent(final Arena arena) {
 		super(arena);
@@ -27,6 +31,8 @@ public class HillEvent extends ArenaEvent {
 		hm = arena.getHillManager();
 		utils = arena.getHillUtils();
 		timer = arena.getHillTimer();
+
+		cancelled = false;
 	}
 
 	/**
@@ -87,6 +93,26 @@ public class HillEvent extends ArenaEvent {
 	 */
 	public HillTask getTimer() {
 		return timer;
+	}
+
+	/**
+	 * Obtains where all the arena hills are stored.
+	 * 
+	 * @return a ConfigurationSection
+	 * @since 1.2.5
+	 */
+	public ConfigurationSection getHills() {
+		return arena.getWarps().getConfigurationSection("hills");
+	}
+
+	@Override
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	@Override
+	public void setCancelled(boolean value) {
+		this.cancelled = value;
 	}
 
 }
