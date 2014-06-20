@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -101,21 +100,6 @@ public class Messenger {
     public static void announce(Arena arena, Msg msg) {
         announce(arena, msg.toString());
     }
-
-    public static void teamAnnounce(Arena arena, String msg, Set<Player> players) {
-    	for (Player p : players) {
-    		tell(p, msg);
-    	}
-    }
-    
-    public static void teamAnnounce(Arena arena, Msg msg, Set<Player> players) {
-    	teamAnnounce(arena, msg.toString(), players);
-    }
-    
-    public static void teamAnnounce(Arena arena, Msg msg, String s, Set<Player> players) {
-    	teamAnnounce(arena, msg.format(s), players);
-    }
-    
 
     public static void info(String msg) {
         log.info(prefix + msg);
