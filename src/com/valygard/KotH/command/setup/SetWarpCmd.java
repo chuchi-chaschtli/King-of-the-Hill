@@ -43,7 +43,7 @@ public class SetWarpCmd implements Command {
 		}
 		// if a location isn't specified, tell the player what's missing.
 		if (args.length == 1) {
-			am.getMissingWarps(arena, p);
+			am.tellHowManyMissing(arena, p);
 		}
 		
 		if (arena.isRunning()) {
@@ -74,7 +74,7 @@ public class SetWarpCmd implements Command {
 				default:
 					return false;
 			}
-			am.getMissingWarps(arena, p);
+			am.tellHowManyMissing(arena, p);
 			am.saveConfig();
 			am.reloadArena(arena);
 		}

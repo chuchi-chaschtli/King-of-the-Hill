@@ -55,6 +55,9 @@ public class ArenaManager {
 
 	// Commands that are allowed while playing koth.
 	private Set<String> allowedcmds;
+	
+	// Missing Warps
+	private List<String> missing;
 
 	/**
 	 * Constructor
@@ -70,6 +73,8 @@ public class ArenaManager {
 		this.enabled = config.getBoolean("global.enabled", true);
 
 		this.allowedcmds = new HashSet<String>();
+		
+		this.missing = new ArrayList<String>();
 	}
 
 	// --------------------------- //
@@ -692,13 +697,12 @@ public class ArenaManager {
 	}
 
 	/**
-	 * Get the warps an arena needs before it's ready.
+	 * Gets the warps missing in an arena before it is playable.
 	 * 
 	 * @param arena
 	 * @param p
 	 */
-	public void getMissingWarps(Arena arena, Player p) {
-		List<String> missing = new ArrayList<String>();
+	private List<String> getMissingWarps(Arena arena) {
 		if (arena.getRedSpawn() == null)
 			missing.add("redspawn,");
 
@@ -713,7 +717,16 @@ public class ArenaManager {
 
 		if (arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills,");
-
+		return missing;
+	}
+	
+	/**
+	 * Tells a player which warps are missing.
+	 * 
+	 * @param arena
+	 * @param p
+	 */
+	public void tellHowManyMissing(Arena arena, Player p) {
 		if (missing.size() > 0) {
 			String formatted = KotHUtils.formatList(missing, arena.getPlugin());
 			Messenger.tell(p, "Missing Warps: " + formatted);
@@ -721,37 +734,6 @@ public class ArenaManager {
 			arena.setReady(false);
 		} else {
 			Messenger.tell(p, Msg.ARENA_READY);
-			arena.setReady(true);
-		}
-	}
-
-	/**
-	 * Get the missing warps of an arena.
-	 * 
-	 * @param arena
-	 */
-	public void getMissingWarps(Arena arena) {
-		List<String> missing = new ArrayList<String>();
-		if (arena.getRedSpawn() == null)
-			missing.add("redspawn,");
-
-		if (arena.getBlueSpawn() == null)
-			missing.add("bluespawn,");
-
-		if (arena.getLobby() == null)
-			missing.add("lobby,");
-
-		if (arena.getSpec() == null)
-			missing.add("spectator,");
-
-		if (arena.getWarps() == null
-				|| arena.getWarps().getConfigurationSection("hills") == null)
-			missing.add("hills,");
-
-		if (missing.size() > 0) {
-			// Although it should already be false, never hurts to be cautious.
-			arena.setReady(false);
-		} else {
 			arena.setReady(true);
 		}
 	}

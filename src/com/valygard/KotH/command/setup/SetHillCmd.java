@@ -120,7 +120,7 @@ public class SetHillCmd implements Command {
 			}
 		}
 		am.reloadArena(arena);
-		am.getMissingWarps(arena, p);
+		am.tellHowManyMissing(arena, p);
 		
 		return true;
 	}
