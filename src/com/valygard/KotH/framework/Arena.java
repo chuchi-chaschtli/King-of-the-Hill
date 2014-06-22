@@ -953,7 +953,7 @@ public class Arena {
 	 */
 	public void setLobby(Location lobby) {
 		this.lobby = lobby;
-		warps.set("lobby", lobby);
+		ConfigUtil.setLocation(warps, "lobby", lobby);
 		plugin.saveConfig();
 	}
 
@@ -978,7 +978,7 @@ public class Arena {
 	 */
 	public void setSpec(Location spec) {
 		this.spec = spec;
-		warps.set("spec", spec);
+		ConfigUtil.setLocation(warps, "spec", spec);
 		plugin.saveConfig();
 	}
 
@@ -1003,7 +1003,7 @@ public class Arena {
 	 */
 	public void setRedSpawn(Location red) {
 		this.red = red;
-		warps.set("redspawn", red);
+		ConfigUtil.setLocation(warps, "redspawn", red);
 		plugin.saveConfig();
 	}
 
@@ -1028,7 +1028,7 @@ public class Arena {
 	 */
 	public void setBlueSpawn(Location blue) {
 		this.blue = blue;
-		warps.set("bluespawn", blue);
+		ConfigUtil.setLocation(warps, "bluespawn", blue);
 		plugin.saveConfig();
 	}
 	
@@ -1053,7 +1053,7 @@ public class Arena {
 	 */
 	public void setEndWarp(Location end) {
 		this.end = end;
-		warps.set("endwarp", end);
+		ConfigUtil.setLocation(warps, "endwarp", end);
 		plugin.saveConfig();
 	}
 
