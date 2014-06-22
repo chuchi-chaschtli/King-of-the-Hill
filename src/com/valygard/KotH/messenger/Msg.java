@@ -17,6 +17,7 @@ public enum Msg {
 	ABILITY_FIREBALL_SHOOT("You have shot a fireball!"),
 	ABILITY_LANDMINE_EXPLODE("You triggered a landmine that &e%&r placed."),
 	ABILITY_LANDMINE_PLACE("You have placed a landmine!"),
+	ABILITY_NOT_ENOUGH_ITEMS("You do not have enough &e%&r to perform this ability."),
 	ABILITY_HORSE_SPAWNED("You have spawned a customized horse!"),
 	ABILITY_WOLF_LOST("You have lost a wolf! You have &b% wolves&r remaining."),
 	ABILITY_WOLF_SPAWNED("You have spawned a wolf!"),

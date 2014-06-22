@@ -39,6 +39,7 @@ import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
+import com.valygard.KotH.abilities.AbilityHandler;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.event.ArenaEndEvent;
 import com.valygard.KotH.event.ArenaStartEvent;
@@ -48,7 +49,6 @@ import com.valygard.KotH.event.player.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
 import com.valygard.KotH.hill.HillUtils;
-import com.valygard.KotH.listener.AbilityListener;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
@@ -114,8 +114,8 @@ public class Arena {
 	// Arena Information
 	private ArenaInfo ai;
 
-	// AbilityListener
-	private AbilityListener abilityListener;
+	// AbilityHandler
+	private AbilityHandler ah;
 
 	// --------------------------- //
 	// constructor
@@ -182,9 +182,6 @@ public class Arena {
 		this.invManager = new InventoryManager(this);
 		this.rewards = new RewardManager(this,
 				config.getConfigurationSection("arenas." + arenaName));
-
-		// Arena abilities
-		this.abilityListener = new AbilityListener(plugin);
 	}
 
 	// --------------------------- //
@@ -274,8 +271,7 @@ public class Arena {
 		scoreboard.removePlayer(p);
 
 		// Remove all their pets and landmines.
-		abilityListener.removeEntities(p);
-		abilityListener.removeLandmines(p);
+		ah.cleanup(p);
 
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
@@ -414,6 +410,8 @@ public class Arena {
 
 		// Set running to true.
 		running = true;
+		
+		ah = new AbilityHandler(this);
 
 		Messenger.announce(this, Msg.ARENA_START);	
 		playSound(Sound.WITHER_DEATH, 0.382F, 0.1F);

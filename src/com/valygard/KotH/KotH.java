@@ -23,7 +23,6 @@ import com.valygard.KotH.command.CommandManager;
 import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
-import com.valygard.KotH.listener.AbilityListener;
 import com.valygard.KotH.listener.GlobalListener;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
@@ -107,7 +106,6 @@ public class KotH extends JavaPlugin {
 	
 	private void registerListeners() {
 		getServer().getPluginManager().registerEvents(new GlobalListener(this), this);
-		getServer().getPluginManager().registerEvents(new AbilityListener(this), this);
 	}
 	
 	public boolean has(Player p, String s) {
