@@ -1258,6 +1258,7 @@ public class Arena {
 	 */
 	public Set<Player> setWinner(Set<Player> newWinner) {
 		winner = newWinner;
+		declareWinner(false);
 		return winner;
 	}
 
