@@ -75,7 +75,7 @@ public class GlobalListener implements Listener {
 	// Player Events
 	// --------------------------- //
 	
-	@EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		
