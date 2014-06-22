@@ -270,9 +270,6 @@ public class Arena {
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
 
-		// Remove all their pets and landmines.
-		ah.cleanup(p);
-
 		// Restore all of their data; i.e armor, inventory, health, etc.
 		PlayerData data = getData(p);
 		data.restoreData();
@@ -303,6 +300,8 @@ public class Arena {
 					fee = fee.substring(1);
 
 				em.withdraw(p, Double.parseDouble(fee));
+				
+				ah.cleanup(p);
 			}
 		}
 		
@@ -369,8 +368,6 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
-		
-		ai.setNewPlayerTotal();
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
@@ -458,6 +455,7 @@ public class Arena {
 		Set<Player> temp = new HashSet<Player>();
 		for (final Player p : arenaPlayers) {
 			temp.add(p);
+			ah.cleanup(p);
 			removePlayer(p, true);
 		}
 
