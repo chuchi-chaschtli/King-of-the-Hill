@@ -4,6 +4,8 @@
  */
 package com.valygard.KotH.command.setup;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -52,21 +54,34 @@ public class SetWarpCmd implements Command {
 		}
 		
 		if (args.length > 1) {
+			List<String> missing = am.getMissingWarps(arena);
 			switch (args[1]) {
 				case "red":
 				case "redspawn":
 					arena.setRedSpawn(p.getLocation());
+					if (missing.contains("redspawn,")) {
+						missing.remove("redspawn,");
+					}
 					break;
 				case "blue":
 				case "bluespawn":
 					arena.setBlueSpawn(p.getLocation());
+					if (missing.contains("bluespawn,")) {
+						missing.remove("bluespawn,");
+					}
 					break;
 				case "lobby":
 					arena.setLobby(p.getLocation());
+					if (missing.contains("lobby,")) {
+						missing.remove("lobby,");
+					}
 					break;
 				case "spec":
 				case "spectator":
 					arena.setSpec(p.getLocation());
+					if (missing.contains("spec,")) {
+						missing.remove("spec,");
+					}
 					break;
 				case "end":
 				case "endwarp":
@@ -74,9 +89,9 @@ public class SetWarpCmd implements Command {
 				default:
 					return false;
 			}
-			am.tellHowManyMissing(arena, p);
 			am.saveConfig();
 			am.reloadArena(arena);
+			am.tellHowManyMissing(arena, p);
 		}
 		return true;
 	}

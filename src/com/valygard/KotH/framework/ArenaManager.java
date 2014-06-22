@@ -702,7 +702,7 @@ public class ArenaManager {
 	 * @param arena
 	 * @param p
 	 */
-	private List<String> getMissingWarps(Arena arena) {
+	public List<String> getMissingWarps(Arena arena) {
 		if (arena.getRedSpawn() == null)
 			missing.add("redspawn,");
 
@@ -715,7 +715,7 @@ public class ArenaManager {
 		if (arena.getSpec() == null)
 			missing.add("spectator,");
 
-		if (arena.getWarps().getConfigurationSection("hills") == null)
+		if (arena.getWarps() == null || arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills,");
 		return missing;
 	}
