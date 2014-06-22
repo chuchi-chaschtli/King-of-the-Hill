@@ -107,6 +107,7 @@ public class SettingsCmd implements Command {
 		}
 
 		am.saveConfig();
+		am.reloadConfig();
 		am.reloadArena(arena);
 
 		foo.append("The ").append(ChatColor.DARK_GREEN).append(args[1])
