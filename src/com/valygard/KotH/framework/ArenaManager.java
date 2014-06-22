@@ -57,7 +57,7 @@ public class ArenaManager {
 	private Set<String> allowedcmds;
 	
 	// Missing Warps
-	private List<String> missing;
+	private Set<String> missing;
 
 	/**
 	 * Constructor
@@ -74,7 +74,7 @@ public class ArenaManager {
 
 		this.allowedcmds = new HashSet<String>();
 		
-		this.missing = new ArrayList<String>();
+		this.missing = new HashSet<String>();
 	}
 
 	// --------------------------- //
@@ -702,7 +702,7 @@ public class ArenaManager {
 	 * @param arena
 	 * @param p
 	 */
-	public List<String> getMissingWarps(Arena arena) {
+	public Set<String> getMissingWarps(Arena arena) {
 		if (arena.getRedSpawn() == null)
 			missing.add("redspawn,");
 
