@@ -35,8 +35,8 @@ import com.valygard.KotH.messenger.Msg;
 public class ZombieAbility extends Ability implements Listener {
 	private Set<Zombie> zombies;
 	
-	public ZombieAbility(Arena arena, Player player) {
-		super (arena, player, Material.ROTTEN_FLESH);
+	public ZombieAbility(Arena arena, Player player, Material m) {
+		super (arena, player, m);
 		
 		Zombie z = spawnZombie();
 		this.zombies = new HashSet<Zombie>();

@@ -33,8 +33,8 @@ import com.valygard.KotH.messenger.Msg;
 public class WolfAbility extends Ability implements Listener {
 	private Set<Wolf> wolves;
 	
-	public WolfAbility(Arena arena, Player player) {
-		super(arena, player, Material.BONE);
+	public WolfAbility(Arena arena, Player player, Material m) {
+		super(arena, player, m);
 		
 		this.wolves = new HashSet<Wolf>();
 		Wolf w = spawnWolf();
@@ -93,7 +93,7 @@ public class WolfAbility extends Ability implements Listener {
 		Wolf w = (Wolf) e.getEntity();
 
 		wolves.remove(w);
-		Messenger.tell(player, Msg.ABILITY_ZOMBIE_LOST,
+		Messenger.tell(player, Msg.ABILITY_WOLF_LOST,
 				String.valueOf(wolves.size()));
 	}
 	

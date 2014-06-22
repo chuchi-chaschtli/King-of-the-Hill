@@ -11,6 +11,7 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.Horse.Variant;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,8 +28,8 @@ import com.valygard.KotH.messenger.Msg;
 public class HorseAbility extends Ability implements Listener {
 	private Horse horse;
 	
-	public HorseAbility(Arena arena, Player p) {
-		super(arena, p, Material.HAY_BLOCK);
+	public HorseAbility(Arena arena, Player p, Material m) {
+		super(arena, p, m);
 		
 		spawnHorse();
 		
@@ -45,8 +46,7 @@ public class HorseAbility extends Ability implements Listener {
 			return null;
 		}
 		
-		if (player.getVehicle() != null) {
-			player.getVehicle().eject();
+		if (player.getVehicle() != null && player.getVehicle() instanceof Horse) {
 			player.getVehicle().remove();
 		}
 		
@@ -122,12 +122,10 @@ public class HorseAbility extends Ability implements Listener {
 		return horse;
 	}
 	
-	@EventHandler
+	@EventHandler (priority = EventPriority.HIGH)
 	public void onVehicleExit(VehicleExitEvent e) {
-		if (e.getExited().equals(player)) {
-			if (e.getVehicle().hasMetadata(player.getName())) {
-				e.getVehicle().remove();
-			}
+		if (e.getVehicle().hasMetadata(player.getName())) {
+			e.getVehicle().remove();
 		}
 	}
 

@@ -5,6 +5,7 @@
 package com.valygard.KotH.abilities.types;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,16 +38,16 @@ public class LandmineAbility extends Ability implements Listener {
 	private Map<UUID, List<Location>> landmines;
 	private Location l;
 	
-	public LandmineAbility(Arena arena, Player player, Location l) {
-		super(arena, player, Material.STONE_PLATE);
+	public LandmineAbility(Arena arena, Player player, Location l, Material m) {
+		super(arena, player, m);
 		
 		this.l = l;
+		this.landmines = new HashMap<UUID, List<Location>>();
 		
 		if (placeLandmine(l).equals(null)) {
 			Messenger.tell(player, "Could not place landmine");
 		} else {
 			Bukkit.getPluginManager().registerEvents(this, plugin);
-			Messenger.tell(player, Msg.ABILITY_LANDMINE_PLACE);
 		}
 	}
 	

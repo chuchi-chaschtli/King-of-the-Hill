@@ -70,13 +70,17 @@ public class AbilityHandler implements Listener {
 		
 		switch (hand.getType()) {
 		case BONE:
-			new WolfAbility(arena, p);
+			new WolfAbility(arena, p, Material.BONE);
+			break;
 		case ROTTEN_FLESH:
-			new ZombieAbility(arena, p);
+			new ZombieAbility(arena, p, Material.ROTTEN_FLESH);
+			break;
 		case FIREBALL:
-			new FireballAbility(arena, p);
+			new FireballAbility(arena, p, Material.FIREBALL);
+			break;
 		case HAY_BLOCK:
-			new HorseAbility(arena, p);
+			new HorseAbility(arena, p, Material.HAY_BLOCK);
+			break;
 		default:
 			return;
 		}
@@ -95,10 +99,11 @@ public class AbilityHandler implements Listener {
 		switch (e.getBlock().getType()) {
 		case STONE_PLATE:
 			// Remove from inventory
-			LandmineAbility la = new LandmineAbility(arena, p, e.getBlock().getLocation());
+			LandmineAbility la = new LandmineAbility(arena, p, e.getBlock().getLocation(), Material.STONE_PLATE);
 			if (la.getLandmines(p) != null) {
 				landmines.put(p.getUniqueId(), la.getLandmines(p));
 			}
+			break;
 		default:
 			if (!p.hasPermission("koth.admin.placeblocks"))
 				e.setCancelled(true);

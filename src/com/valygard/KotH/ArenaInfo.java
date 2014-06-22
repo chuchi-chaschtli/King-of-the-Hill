@@ -55,6 +55,8 @@ public class ArenaInfo {
 		this.rw = info.getInt("red-wins");
 		this.bw = info.getInt("blue-wins");
 		this.draws = info.getInt("draws");
+		
+		addTimePlayed();
 
 		crunchPercentages();
 	}
@@ -85,7 +87,7 @@ public class ArenaInfo {
 	/**
 	 * Increment the amount of times the arena has been played.
 	 */
-	public void addTimePlayed() {
+	private void addTimePlayed() {
 		timesPlayed += 1;
 		info.set("times-played", timesPlayed);
 		arena.getPlugin().saveConfig();
@@ -127,12 +129,15 @@ public class ArenaInfo {
 		case "red":
 			rw += 1;
 			info.set("red-wins", rw);
+			break;
 		case "blue":
 			bw += 1;
 			info.set("blue-wins", bw);
+			break;
 		default:
 			draws += 1;
 			info.set("draws", draws);
+			break;
 		}
 		arena.getPlugin().saveConfig();
 		crunchPercentages();

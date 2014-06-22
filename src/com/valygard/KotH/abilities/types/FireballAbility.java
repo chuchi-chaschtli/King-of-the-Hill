@@ -28,8 +28,8 @@ import com.valygard.KotH.messenger.Msg;
  */
 public class FireballAbility extends Ability implements Listener {
 
-	public FireballAbility(Arena arena, Player player) {
-		super(arena, player, Material.FIREBALL);
+	public FireballAbility(Arena arena, Player player, Material m) {
+		super(arena, player, m);
 		
 		if (!shootFireball()) {
 			Messenger.tell(player, "Could not shoot fireball.");
@@ -75,14 +75,6 @@ public class FireballAbility extends Ability implements Listener {
 					if (le.equals(tmp) || arena.getTeam(tmp).contains(le)) {
 						if (!arena.getSettings().getBoolean("friendly-fire"))
 							continue;
-					}
-					
-					if (le instanceof Player) {
-						if (!arena.hasPlayer((Player) le)) {
-							continue;
-						} else {
-							Messenger.tell((Player) le, Msg.ABILITY_FIREBALL_HIT, tmp.getName());
-						}
 					}
 
 					double distance = f.getLocation()

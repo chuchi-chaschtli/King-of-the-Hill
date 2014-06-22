@@ -86,6 +86,7 @@ public class SetWarpCmd implements Command {
 				case "end":
 				case "endwarp":
 					arena.setEndWarp(p.getLocation());
+					break;
 				default:
 					return false;
 			}

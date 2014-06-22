@@ -64,8 +64,9 @@ public class SetHillCmd implements Command {
 		if (args.length == 1) {
 			if (s == null) {
 				arena.getWarps().createSection("hills");
+				arena.getWarps().getConfigurationSection("hills").set(String.valueOf(1), "");
 				am.saveConfig();
-				ConfigUtil.setLocation(s, String.valueOf(1), p.getLocation());
+				ConfigUtil.setLocation(s, String.valueOf(1), l);
 			} else {
 				for (int i = 0; i <= s.getKeys(false).size(); i++) {
 					// Sanity Checks	
@@ -92,7 +93,7 @@ public class SetHillCmd implements Command {
 						Messenger.tell(p, "There is already a hill at this location.");
 						s.set(String.valueOf(i + 1), null);
 						am.saveConfig();
-						break;
+						return true;
 					}
 					
 					if(!callHillEvent(arena, p)) {
@@ -109,16 +110,16 @@ public class SetHillCmd implements Command {
 				ConfigUtil.setLocation(s, String.valueOf(number), l);
 				
 				if (!callHillEvent(arena, p)) {
-					return false;
+					return true;
 				}
 				
 				Messenger.tell(p, Msg.HILLS_RESET, String.valueOf(number));
-				am.saveConfig();
 			} else {
 				Messenger.tell(p, "There is no hill with the specified number.");
 				return true;
 			}
 		}
+		am.saveConfig();
 		am.reloadArena(arena);
 		am.tellHowManyMissing(arena, p);
 		

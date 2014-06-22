@@ -369,6 +369,8 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
+		
+		ai.setNewPlayerTotal();
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
