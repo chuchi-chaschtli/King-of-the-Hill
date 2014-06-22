@@ -101,7 +101,7 @@ public class GlobalListener implements Listener {
 			if (arena.getHillManager().containsPlayer(p))
 				Messenger.tell(p, "You are in the hill.");
 			else
-				Messenger.tell(p, Msg.HILLS_DISTANCE, df.format(l.distance(temp) - arena.getSettings().getInt("hill-radius") - 1));
+				Messenger.tell(p, Msg.HILLS_DISTANCE, df.format(l.distance(temp) - arena.getSettings().getInt("hill-radius")));
 			e.setCancelled(true);
 			return;
 		}
