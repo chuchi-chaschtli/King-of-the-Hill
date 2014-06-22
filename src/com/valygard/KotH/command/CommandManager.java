@@ -58,7 +58,7 @@ public class CommandManager implements CommandExecutor {
 
 	public CommandManager(KotH plugin) {
 		this.plugin = plugin;
-		this.am		= plugin.getArenaManager();
+		this.am = plugin.getArenaManager();
 
 		registerCommands();
 	}
@@ -72,7 +72,7 @@ public class CommandManager implements CommandExecutor {
 			org.bukkit.command.Command cmd, String commandLabel, String[] args) {
 		String first = (args.length > 0 ? args[0] : "");
 		String last = (args.length > 0 ? args[args.length - 1] : "");
-		
+
 		if (first.toLowerCase().startsWith("ver")) {
 			StringBuilder foo = new StringBuilder();
 			foo.append("\n");
@@ -94,18 +94,18 @@ public class CommandManager implements CommandExecutor {
 		}
 
 		String second = (args.length > 1 ? args[1] : "");
-		
+
 		if (first.equals("?") || first.equalsIgnoreCase("help")) {
 			if (!second.matches("\\d")) {
 				showHelp(sender);
 				return true;
 			}
-			
+
 			if (second.equals("") || Integer.parseInt(second) <= 1) {
 				showHelp(sender);
 				return true;
 			}
-			
+
 			showHelp(sender, Integer.parseInt(second));
 			return true;
 		}
@@ -117,6 +117,8 @@ public class CommandManager implements CommandExecutor {
 
 		List<Command> matches = getMatchingCommands(first);
 
+		// Because we use regex patterns for the command arguments, we need to
+		// make sure that there are no conflicting matches.
 		if (matches.size() > 1) {
 			Messenger.tell(sender, Msg.CMD_MULTIPLE_MATCHES);
 			for (Command command : matches) {
@@ -157,8 +159,9 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 			return true;
 		}
-		
-		ArenaCommandEvent ace = new ArenaCommandEvent(sender, cmd.getName() + " " + StringUtils.convertArrayToString(args));
+
+		ArenaCommandEvent ace = new ArenaCommandEvent(sender, cmd.getName()
+				+ " " + StringUtils.convertArrayToString(args));
 		Bukkit.getServer().getPluginManager().callEvent(ace);
 		if (ace.isCancelled()) {
 			Messenger.tell(sender, Msg.MISC_NO_ACCESS);
@@ -168,16 +171,31 @@ public class CommandManager implements CommandExecutor {
 		if (!command.execute(am, sender, params)) {
 			showUsage(command, sender, true);
 		}
-		
-		Messenger.log(sender.getName() + " has used command: " + "/koth " + info.name());
+
+		Messenger.log(sender.getName() + " has used command: " + "/koth "
+				+ info.name());
 		return false;
 	}
 
+	/**
+	 * Trims the first argument, which eventually becomes the command name.
+	 * 
+	 * @param args the arguments to trim.
+	 * @return the new String array.
+	 */
 	private String[] trimFirstArg(String[] args) {
 		return Arrays.copyOfRange(args, 1, args.length);
 	}
 
-	public void showUsage(Command command, CommandSender sender, boolean prefix) {
+	/**
+	 * Shows the usage information of a command to a sender upon incorrect
+	 * usage or when assistance is requested.
+	 * 
+	 * @param command the Command given
+	 * @param sender a CommandSender
+	 * @param prefix a boolean: if true, we attach "Usage : " before the usage.
+	 */
+	private void showUsage(Command command, CommandSender sender, boolean prefix) {
 		CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
 		CommandPermission perm = command.getClass().getAnnotation(
 				CommandPermission.class);
@@ -191,6 +209,15 @@ public class CommandManager implements CommandExecutor {
 				+ ChatColor.YELLOW + info.desc());
 	}
 
+	/**
+	 * Gets a list of commands matching a string given. Because the command
+	 * system uses regex patterns rather than the conventional
+	 * {@link #equals(Object)}, this helps ensures a command sent has no
+	 * conflicting commands.
+	 * 
+	 * @param arg a string representing the first argument in a command
+	 * @return a list of matching commands.
+	 */
 	private List<Command> getMatchingCommands(String arg) {
 		List<Command> result = new ArrayList<Command>();
 		for (Entry<String, Command> entry : commands.entrySet()) {
@@ -202,11 +229,25 @@ public class CommandManager implements CommandExecutor {
 		return result;
 	}
 
+	/**
+	 * Show the first page of helpful commands. 
+	 * 
+	 * @param sender the CommandSender
+	 * @see #showHelp(CommandSender, int)
+	 */
 	private void showHelp(CommandSender sender) {
 		showHelp(sender, 1);
 	}
 
+	/**
+	 * Because there are so many commands, this method shows helpful information
+	 * in a paginated fashion so as not to spam chat.
+	 * 
+	 * @param sender the CommandSender
+	 * @param page an integer representing which commands to show to the player.
+	 */
 	private void showHelp(CommandSender sender, int page) {
+		// Amount of commands
 		int cmds = 0;
 		for (Command cmd : commands.values()) {
 			CommandPermission perm = cmd.getClass().getAnnotation(
@@ -215,10 +256,11 @@ public class CommandManager implements CommandExecutor {
 			if (plugin.has(sender, perm.value()))
 				cmds++;
 		}
-		
+
+		// Tell the sender if they asked for a page that was too high.
 		if (Math.ceil(cmds / 6.0) < page) {
-			Messenger.tell(sender,
-					"Given: " + page + "; Expected integer 1 and "
+			Messenger.tell(sender, 
+					"Given: " + page + "; Expected integer 1 and " 
 							+ (int) Math.ceil(cmds / 6.0));
 			return;
 		}
@@ -236,12 +278,15 @@ public class CommandManager implements CommandExecutor {
 			if (!plugin.has(sender, perm.value()))
 				continue;
 
+			// Make sure we are on the right page.
 			if ((page * 6) - 5 > number)
 				continue;
 
+			// Break to make sure we don't have too many commands.
 			if (page * 6 < number)
 				break;
 
+			// Append the command and it's information
 			buffy.append("\n").append(ChatColor.RESET).append(usage.value())
 					.append(" ").append(ChatColor.YELLOW).append(info.desc());
 		}
@@ -287,8 +332,8 @@ public class CommandManager implements CommandExecutor {
 	}
 
 	/**
-	 * Registers the commands by checking if the class implements Command
-	 * and then appending it based on the command name.
+	 * Registers the commands by checking if the class implements Command and
+	 * then appending it based on the command name.
 	 * 
 	 * @param c a class that implements Command
 	 */
