@@ -1255,10 +1255,18 @@ public class Arena {
 	 * 
 	 * @param newWinner a team
 	 * @return the new victors of the arena.
+	 * @throws IllegalArgumentException if the winner specified is not a valid
+	 *             one.
 	 */
 	public Set<Player> setWinner(Set<Player> newWinner) {
-		winner = newWinner;
-		declareWinner(false);
+		if (winner != newWinner) {
+			if (!newWinner.equals(redPlayers) || !newWinner.equals(bluePlayers)
+					|| !newWinner.equals(null))
+				throw new IllegalArgumentException(
+						"Invalid winner! The winner must be the red team, blue team, or null.");
+			winner = newWinner;
+			declareWinner(false);
+		}
 		return winner;
 	}
 
