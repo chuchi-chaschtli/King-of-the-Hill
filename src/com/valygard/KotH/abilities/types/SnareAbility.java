@@ -5,7 +5,9 @@
 package com.valygard.KotH.abilities.types;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,7 +47,7 @@ public class SnareAbility extends Ability implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
-	public boolean placeSnare(Location l) {
+	private boolean placeSnare(Location l) {
 		if (!removeMaterial()) {
 			return false;
 		}
@@ -56,7 +58,7 @@ public class SnareAbility extends Ability implements Listener {
 		return true;
 	}
 
-	public boolean activateSnare(Location l) {
+	private boolean activateSnare(Location l) {
 		if (l.getBlock() == null || l.getBlock().getType() != mat) {
 			return false;
 		}
@@ -112,25 +114,30 @@ public class SnareAbility extends Ability implements Listener {
 			}
 
 			activateSnare(e.getTo());
-			snare.removeMetadata(player.getName(), plugin);
 			Messenger.tell(player, Msg.ABILITY_SNARE_ACTIVATED);
 			Messenger.tell(p, Msg.ABILITY_SNARED, player.getName());
-
+			
+			Set<LivingEntity> affected = new HashSet<LivingEntity>();
+			affected.add(p);
 			for (Entity entity : p.getNearbyEntities(3.3, 3.3, 3.3)) {
 				if (!(entity instanceof LivingEntity)) {
 					continue;
 				}
 				LivingEntity le = (LivingEntity) entity;
+				affected.add(le);
+			}
 
+			for (LivingEntity le : affected) {
 				double distance = le.getLocation().distance(e.getTo());
 				if (arena.getTeam(p).contains(le)
 						|| (le.getPassenger() != null && arena.getTeam(p)
 								.contains(le.getPassenger()))) {
 					double maxHealth = le.getMaxHealth();
-					le.damage(distance < 1.74 ? 0.84 * maxHealth : Math.min(
-							8.1 / distance + 0.9, 0.617 * maxHealth) + 7.1);
+					le.setHealth(le.getHealth() - (distance < 1.64 ? 0.68 * maxHealth : Math.min(
+							8.0 / distance + 1.3, 0.493 * maxHealth)));
 				}
 			}
+			affected.clear();
 
 			for (Player team : arena.getTeam(p)) {
 				if (team.isDead()) {
@@ -154,5 +161,6 @@ public class SnareAbility extends Ability implements Listener {
 		}
 		Block b = world.getBlockAt(x, y, z);
 		b.setType(Material.AIR);
+		b.removeMetadata(player.getName(), plugin);
 	}
 }

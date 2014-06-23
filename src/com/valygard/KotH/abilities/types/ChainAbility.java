@@ -36,11 +36,13 @@ public class ChainAbility extends Ability implements Listener {
 		super(arena, player, mat);
 		
 		this.affected = new HashMap<LivingEntity, Long>();
+		
+		activateChainEffect();
 		Messenger.tell(player, Msg.ABILITY_CHAIN_AMOUNT, String.valueOf(affected.size()));
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
-	public boolean activateChainEffect() {
+	private void activateChainEffect() {
 		ItemStack hand = player.getItemInHand();
 		short durability = hand.getDurability();
 		if (durability + 3 > 32) {
@@ -59,6 +61,7 @@ public class ChainAbility extends Ability implements Listener {
 				Player p = (Player) e;
 				if (getOpposingTeamOfPlayer().contains(p)) {
 					affected.put(p, System.currentTimeMillis());
+					p.setWalkSpeed(0.04F);
 				}
 				continue;
 			case ZOMBIE:
@@ -86,7 +89,7 @@ public class ChainAbility extends Ability implements Listener {
 		for (LivingEntity e : affected.keySet()) {
 			Location loc = e.getLocation();
 			world.strikeLightningEffect(loc);
-			e.damage(e.getMaxHealth() / 5.0);
+			e.setHealth(e.getHealth() - (e.getMaxHealth() / 5.0));
 
 			if (e.isDead()) {
 				if (!(e instanceof Player)) {
@@ -109,8 +112,6 @@ public class ChainAbility extends Ability implements Listener {
 						.callEvent(new ArenaPlayerDeathEvent(arena, p, player));
 			}
 		}
-		
-		return true;
 	}
 	
 	@EventHandler

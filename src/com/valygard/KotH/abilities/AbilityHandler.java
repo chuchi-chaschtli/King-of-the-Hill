@@ -70,23 +70,24 @@ public class AbilityHandler implements Listener {
 			return;
 		}
 
-		if (e.getAction() != Action.LEFT_CLICK_AIR
-				&& e.getAction() != Action.LEFT_CLICK_BLOCK) {
-			return;
-		}
-		
 		switch (hand.getType()) {
 		case GOLD_AXE:
+			if (e.getAction() != Action.RIGHT_CLICK_AIR
+					&& e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+				break;
+			}
+
 			if (p.hasMetadata("cooldown")) {
 				Messenger.tell(p, Msg.ABILITY_CHAIN_COOLDOWN);
 				break;
 			}
-			
+
 			new ChainAbility(arena, p, Material.GOLD_AXE);
 			p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
 			arena.scheduleTask(new Runnable() {
 				public void run() {
 					p.removeMetadata("cooldown", plugin);
+					Messenger.tell(p, "You may now use chain-lightning.");
 				}
 			}, 400L);
 			break;
@@ -100,6 +101,11 @@ public class AbilityHandler implements Listener {
 			new FireballAbility(arena, p, Material.FIREBALL);
 			break;
 		case HAY_BLOCK:
+			if (e.getAction() != Action.LEFT_CLICK_AIR
+					&& e.getAction() != Action.LEFT_CLICK_BLOCK) {
+				break;
+			}
+
 			new HorseAbility(arena, p, Material.HAY_BLOCK);
 			break;
 		default:
