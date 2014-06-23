@@ -41,7 +41,7 @@ public class Ability {
 			"Clementine", "Rupert", "Ronald", "Tobias", "Harold", "Phineas",
 			"Gene", "Milo", "Chief Keef" };
 	
-	protected static Random random = new Random();
+	protected Random random = new Random();
 
 	protected Ability(Arena arena, Player p, Material mat) {
 		if (!arena.isRunning()) {
