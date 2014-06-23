@@ -65,12 +65,14 @@ public class AbilityHandler implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		ItemStack hand = p.getItemInHand();
-		
-		if (hand == null || !arena.isRunning() || !arena.getPlayersInArena().contains(p)) {
+
+		if (hand == null || hand.getType() == Material.COMPASS
+				|| !arena.isRunning() || !arena.getPlayersInArena().contains(p)) {
 			return;
 		}
-		
-		if (e.getAction() != Action.LEFT_CLICK_AIR && e.getAction() != Action.LEFT_CLICK_BLOCK) {
+
+		if (e.getAction() != Action.LEFT_CLICK_AIR
+				&& e.getAction() != Action.LEFT_CLICK_BLOCK) {
 			return;
 		}
 		
