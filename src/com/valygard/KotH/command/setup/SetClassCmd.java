@@ -14,6 +14,7 @@ import com.valygard.KotH.command.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.player.ArenaClass;
 
 @CommandInfo(
 		name = "addclass", 
@@ -42,11 +43,17 @@ public class SetClassCmd implements Command {
 			return true;
 		}
 		
-		am.createClassNode(newClass, p.getInventory(), overwrite);
+		ArenaClass ac = am.createClassNode(newClass, p.getInventory(), overwrite);
+		if (ac == null) {
+			Messenger.tell(p, Msg.CLASS_EXISTS, newClass);
+			return true;
+		}
+		
 		if (overwrite)
 			Messenger.tell(p, Msg.CLASS_EDITED, newClass.toLowerCase());
-		else
+		else {
 			Messenger.tell(p, Msg.CLASS_ADDED, newClass.toLowerCase());
+		}
 		return true;
 	}
 

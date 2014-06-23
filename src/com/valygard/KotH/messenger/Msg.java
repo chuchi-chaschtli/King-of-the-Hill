@@ -49,6 +49,7 @@ public enum Msg {
 	CLASS_ADDED("You have created &e%&r with your inventory."),
 	CLASS_CHOSEN("You have chosen the &e%&r class."),
 	CLASS_EDITED("You have edited &e%&r with your inventory."),
+	CLASS_EXISTS("A class with name '&e%'&r was found. Specify the override flag to edit it."),
 	CLASS_NO_ACCESS("Sorry, you can't use this class."),
 	CLASS_NULL("The class specified does not exist!"),
 	CLASS_RANDOM("You have chosen a random class!"),
