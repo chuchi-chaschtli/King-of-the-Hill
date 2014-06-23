@@ -678,12 +678,6 @@ public class Arena {
 		for (Player p : arenaPlayers) {
 			playSound(p);
 		}
-
-		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-			public void run() {
-				firework.detonate();
-			}
-		}, 20 * random.nextInt(3) + 2);
 	}
 
 	/**
