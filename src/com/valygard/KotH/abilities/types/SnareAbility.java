@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,16 +30,16 @@ import com.valygard.KotH.messenger.Msg;
  * 
  */
 public class SnareAbility extends Ability implements Listener {
-	private Map<Location, Block> oldBlocks;
+	private Map<Block, Material> oldBlocks;
+	private boolean activated;
 
 	public SnareAbility(Arena arena, Player p, Location loc, Material mat) {
 		super(arena, p, mat);
-
-		this.oldBlocks = new HashMap<Location, Block>();
 		
-		if (!placeSnare(loc)) {
-			Messenger.tell(player, "Could not place snare.");
-		} else {
+		this.oldBlocks = new HashMap<Block, Material>();
+		this.activated = false;
+		
+		if (placeSnare(loc)) {
 			Messenger.tell(player, Msg.ABILITY_SNARE_PLACED);
 		}
 		Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -62,6 +64,12 @@ public class SnareAbility extends Ability implements Listener {
 		if (!l.getBlock().hasMetadata(player.getName())) {
 			return false;
 		}
+		
+		if (activated) {
+			return false;
+		} else {
+			activated = true;
+		}
 
 		final int x = l.getBlockX();
 		final int y = l.getBlockY();
@@ -71,26 +79,21 @@ public class SnareAbility extends Ability implements Listener {
 			for (int yn = y - 2; yn <= y + 2; yn++) {
 				for (int zn = z - 1; zn <= z + 1; zn++) {
 					Block b = world.getBlockAt(xn, yn, zn);
-					oldBlocks.put(b.getLocation(), b);
+					oldBlocks.put(b, b.getType());
 					b.setType(Material.WEB);
 				}
 			}
 		}
-		if (arena.getEndTimer().getRemaining() > 2) {
+		if (arena.getEndTimer().getRemaining() >= 4) {
 			arena.scheduleTask(new Runnable() {
 				public void run() {
-					world.createExplosion(x, y, z, 7.64F, false, false);
+					createExplosion(x, y, z);
 				}
 			}, 40);
 		} else {
-			world.createExplosion(x, y, z, 7.64F, false, false);
+			createExplosion(x, y, z);
 		}
-
-		for (Location loc : oldBlocks.keySet()) {
-			loc.getBlock().setType(oldBlocks.get(loc).getType());
-			loc.getBlock().getState().update();
-		}
-
+		
 		return true;
 	}
 
@@ -109,21 +112,47 @@ public class SnareAbility extends Ability implements Listener {
 			}
 
 			activateSnare(e.getTo());
+			snare.removeMetadata(player.getName(), plugin);
 			Messenger.tell(player, Msg.ABILITY_SNARE_ACTIVATED);
-			Messenger.tell(p, Msg.ABILITY_SNARED);
+			Messenger.tell(p, Msg.ABILITY_SNARED, player.getName());
 
-			if (p.isDead()) {
-				Messenger.tell(player, Msg.ABILITY_SNARE_KILL);
-				Bukkit.getPluginManager().callEvent(
-						new ArenaPlayerDeathEvent(arena, p, player));
-				arena.getStats(player).increment("kills");
-				arena.getRewards().giveKillstreakRewards(player);
-				arena.playSound(player);
+			for (Entity entity : p.getNearbyEntities(3.3, 3.3, 3.3)) {
+				if (!(entity instanceof LivingEntity)) {
+					continue;
+				}
+				LivingEntity le = (LivingEntity) entity;
+
+				double distance = le.getLocation().distance(e.getTo());
+				if (arena.getTeam(p).contains(le)
+						|| (le.getPassenger() != null && arena.getTeam(p)
+								.contains(le.getPassenger()))) {
+					double maxHealth = le.getMaxHealth();
+					le.damage(distance < 1.74 ? 0.84 * maxHealth : Math.min(
+							8.1 / distance + 0.9, 0.617 * maxHealth) + 7.1);
+				}
+			}
+
+			for (Player team : arena.getTeam(p)) {
+				if (team.isDead()) {
+					Messenger.tell(player, Msg.ABILITY_SNARE_KILL);
+					Bukkit.getPluginManager().callEvent(
+							new ArenaPlayerDeathEvent(arena, p, player));
+					arena.getStats(player).increment("kills");
+					arena.getRewards().giveKillstreakRewards(player);
+					arena.playSound(player);
+				}
 			}
 		}
 	}
-
-	public Map<Location, Block> getSnareAffectedBlocks() {
-		return oldBlocks;
+	
+	private void createExplosion(int x, int y, int z) {
+		world.createExplosion(x, y, z, 4F, false, false);
+		
+		for (Block b : oldBlocks.keySet()) {
+			Location loc = b.getLocation();
+			loc.getBlock().setType(oldBlocks.get(b));
+		}
+		Block b = world.getBlockAt(x, y, z);
+		b.setType(Material.AIR);
 	}
 }

@@ -23,6 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.abilities.types.ChainAbility;
@@ -33,6 +34,8 @@ import com.valygard.KotH.abilities.types.SnareAbility;
 import com.valygard.KotH.abilities.types.WolfAbility;
 import com.valygard.KotH.abilities.types.ZombieAbility;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.Msg;
 
 /**
  * @author Anand
@@ -59,7 +62,7 @@ public class AbilityHandler implements Listener {
 	
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		Player p = e.getPlayer();
+		final Player p = e.getPlayer();
 		ItemStack hand = p.getItemInHand();
 
 		if (hand == null || hand.getType() == Material.COMPASS
@@ -74,7 +77,18 @@ public class AbilityHandler implements Listener {
 		
 		switch (hand.getType()) {
 		case GOLD_AXE:
+			if (p.hasMetadata("cooldown")) {
+				Messenger.tell(p, Msg.ABILITY_CHAIN_COOLDOWN);
+				break;
+			}
+			
 			new ChainAbility(arena, p, Material.GOLD_AXE);
+			p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
+			arena.scheduleTask(new Runnable() {
+				public void run() {
+					p.removeMetadata("cooldown", plugin);
+				}
+			}, 400L);
 			break;
 		case BONE:
 			new WolfAbility(arena, p, Material.BONE);

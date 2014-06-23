@@ -4,6 +4,7 @@
  */
 package com.valygard.KotH.abilities.types;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -31,29 +32,19 @@ import com.valygard.KotH.messenger.Msg;
 public class ChainAbility extends Ability implements Listener {
 	private Map<LivingEntity, Long> affected;
 	
-	private boolean cooldown;
-	
 	public ChainAbility(Arena arena, Player player, Material mat) {
 		super(arena, player, mat);
 		
-		if (!activateChainEffect()) {
-			Messenger.tell(player, Msg.ABILITY_CHAIN_COOLDOWN);
-		} else {
-			Messenger.tell(player, Msg.ABILITY_CHAIN_AMOUNT, String.valueOf(affected.size()));
-			Bukkit.getPluginManager().registerEvents(this, plugin);
-		}
+		this.affected = new HashMap<LivingEntity, Long>();
+		Messenger.tell(player, Msg.ABILITY_CHAIN_AMOUNT, String.valueOf(affected.size()));
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
 	public boolean activateChainEffect() {
-		if (cooldown) {
-			// Penalty damage
-			player.damage(0.93);
-			return false;
-		}
 		ItemStack hand = player.getItemInHand();
 		short durability = hand.getDurability();
 		if (durability + 3 > 32) {
-			hand.setType(Material.AIR);
+			removeMaterial();
 		} else {
 			hand.setDurability((short) (durability + 3));
 		}
@@ -118,13 +109,6 @@ public class ChainAbility extends Ability implements Listener {
 						.callEvent(new ArenaPlayerDeathEvent(arena, p, player));
 			}
 		}
-		
-		cooldown = true;
-		arena.scheduleTask(new Runnable() {
-			public void run() {
-				cooldown = false;
-			}
-		}, 600);
 		
 		return true;
 	}
