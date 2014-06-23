@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.KotH;
+import com.valygard.KotH.abilities.types.ChainAbility;
 import com.valygard.KotH.abilities.types.FireballAbility;
 import com.valygard.KotH.abilities.types.HorseAbility;
 import com.valygard.KotH.abilities.types.LandmineAbility;
@@ -77,6 +78,9 @@ public class AbilityHandler implements Listener {
 		}
 		
 		switch (hand.getType()) {
+		case GOLD_AXE:
+			new ChainAbility(arena, p, Material.GOLD_AXE);
+			break;
 		case BONE:
 			new WolfAbility(arena, p, Material.BONE);
 			break;
@@ -90,7 +94,7 @@ public class AbilityHandler implements Listener {
 			new HorseAbility(arena, p, Material.HAY_BLOCK);
 			break;
 		default:
-			return;
+			break;
 		}
 	}
 	
