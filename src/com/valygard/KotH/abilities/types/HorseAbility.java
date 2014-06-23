@@ -41,6 +41,16 @@ public class HorseAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * Spawns a horse on the player. If the player is already riding a horse,
+	 * they are ejected and the horse is removed. The horse spawn is randomly
+	 * given armor, a breed, and an age. The player is given the horse as a
+	 * passenger, and this horse is tamed to obey the player's will. When the
+	 * player exits the horse, {@link #onVehicleExit(VehicleExitEvent) the horse
+	 * will be despawned}.
+	 * 
+	 * @return the Horse that was spawned.
+	 */
 	public Horse spawnHorse() {
 		if (!removeMaterial()) {
 			return null;

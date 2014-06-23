@@ -42,6 +42,13 @@ public class ChainAbility extends Ability implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
+	/**
+	 * Strikes lightning on all nearby entities of the player. This lightning is
+	 * arbitrary and is a visual effect. Entities lose 20% of their maximum
+	 * health, and all players have reduced walking speed for 5 seconds. To
+	 * strike lightning, players right click a golden axe, which has
+	 * approximately 11 total uses.
+	 */
 	private void activateChainEffect() {
 		ItemStack hand = player.getItemInHand();
 		short durability = hand.getDurability();

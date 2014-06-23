@@ -52,6 +52,11 @@ public class WolfAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * Spawn a wolf whose owner is the player.
+	 * 
+	 * @return the wolf if it was spawned, null otherwise.
+	 */
 	public Wolf spawnWolf() {
 		if (!removeMaterial()) {
 			return null;

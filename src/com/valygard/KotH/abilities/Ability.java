@@ -43,9 +43,20 @@ public class Ability {
 	
 	protected Random random = new Random();
 
+	/**
+	 * The constructor requires an arena, a player, and a material. If called
+	 * while the arena is not running, an IllegalStateException will be thrown.
+	 * Calling this constructor while the player is not on a team will also
+	 * result in an IllegalStateException.
+	 * 
+	 * @param arena a running arena
+	 * @param p a player
+	 * @param mat the material of the ability
+	 */
 	protected Ability(Arena arena, Player p, Material mat) {
 		if (!arena.isRunning()) {
-			throw new IllegalStateException("Arena must be running to use abilities!");
+			throw new IllegalStateException(
+					"Arena must be running to use abilities!");
 		}
 		
 		this.arena = arena;
@@ -66,42 +77,94 @@ public class Ability {
 		}
 	}
 	
+	/**
+	 * Gets the plugin.
+	 * 
+	 * @return an instance of the main class.
+	 */
 	protected KotH getPlugin() {
 		return plugin;
 	}
 	
+	/**
+	 * Gets the arena.
+	 * 
+	 * @return the arena the ability is being used in.
+	 */
 	protected Arena getArena() {
 		return arena;
 	}
 	
+	/**
+	 * Retrieves the world of an arena.
+	 * 
+	 * @return a World
+	 */
 	protected World getArenaWorld() {
 		return world;
 	}
 	
+	/**
+	 * Gets the player currently using an ability.
+	 * 
+	 * @return a Player.
+	 */
 	protected Player getPlayer() {
 		return player;
 	}
 	
+	/**
+	 * Gets the team of the player. This is useful for avoiding friendly-fire.
+	 * 
+	 * @return a set of players.
+	 */
 	protected Set<Player> getTeamWithPlayer() {
 		return team;
 	}
 	
+	/**
+	 * Obtains the players that can be attacked with most abilities.
+	 * 
+	 * @return a player set.
+	 */
 	protected Set<Player> getOpposingTeamOfPlayer() {
 		return opponents;
 	}
 	
+	/**
+	 * Gets the player's location.
+	 * 
+	 * @return a Location
+	 */
 	protected Location getLocation() {
 		return loc;
 	}
 
+	/**
+	 * Gets the material with which the ability can be used with.
+	 * 
+	 * @return an enumeration value from Material.
+	 */
 	protected Material getAbilityMaterial() {
 		return mat;
 	}
 
+	/**
+	 * Returns true if the player is holding the ability material, false
+	 * otherwise.
+	 * 
+	 * @return a boolean value.
+	 */
 	protected boolean isHoldingMaterial() {
 		return (player.getItemInHand().getType() == mat);
 	}
 
+	/**
+	 * Attempts to remove the material from the player's inventory. However,
+	 * this only removes the item if the player is holding it.
+	 * 
+	 * @return true if the item is removed, false otherwise.
+	 */
 	protected boolean removeMaterial() {
 		if (isHoldingMaterial()) {
 			player.getInventory().removeItem(
@@ -112,10 +175,21 @@ public class Ability {
 		return false;
 	}
 	
+	/**
+	 * Gets an array of names which can be used as custom names for mobs.
+	 * 
+	 * @return a String array.
+	 */
 	protected String[] getNames() {
 		return names;
 	}
-	
+
+	/**
+	 * Acts as nextInt() for our globalized random.
+	 * 
+	 * @param i the max value of the random.
+	 * @return a random integer.
+	 */
 	protected int nextInt(int i) {
 		return random.nextInt(i);
 	}

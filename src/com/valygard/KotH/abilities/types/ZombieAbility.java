@@ -55,6 +55,16 @@ public class ZombieAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * Spawn a zombie on the player. These zombies are super strong with 1.8x
+	 * the health of normal zombies (therefore 38 hearts), in an attempt to
+	 * balance out sunlight and make them adequate fighters. These zombies can
+	 * only target enemies of the player who spawned them, and teleport to a
+	 * random opponent. This teleportation is fairly buggy and zombies have been
+	 * known to meander through blocks and attack from great distances.
+	 * 
+	 * @return
+	 */
 	public Zombie spawnZombie() {
 		if (!removeMaterial()) {
 			return null;

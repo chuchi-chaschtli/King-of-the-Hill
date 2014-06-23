@@ -47,6 +47,13 @@ public class SnareAbility extends Ability implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
+	/**
+	 * Places a 'snare' on a given location. This snare is a Cobweb, which is
+	 * meant to trap the player.
+	 * 
+	 * @param l a Location
+	 * @return true if the snare was placed, false otherwise.
+	 */
 	private boolean placeSnare(Location l) {
 		if (!removeMaterial()) {
 			return false;
@@ -58,6 +65,16 @@ public class SnareAbility extends Ability implements Listener {
 		return true;
 	}
 
+	/**
+	 * When a player enters a snare, a box of cobwebs forms (3x3x5, L x W x H)
+	 * centered on the player. If there are more than 4 seconds left in the
+	 * arena, the box waits 2 seconds before exploding. Otherwise, there is no
+	 * wait, to make sure the player does not die after the arena ends. The
+	 * player who enters the snare must be an enemy.
+	 * 
+	 * @param l a Location
+	 * @return true if the snare blew up, false otherwise.
+	 */
 	private boolean activateSnare(Location l) {
 		if (l.getBlock() == null || l.getBlock().getType() != mat) {
 			return false;
@@ -152,9 +169,18 @@ public class SnareAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * A helper method to create an explosion and regenerate the blocks that
+	 * were present before the snare.
+	 * 
+	 * @param x an x coordinate of a location (snare)
+	 * @param y a y coordinate of a location (snare)
+	 * @param z a z coordinate of a location (snare)
+	 * @see #activateSnare(Location)
+	 */
 	private void createExplosion(int x, int y, int z) {
 		world.createExplosion(x, y, z, 4F, false, false);
-		
+
 		for (Block b : oldBlocks.keySet()) {
 			Location loc = b.getLocation();
 			loc.getBlock().setType(oldBlocks.get(b));

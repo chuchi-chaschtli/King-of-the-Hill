@@ -39,6 +39,13 @@ public class FireballAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * Shoots a fireball dud, which is for visual effects. Damage from the
+	 * fireball is handled independently with an algorithm.
+	 * 
+	 * @return true if the fireball was shot.
+	 * @see #onProjectileHit(ProjectileHitEvent) damage algorithm
+	 */
 	public boolean shootFireball() {
 		if (!removeMaterial()) {
 			return false;

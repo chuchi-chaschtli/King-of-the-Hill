@@ -51,6 +51,16 @@ public class LandmineAbility extends Ability implements Listener {
 		}
 	}
 	
+	/**
+	 * Sets a landmine on a location. This landmine is a stone plate and will
+	 * explode when triggered. However, if friendly-fire is disabled for the
+	 * arena, it can only be triggered by enemy players of the player who placed
+	 * aforementioned landmine. A player can have as many landmines as they
+	 * wish, and all are cleared at the end of the arena.
+	 * 
+	 * @param l the Location at which the landmine will be placed.
+	 * @return l the Location of the landmine. Returns null if the landmine was not placed.
+	 */
 	public Location placeLandmine(Location l) {
 		if (!removeMaterial()) {
 			return null;
@@ -86,10 +96,21 @@ public class LandmineAbility extends Ability implements Listener {
 		return l;
 	}
 	
+	/**
+	 * Gets the most recent landmine placed by a player.
+	 * 
+	 * @return a Location
+	 */
 	public Location getNewLandmine() {
 		return l;
 	}
 	
+	/**
+	 * Retrieves all the landmines of a player.
+	 * 
+	 * @param p the Player
+	 * @return a list of Locations.
+	 */
 	public List<Location> getLandmines(Player p) {
 		if (landmines.get(p.getUniqueId()) != null) {
 			return landmines.get(p.getUniqueId());
@@ -97,11 +118,25 @@ public class LandmineAbility extends Ability implements Listener {
 		return null;
 	}
 	
+	/**
+	 * Creates an explosion on a player. When the player
+	 * {@link #onPlayerInteract(PlayerInteractEvent) trips the landmine}, they
+	 * will blow up.
+	 * 
+	 * @param p the player who triggered a landmine.
+	 */
 	private void createExplosion(Player p) {
 		Location l = p.getLocation();
 		l.getWorld().createExplosion(l.getX(), l.getY(), l.getZ(), 4F, false, false);
 	}
 	
+	/**
+	 * Retrieves the player who placed a landmine at a location.
+	 * 
+	 * @param l the Location to check
+	 * @return a Player that placed the landmine. Returns null if no landmine
+	 *         was placed.
+	 */
 	private Player getWhoPlacedLandmine(Location l) {
 		for (Entry<UUID, List<Location>> entry : landmines.entrySet()) {
             if (entry.getValue().contains(l)) {
