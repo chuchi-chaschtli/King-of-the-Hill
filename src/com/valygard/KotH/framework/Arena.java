@@ -423,7 +423,7 @@ public class Arena {
 	 * @param restarting whether or not the arena should launch fireworks.
 	 * @return true if the arena successfully ended; false otherwise
 	 */
-	public boolean endArena(boolean restarting) {
+	public boolean endArena() {
 		// Sanity-checks.
 		if (!running || !enabled) {
 			return false;
@@ -449,7 +449,7 @@ public class Arena {
 				}
 			}
 		}
-		declareWinner(restarting);
+		declareWinner();
 		playSound(Sound.BURP, 1F, 1F);
 
 		Set<Player> temp = new HashSet<Player>();
@@ -486,17 +486,6 @@ public class Arena {
 
 		return true;
 	}
-	
-	/**
-	 * We do not always need to check if a server is reloading or restarting to
-	 * end an arena. By default, we will assume the server is not being
-	 * restarted.
-	 * 
-	 * @return true if the arena successfully ended; false otherwise.
-	 */
-	public boolean endArena() {
-		return endArena(false);
-	}
 
 	/**
 	 * Force an arena to begin.
@@ -509,19 +498,10 @@ public class Arena {
 	/**
 	 * Forcibly end an arena.
 	 * 
-	 * @param is the server restarting?
-	 */
-	public void forceEnd(boolean restarting) {
-		endTimer.halt();
-		endArena(restarting);
-	}
-
-	/**
-	 * Assume that the arena is not going under a server reload or restart is
-	 * safe, because we only need to check for it in the onDisable().
 	 */
 	public void forceEnd() {
-		forceEnd(false);
+		endTimer.halt();
+		endArena();
 	}
 
 	/**
@@ -589,10 +569,8 @@ public class Arena {
 
 	/**
 	 * Declare one team as victorious based on which set has a higher score.
-	 * 
-	 * @param restarting whether or not the arena should create fireworks.
 	 */
-	public void declareWinner(boolean restarting) {
+	public void declareWinner() {
 		Set<Player> loser;
 		if (winner == null) {
 			Messenger.announce(this, Msg.ARENA_DRAW);
@@ -616,8 +594,7 @@ public class Arena {
 			loser = null;
 
 		for (Player p : winner) {
-			if (!restarting)
-				createFirework(p.getLocation());
+			createFirework(p.getLocation());
 			getStats(p).increment("wins");
 		}
 
@@ -1257,7 +1234,7 @@ public class Arena {
 				throw new IllegalArgumentException(
 						"Invalid winner! The winner must be the red team, blue team, or null.");
 			winner = newWinner;
-			declareWinner(false);
+			declareWinner();
 		}
 		return winner;
 	}
