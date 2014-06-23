@@ -5,13 +5,16 @@
 package com.valygard.KotH.abilities;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
@@ -28,6 +31,7 @@ import com.valygard.KotH.KotH;
 import com.valygard.KotH.abilities.types.FireballAbility;
 import com.valygard.KotH.abilities.types.HorseAbility;
 import com.valygard.KotH.abilities.types.LandmineAbility;
+import com.valygard.KotH.abilities.types.SnareAbility;
 import com.valygard.KotH.abilities.types.WolfAbility;
 import com.valygard.KotH.abilities.types.ZombieAbility;
 import com.valygard.KotH.framework.Arena;
@@ -41,6 +45,7 @@ public class AbilityHandler implements Listener {
 	private KotH plugin;
 	
 	private Map<UUID, List<Location>> landmines;
+	private Map<Location, Map<Location, Block>> snares;
 	
 	public AbilityHandler(Arena arena) {
 		this.arena = arena;
@@ -53,6 +58,7 @@ public class AbilityHandler implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		
 		this.landmines = new HashMap<UUID, List<Location>>();
+		this.snares = new HashMap<Location, Map<Location, Block>>();
 	}
 	
 	@EventHandler (priority = EventPriority.HIGH)
@@ -104,6 +110,14 @@ public class AbilityHandler implements Listener {
 				landmines.put(p.getUniqueId(), la.getLandmines(p));
 			}
 			break;
+		case WEB:
+			SnareAbility sa = new SnareAbility(arena, p, e.getBlock().getLocation(), Material.WEB);
+			snares.put(e.getBlock().getLocation(), sa.getSnareAffectedBlocks());
+			break;
+		case HAY_BLOCK:
+			new HorseAbility(arena, p, Material.HAY_BLOCK);
+			e.setCancelled(true);
+			break;
 		default:
 			if (!p.hasPermission("koth.admin.placeblocks"))
 				e.setCancelled(true);
@@ -111,10 +125,16 @@ public class AbilityHandler implements Listener {
 		}
 	}
 	
+	// --------------------------- //
+	// Cleanup
+	// --------------------------- //
+	
+	
 	public void cleanup(Player p) {
 		clearZombies(p);
 		clearWolves(p);
 		clearLandmines(p);
+		clearSnares(p);
 		
 		if (p.getVehicle() instanceof Horse) {
 			p.getVehicle().remove();
@@ -147,6 +167,28 @@ public class AbilityHandler implements Listener {
 		}
 		landmines.remove(p.getUniqueId());
 	}
+	
+	private void clearSnares(Player p) {
+		Set<Location> snaresToRemove = new HashSet<Location>();
+		for (Location l : snares.keySet()) {
+			if (l.getBlock() != null && l.getBlock().getType() == Material.WEB
+					&& l.getBlock().hasMetadata(p.getName())) {
+				l.getBlock().setType(Material.AIR);
+				snaresToRemove.add(l);
+			}
+		}
+		
+		for (Location l : snaresToRemove) {
+			if (snares.containsKey(l)) {
+				snares.remove(l);
+			}
+		}
+		snaresToRemove.clear();
+	}
+	
+	// --------------------------- //
+	// Getters
+	// --------------------------- //
 	
 	public Arena getArena() {
 		return arena;
