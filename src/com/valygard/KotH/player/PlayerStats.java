@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.TimeUtil;
 
 /**
@@ -44,6 +46,9 @@ public class PlayerStats {
 	// Time spent in the arena
 	private int timespent;
 	private BukkitTask task;
+	
+	// Class data of the player
+	private ConfigurationSection data;
 	
 	// Directory where stats are stored.
 	private File dir;
@@ -101,6 +106,8 @@ public class PlayerStats {
 			this.winstreak	= config.getInt(path + "winstreak");
 
 			this.timespent	= config.getInt(path + "time-spent");
+			
+			this.data 		= ConfigUtil.makeSection(config.getConfigurationSection("arenas." + name), "class-data");
 		}
 		config.set("player", player.getName());
 
@@ -243,7 +250,7 @@ public class PlayerStats {
 	public void startTiming() {
 		if (!tracking)
 			return;
-		
+
 		final int i = arena.getSettings().getInt("time-tracking-cycle");
 		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
 				new BukkitRunnable() {
@@ -255,6 +262,13 @@ public class PlayerStats {
 						addTime(i);
 					}
 				}, 20 * i, 20 * i);
+	}
+	
+	public void collectClassData() {
+		loadFile();
+		ArenaClass ac = arena.getClass(player);
+		data.set(ac.getLowercaseName(), data.getInt(ac.getLowercaseName()) + 1);
+		saveFile();
 	}
 	
 	private void saveFile() {

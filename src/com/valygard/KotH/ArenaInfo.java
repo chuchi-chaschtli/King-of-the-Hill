@@ -4,10 +4,14 @@
 package com.valygard.KotH;
 
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.util.ConfigUtil;
 
 /**
@@ -33,6 +37,9 @@ public class ArenaInfo {
 	// Win number crunchers and percentages
 	private int rw, bw, draws;
 	private double rwp, bwp, dp;
+	
+	// How many times each class is used.
+	private Map<ArenaClass, Integer> classes;
 
 	public ArenaInfo(Arena arena) {
 		this.arena = arena;
@@ -54,6 +61,8 @@ public class ArenaInfo {
 		this.rw = info.getInt("red-wins");
 		this.bw = info.getInt("blue-wins");
 		this.draws = info.getInt("draws");
+		
+		this.classes = new TreeMap<ArenaClass, Integer>();
 		
 		addTimePlayed();
 
@@ -98,6 +107,26 @@ public class ArenaInfo {
 	public void setNewPlayerTotal() {
 		totalPlayers += arena.getPlayersInArena().size();
 		info.set("total-players", totalPlayers);
+		arena.getPlugin().saveConfig();
+	}
+	
+	/**
+	 * Gets the classes each player has and inputs it to config in ascending order.
+	 */
+	public void collectClassData() {
+		for (Player p : arena.getPlayersInArena()) {
+			ArenaClass ac = arena.getClass(p);
+			
+			if (classes.containsKey(ac)) {
+				classes.put(ac, classes.get(ac) + 1);
+			} else {
+				classes.put(ac, 1);
+			}
+		}
+		ConfigurationSection data = ConfigUtil.makeSection(info, "class-data");
+		for (ArenaClass ac : classes.keySet()) {
+			data.set(ac.getLowercaseName(), classes.get(ac));
+		}
 		arena.getPlugin().saveConfig();
 	}
 

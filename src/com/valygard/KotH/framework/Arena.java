@@ -409,6 +409,9 @@ public class Arena {
 		// Set running to true.
 		running = true;
 		
+		// Collect class data of players still remaining.
+		ai.collectClassData();
+		
 		ah = new AbilityHandler(this);
 
 		Messenger.announce(this, Msg.ARENA_START);	
