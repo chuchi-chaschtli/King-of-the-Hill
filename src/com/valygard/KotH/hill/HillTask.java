@@ -39,6 +39,7 @@ public class HillTask {
 				manager.changeHills();
 
 				arena.getScoreboard().setTimeleft(arena.getEndTimer().getRemaining());
+				arena.getScoreboard().updateStrengths();
 
 				// Call scoring event
 				ArenaScoreEvent event = new ArenaScoreEvent(arena);

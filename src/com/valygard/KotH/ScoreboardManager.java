@@ -32,8 +32,11 @@ public class ScoreboardManager {
     // two teams (Red and Blue)
     private Team redteam, blueteam;
     
-    // Three different scores (on the side bar)
+    // Red score, blue score, and time remaining
     private Score red, blue, timeLeft;
+    
+    // Amount of red players and blue players in the hill
+    private Score redStr, blueStr;
     
     /**
      * Create a new scoreboard for the given arena.
@@ -52,6 +55,9 @@ public class ScoreboardManager {
 		red 		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_RED + "[Red Team]"));
 		blue 		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.DARK_BLUE + "[Blue Team]"));
 		timeLeft 	= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.YELLOW + "Time left -"));
+		
+		redStr		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.RED + "[Red Control]"));
+		blueStr		= sidebar.getScore(Bukkit.getOfflinePlayer(ChatColor.BLUE + "[Blue Control]"));
 		
 		// teams
 		redteam 	= scoreboard.registerNewTeam("red");
@@ -136,6 +142,30 @@ public class ScoreboardManager {
      */
     public void setTimeleft(int time) {
     	timeLeft.setScore(time);
+    }
+    
+    /**
+     * Get the amount of red players in the hill.
+     * @return
+     */
+    public Score getRedStrength() {
+    	return redStr;
+    }
+    
+    /**
+     * Update the amount of players from each team in the hill.
+     */
+    public void updateStrengths() {
+    	redStr.setScore(arena.getHillManager().getRedStrength());
+    	blueStr.setScore(arena.getHillManager().getBlueStrength());
+    }
+    
+    /**
+     * Get the amount of blue players in the hill.
+     * @return
+     */
+    public Score getBlueStrength() {
+    	return blueStr;
     }
     
     /**
