@@ -6,7 +6,7 @@
 
 	<groupId>com.valygard.KotH</groupId>
 	<artifactId>KotH</artifactId>
-	<version>1.2.7.7</version>
+	<version>1.2.7.10</version>
 	<name>King of the Hill</name>
 	<url>http://dev.bukkit.org/server-mods/king-of-the-hill/</url>
 	<description>King of the Hill is a Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.</description>
