@@ -349,6 +349,10 @@ public class PlayerStats {
 		return TimeUtil.formatIntoSentence(timespent);
 	}
 	
+	public ConfigurationSection getClassData() {
+		return data;
+	}
+	
 	public boolean isTracking() {
 		return tracking;
 	}

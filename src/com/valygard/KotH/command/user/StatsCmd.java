@@ -3,6 +3,13 @@
  */
 package com.valygard.KotH.command.user;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,6 +22,7 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.player.PlayerStats;
 
 @CommandInfo(
@@ -66,6 +74,31 @@ public class StatsCmd implements Command {
 				+ makeString(stats.getKillstreak()) + "killstreak." : "");
 		String winstreak 	= (stats.getWinstreak() > 0 ? "You are on a"
 				+ makeString(stats.getWinstreak()) + "winstreak." : "");
+		
+		// Sorted class-data through comparator
+		final Map<String, Integer> classData = new HashMap<String, Integer>();
+		
+		for (ArenaClass ac : am.getClasses().values()) {
+			int timesUsed = stats.getClassData().getInt(ac.getLowercaseName());
+			classData.put(ac.getLowercaseName(), timesUsed);
+		}
+		
+		List<String> list = new ArrayList<String>(classData.keySet());
+		
+		Comparator<String> cmp = new Comparator<String>() {
+			@Override
+			public int compare(String s1, String s2) {
+				Integer timesUsed1 = classData.get(s1);
+				Integer timesUsed2 = classData.get(s2);
+				return timesUsed1.compareTo(timesUsed2);
+			}
+		};
+		
+		Collections.sort(list, Collections.reverseOrder(cmp));
+		int amount = classData.get(list.get(0));
+		String mostUsed = "You have used class '" + ChatColor.YELLOW
+				+ list.get(0) + ChatColor.RESET + "' a total of "
+				+ ChatColor.YELLOW + amount + (amount == 1 ? " time." : " times.");
 
 		// Pretty up the time spent in the arena.
 		String timespent = "You have spent" + ChatColor.YELLOW
@@ -91,16 +124,22 @@ public class StatsCmd implements Command {
 		foo.append("\n").append(" ");
 		foo.append("\n").append(timespent);
 
+		foo.append("\n").append(" ");
+		foo.append("\n").append(mostUsed);
+
 		Messenger.tell(p, Msg.STATS, foo.toString());
 		return true;
 	}
 
 	private String makeString(int i) {
-		return " " + ChatColor.DARK_GREEN + String.valueOf(i) + ChatColor.RESET + " ";
+		return " " + ChatColor.DARK_GREEN + String.valueOf(i) + ChatColor.RESET
+				+ " ";
 	}
-	
+
 	private String makeString(PlayerStats stats, int x, int y) {
-		return " " + ChatColor.DARK_GREEN + String.valueOf(stats.calculateRatio(x, y)) + ChatColor.RESET + " ";
+		return " " + ChatColor.DARK_GREEN
+				+ String.valueOf(stats.calculateRatio(x, y)) + ChatColor.RESET
+				+ " ";
 	}
 
 }
