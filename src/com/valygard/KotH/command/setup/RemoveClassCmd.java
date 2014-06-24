@@ -1,6 +1,5 @@
 /**
  * RemoveClassCmd.java is part of King of the Hill.
- * (c) 2014 Anand, All Rights Reserved.
  */
 package com.valygard.KotH.command.setup;
 

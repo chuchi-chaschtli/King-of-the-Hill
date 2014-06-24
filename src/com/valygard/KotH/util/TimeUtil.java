@@ -1,3 +1,6 @@
+/**
+ * TimeUtil.java is part of King of the Hill.
+ */
 package com.valygard.KotH.util;
 
 /**
