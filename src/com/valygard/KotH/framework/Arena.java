@@ -389,6 +389,9 @@ public class Arena {
 
 			// Start adding seconds to their time-spent in the arena.
 			getStats(p).startTiming();
+			
+			// Collect player class data.
+			getStats(p).collectClassData();
 
 			if (!redPlayers.contains(p) && !bluePlayers.contains(p))
 				balanceTeams(p);
