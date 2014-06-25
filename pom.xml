@@ -1,0 +1,122 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Project Info -->
+
+	<groupId>com.valygard.KotH</groupId>
+	<artifactId>KotH</artifactId>
+	<version>1.2.7.10</version>
+	<name>King of the Hill</name>
+	<url>http://dev.bukkit.org/server-mods/king-of-the-hill/</url>
+	<description>King of the Hill is a Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.</description>
+	<inceptionYear>2013</inceptionYear>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jm-version>${project.version}</jm-version>
+	</properties>
+
+	<!-- Organization -->
+
+	<organization>
+		<name>AoH_Ruthless</name>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill</url>
+	</organization>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:git://github.com:AoHRuthless/King-of-the-Hill.git</connection>
+		<url>https://github.com/AoHRuthless/King-of-the-Hill</url>
+		<developerConnection>AoHRuthless</developerConnection>
+	</scm>
+
+	<!-- Build -->
+
+	<build>
+		<finalName>KotH</finalName>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<directory>${basedir}/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>config.yml</include>
+					<include>plugin.yml</include>
+				</includes>
+			</resource>
+			<resource>
+				<targetPath>resources</targetPath>
+				<directory>${basedir}/resources/root</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>*.yml</include>
+				</includes>
+			</resource>
+		</resources>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+	<!-- Repositories -->
+
+	<repositories>
+		<repository>
+			<id>bukkit-repo</id>
+			<url>http://repo.bukkit.org/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>vault-repo</id>
+			<url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+		</repository>
+	</repositories>
+
+	<!-- Dependencies -->
+
+	<dependencies>
+		<dependency>
+			<groupId>com.massivecraft</groupId>
+			<artifactId>Factions</artifactId>
+			<version>2.3.1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/Factions.jar</systemPath>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.massivecraft</groupId>
+			<artifactId>MCore</artifactId>
+			<version>7.1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/mcore.jar</systemPath>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.7.2-R0.3</version>
+			<type>jar</type>
+			<scope>provided</scope>
+			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>net.milkbowl.vault</groupId>
+			<artifactId>Vault</artifactId>
+			<version>1.2.31</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+</project>
