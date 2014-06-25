@@ -3,6 +3,7 @@
  */
 package com.valygard.KotH.command.setup;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.valygard.KotH.command.Command;
@@ -34,9 +35,19 @@ public class ConfigCmd implements Command {
 		}
 		
 		else if (args[0].startsWith("reload")) {
-			am.reloadConfig();
-			Messenger.tell(sender, "Config-file reloaded.");
-			Messenger.info("Config-file reloaded.");
+			try {
+				am.reloadConfig();
+				Messenger.tell(sender, "Config-file reloaded.");
+				Messenger.info("Config-file reloaded.");
+			} catch (Exception e) {
+				Messenger.tell(sender, ChatColor.RED
+						+ "Error discovered in config.yml!" + ChatColor.RESET
+						+ "\n" + e.getMessage());
+				Messenger.tell(sender, "King of the Hill has been disabled.");
+				Messenger.tell(sender,
+						"Please fix your config.yml, reload it again, and re-enable King of the Hill by typing "
+						+ ChatColor.YELLOW + "/koth enable");
+			}
 		}
 		
 		else
