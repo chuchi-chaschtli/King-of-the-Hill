@@ -897,8 +897,10 @@ public class Arena {
 	 */
 	public void setLocation(String path, Location loc) {
 		if (loc.getBlock() != null) {
-			loc = loc.getWorld().getHighestBlockAt(loc).getLocation()
-					.add(0, 1, 0);
+			if (settings.getBoolean("location-fixer")) {
+				loc = loc.getWorld().getHighestBlockAt(loc).getLocation()
+						.add(0, 1, 0);
+			}
 		}
 		ConfigUtil.setLocation(warps, path, loc);
 	}

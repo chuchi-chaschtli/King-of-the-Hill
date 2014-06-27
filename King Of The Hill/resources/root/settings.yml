@@ -34,4 +34,5 @@ teleport-to-end: false
 use-scoreboard: true
 use-compasses: true
 give-prizes: true
+location-fixer: false
 play-sounds: true
