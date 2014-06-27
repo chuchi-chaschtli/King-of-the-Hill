@@ -1,10 +1,9 @@
 name: King of the Hill
-main: com.valygard.KotH.KotH
-version: 1.2.7.10
-website: http://valygard.com
+main: ${project.groupId}.${project.artifactId}
+version: ${project.version}
+website: ${project.url}
 author: AoH_Ruthless
-description: >
-  A Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.
+description: ${project.description}
 softdepend: [Vault, Factions]
 
 commands:
