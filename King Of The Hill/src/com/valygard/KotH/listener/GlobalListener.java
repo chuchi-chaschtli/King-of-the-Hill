@@ -382,8 +382,9 @@ public class GlobalListener implements Listener {
 		Player p = e.getPlayer();
 		Arena arena = am.getArenaWithPlayer(p);
 
-		if (arena == null)
+		if (arena == null || !arena.isRunning()) {
 			return;
+		}
 
 		// Cheater cheater pumpkin eater
 		if (!arena.getRedTeam().contains(p) && !arena.getBlueTeam().contains(p)) {
