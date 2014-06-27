@@ -730,7 +730,7 @@ public class Arena {
 				+ "Hill Locator");
 		compass.setItemMeta(im);
 		p.getInventory().addItem(new ItemStack[] { compass });
-		p.setCompassTarget(hillUtils.getCurrentHill());
+		p.setCompassTarget(hillUtils.getCurrentHill() != null ? hillUtils.getCurrentHill() : null);
 	}
 
 	/**
