@@ -1,0 +1,150 @@
+name: King of the Hill
+main: com.valygard.KotH.KotH
+version: 1.2.7.10
+website: http://valygard.com
+author: AoH_Ruthless
+description: >
+  A Minecraft minigame aimed at simulating the extremely combative gametype King of the Hill.
+softdepend: [Vault, Factions]
+
+commands:
+  koth:
+    description: Command for King of the Hill.
+  kingofthehill:
+    description: Command for King of the Hill.
+    
+permissions:
+# ---------- Users ---------- #
+  koth.user:
+    default: true
+    children:
+      koth.user.join: true
+      koth.user.leave: true
+      koth.user.listarenas: true
+      koth.user.listplayers: true
+      koth.user.arenastats: true
+      koth.user.info: true
+      koth.user.spectate: true
+      koth.user.pickclass: true
+      koth.user.pickteam: true
+      koth.user.signs: true
+      koth.arenas: true
+      koth.classes: true
+  koth.user.arenastats:
+    default: false
+    description: View your stats for an arena.
+  koth.user.join:
+    default: false
+    description: Join an arena.
+  koth.user.leave:
+    default: false
+    description: Leave an arena.
+  koth.user.listarenas:
+    default: false
+    description: List all available arenas.
+  koth.user.listplayers:
+    default: false
+    description: List players in an arena.
+  koth.user.info:
+    default: false
+    description: Get the scoop on an arena.
+  koth.user.spectate:
+    default: false
+    description: Spectate an arena.
+  koth.user.pickclass:
+    default: false
+    description: Choose a class.
+  koth.user.signs:
+    default: false
+    description: Use arena signs.
+  koth.user.pickteam:
+    default: false
+    description: Choose a team.
+
+# ---------- Setup ---------- #
+  koth.setup:
+    default: op
+    children:
+      koth.user: true
+      koth.setup.addarena: true
+      koth.setup.removearena: true
+      koth.setup.config: true
+      koth.setup.sethill: true
+      koth.setup.setwarps: true
+      koth.setup.addclass: true
+      koth.setup.removeclass: true
+      koth.setup.location: true
+      koth.setup.setting: true
+  koth.setup.addarena:
+    default: false
+    description: Add a new arena.
+  koth.setup.removearena:
+    default: false
+    description: Remove an existing arena.
+  koth.setup.config:
+    default: false
+    description: Save or reload the config.yml in-game.
+  koth.setup.sethill:
+    default: false 
+    description: Add a new hill to an arena.
+  koth.setup.setwarps:
+    default: false
+    description: Set an important arena warp.
+  koth.setup.addclass:
+    default: false
+    description: Add a new class.
+  koth.setup.removeclass:
+    default: false
+    description: Remove an existing class.
+  koth.setup.setting:
+    default: false
+    description: View arena settings.
+  koth.setup.location:
+    default: false
+    description: View arena locations.
+      
+# ---------- Admin ---------- #
+  koth.admin:
+    default: op
+    children:
+      koth.setup: true
+      koth.admin.enable: true
+      koth.admin.disable: true
+      koth.admin.forcestart: true
+      koth.admin.forceend: true
+      koth.admin.breakblocks: true
+      koth.admin.placeblocks: true
+      koth.admin.teleport: true
+      koth.admin.dropitems: true
+      koth.admin.update: true
+      koth.admin.signs: true
+  koth.admin.enable:
+    default: false
+    description: Enable the plugin or individual arenas.
+  koth.admin.disable:
+    default: false
+    description: Disable the plugin or individual arenas.
+  koth.admin.forcestart:
+    default: false
+    description: Force an arena to begin.
+  koth.admin.forceend:
+    default: false
+    description: Force an arena to end.
+  koth.admin.breakblocks:
+    default: false
+    description: Be able to break blocks while in a match.
+  koth.admin.placeblocks:
+    default: false
+    description: Be able to place blocks during a match.
+  koth.admin.update:
+    default: false
+    description: Allow players to be notified of updates.
+  koth.admin.signs:
+    default: false
+    description: Create class signs
+  koth.admin.dropitems:
+    default: false
+    description: Be able to drop items whilst in the arena.
+  koth.admin.teleport:
+    default: false
+    description: Teleport while in the arena.

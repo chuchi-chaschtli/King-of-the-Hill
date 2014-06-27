@@ -1,0 +1,4 @@
+enabled: true
+check-for-updates: true
+allowed-cmds: /koth, /list, /notarealcommand
+logging: true
