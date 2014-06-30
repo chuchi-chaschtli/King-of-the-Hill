@@ -125,7 +125,6 @@ public class ScoreboardManager {
     			removePlayer(p);
     	}
     	scoreboard.clearSlot(DisplaySlot.SIDEBAR);
-    	scoreboard.getObjectives().clear();
     }
     
     /**
