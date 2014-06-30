@@ -3,7 +3,11 @@
  */
 package com.valygard.KotH;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -202,6 +206,43 @@ public class KotH extends JavaPlugin {
     }
 
 	private void loadConfigFile() {
+		BufferedReader reader = null;
+		try {
+			File file = new File(getDataFolder(), "config.yml");
+			reader = new BufferedReader(new FileReader(file));
+
+			int row = 1;
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				if (line.indexOf("\t") > -1) {
+					throw new IllegalArgumentException(
+							"A tab was found in the config.yml on row "
+									+ row
+									+ "."
+									+ "\n"
+									+ "Please remember to use SPACES, NOT TABS, in Yaml files.");
+				}
+				row++;
+			}
+			reloadConfig();
+		} catch (FileNotFoundException e) {
+			Messenger.info("Generating a new config.yml.");
+			saveDefaultConfig();
+		} catch (IOException e) {
+			Messenger.severe("There was an error reading the config.yml.");
+			throw new RuntimeException(e);
+		 } finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					Messenger.severe("ERROR: Could not close BufferedReader!");
+					e.printStackTrace();
+				}
+			}
+		}
+
 		saveDefaultConfig();
 		getConfig().options().header(getHeader());
 		saveConfig();
