@@ -23,7 +23,8 @@ public class HillUtils {
 	/**
 	 * Constructor. Requires an arena to get the hills of.
 	 * 
-	 * @param arena the arena.
+	 * @param arena
+	 *            the arena.
 	 */
 	public HillUtils(Arena arena) {
 		this.arena = arena;
@@ -68,7 +69,7 @@ public class HillUtils {
 	 */
 	public Location getCurrentHill() {
 		int current = getHillRotations() - getRotationsLeft();
-		
+
 		return getHill(current);
 	}
 
@@ -98,10 +99,17 @@ public class HillUtils {
 		// There was no previous hill...
 		if (isFirstHill())
 			return null;
-		
-		return getHill(current- 1);
+
+		return getHill(current - 1);
 	}
-	
+
+	/**
+	 * Retrieves a hill based on an integer status.
+	 * 
+	 * @param status
+	 *            an integer parsed as a config key.
+	 * @return a Location, the hill.
+	 */
 	public Location getHill(int status) {
 		ConfigurationSection section = arena.getWarps()
 				.getConfigurationSection("hills");
@@ -126,17 +134,19 @@ public class HillUtils {
 
 	/**
 	 * If there are no more rotations, we know we are on the last hill.
+	 * 
 	 * @return true / false
 	 */
 	public boolean isLastHill() {
 		ConfigurationSection section = arena.getWarps()
 				.getConfigurationSection("hills");
 		Set<String> hills = section.getKeys(false);
-		
+
 		if (hills.size() == 1) {
-			return (arena.getEndTimer().getRemaining() <= arena.getSettings().getInt("hill-clock"));
+			return (arena.getEndTimer().getRemaining() <= arena.getSettings()
+					.getInt("hill-clock"));
 		}
-		
+
 		return (getRotationsLeft() <= 0);
 	}
 
@@ -152,7 +162,8 @@ public class HillUtils {
 		if (isLastHill())
 			return false;
 
-		return ((getRotationsLeft() + 1) * arena.getSettings().getInt("hill-clock") == arena
+		return ((getRotationsLeft() + 1)
+				* arena.getSettings().getInt("hill-clock") == arena
 				.getEndTimer().getRemaining());
 	}
 }
