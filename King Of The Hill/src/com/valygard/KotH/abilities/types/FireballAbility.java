@@ -17,10 +17,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityPermission("koth.abilities.fireball")
 /**
  * @author Anand
  *

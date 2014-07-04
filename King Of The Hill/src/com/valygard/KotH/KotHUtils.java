@@ -8,6 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 /**
  * @author Anand
@@ -18,9 +22,12 @@ public class KotHUtils {
 	/**
 	 * Format a list into a string.
 	 * 
-	 * @param list a list
-	 * @param none a check to see if a player can join an arena.
-	 * @param plugin the main class.
+	 * @param list
+	 *            a list
+	 * @param none
+	 *            a check to see if a player can join an arena.
+	 * @param plugin
+	 *            the main class.
 	 * @return the string
 	 */
 	public static <E> String formatList(Collection<E> list, boolean none,
@@ -48,12 +55,13 @@ public class KotHUtils {
 		return buffy.toString().substring(0, buffy.length() - trimLength);
 	}
 
-	
 	/**
 	 * Format a list into a string.
 	 * 
-	 * @param list any list
-	 * @param plugin the main class
+	 * @param list
+	 *            any list
+	 * @param plugin
+	 *            the main class
 	 * @return
 	 */
 	public static <E> String formatList(Collection<E> list, KotH plugin) {
@@ -63,7 +71,8 @@ public class KotHUtils {
 	/**
 	 * Format a string into list form.
 	 * 
-	 * @param list the string.
+	 * @param list
+	 *            the string.
 	 * @return a string list.
 	 */
 	public static List<String> formatList(String list) {
@@ -82,8 +91,10 @@ public class KotHUtils {
 	/**
 	 * Return an enumeration from a specified string.
 	 * 
-	 * @param c the enum
-	 * @param string the string
+	 * @param c
+	 *            the enum
+	 * @param string
+	 *            the string
 	 * @return an enum class.
 	 */
 	public static <T extends Enum<T>> T getEnumFromString(Class<T> c,
@@ -95,5 +106,41 @@ public class KotHUtils {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Registers a new permission.
+	 * 
+	 * @param plugin
+	 *            an instance of the plugin.
+	 * @param permString
+	 *            the new permission string.
+	 * @param value
+	 *            the default value.
+	 * @return the permission added.
+	 */
+	public static Permission registerPermission(Plugin plugin,
+			String permString, PermissionDefault value) {
+		PluginManager pm = plugin.getServer().getPluginManager();
+
+		Permission perm = pm.getPermission(permString);
+		if (perm == null) {
+			perm = new Permission(permString);
+			perm.setDefault(value);
+			pm.addPermission(perm);
+		}
+		return perm;
+	}
+
+	/**
+	 * Unregisters a given permission.
+	 * 
+	 * @param plugin
+	 *            the instance of the plugin.
+	 * @param s
+	 *            the permission string to unregister.
+	 */
+	public static void unregisterPermission(Plugin plugin, String s) {
+		plugin.getServer().getPluginManager().removePermission(s);
 	}
 }

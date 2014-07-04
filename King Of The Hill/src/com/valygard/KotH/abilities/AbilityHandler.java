@@ -23,8 +23,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.valygard.KotH.KotH;
+import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.abilities.types.ChainAbility;
 import com.valygard.KotH.abilities.types.FireballAbility;
 import com.valygard.KotH.abilities.types.HorseAbility;
@@ -38,28 +40,29 @@ import com.valygard.KotH.messenger.Msg;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class AbilityHandler implements Listener {
 	private Arena arena;
 	private KotH plugin;
-	
+
 	private Map<UUID, List<Location>> landmines;
-	
+
 	public AbilityHandler(Arena arena) {
 		this.arena = arena;
-		
+
 		if (!arena.isRunning()) {
-			throw new IllegalStateException("Abilities are only allowed while the arena is running!");
+			throw new IllegalStateException(
+					"Abilities are only allowed while the arena is running!");
 		}
-		
+
 		this.plugin = arena.getPlugin();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		
+
 		this.landmines = new HashMap<UUID, List<Location>>();
 	}
-	
-	@EventHandler (priority = EventPriority.HIGH)
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		final Player p = e.getPlayer();
 		ItemStack hand = p.getItemInHand();
@@ -80,6 +83,11 @@ public class AbilityHandler implements Listener {
 				Messenger.tell(p, Msg.ABILITY_CHAIN_COOLDOWN);
 				break;
 			}
+			
+			if (!hasPermission(p, ChainAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
 
 			new ChainAbility(arena, p, Material.GOLD_AXE);
 			p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
@@ -91,12 +99,26 @@ public class AbilityHandler implements Listener {
 			}, 400L);
 			break;
 		case BONE:
+			if (!hasPermission(p, WolfAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
+			
 			new WolfAbility(arena, p, Material.BONE);
 			break;
 		case ROTTEN_FLESH:
+			if (!hasPermission(p, ZombieAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
+			
 			new ZombieAbility(arena, p, Material.ROTTEN_FLESH);
 			break;
 		case FIREBALL:
+			if (!hasPermission(p, FireballAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
 			new FireballAbility(arena, p, Material.FIREBALL);
 			break;
 		case HAY_BLOCK:
@@ -105,35 +127,55 @@ public class AbilityHandler implements Listener {
 				break;
 			}
 
+			if (!hasPermission(p, HorseAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
+			
 			new HorseAbility(arena, p, Material.HAY_BLOCK);
 			break;
 		default:
 			break;
 		}
 	}
-	
-	@EventHandler (priority = EventPriority.HIGH)
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
-		
+
 		if (arena == null)
 			return;
-		
+
 		if (!arena.getPlayersInArena().contains(p))
 			return;
-		
+
 		switch (e.getBlock().getType()) {
 		case STONE_PLATE:
+			if (!hasPermission(p, LandmineAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
 			// Remove from inventory
-			LandmineAbility la = new LandmineAbility(arena, p, e.getBlock().getLocation(), Material.STONE_PLATE);
+			LandmineAbility la = new LandmineAbility(arena, p, e.getBlock()
+					.getLocation(), Material.STONE_PLATE);
 			if (la.getLandmines(p) != null) {
 				landmines.put(p.getUniqueId(), la.getLandmines(p));
 			}
 			break;
 		case WEB:
+			if (!hasPermission(p, SnareAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
+			
 			new SnareAbility(arena, p, e.getBlock().getLocation(), Material.WEB);
 			break;
 		case HAY_BLOCK:
+			if (!hasPermission(p, HorseAbility.class)) {
+				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
+				break;
+			}
+			
 			new HorseAbility(arena, p, Material.HAY_BLOCK);
 			e.setCancelled(true);
 			break;
@@ -143,29 +185,28 @@ public class AbilityHandler implements Listener {
 			break;
 		}
 	}
-	
+
 	// --------------------------- //
 	// Cleanup
 	// --------------------------- //
-	
-	
+
 	public void cleanup(Player p) {
 		clearZombies(p);
 		clearWolves(p);
 		clearLandmines(p);
-		
+
 		if (p.getVehicle() instanceof Horse) {
 			p.getVehicle().remove();
 		}
 	}
-	
+
 	private void clearZombies(Player p) {
 		for (Zombie z : p.getWorld().getEntitiesByClass(Zombie.class)) {
 			if (z.hasMetadata(p.getName()))
 				z.remove();
 		}
 	}
-	
+
 	private void clearWolves(Player p) {
 		for (Wolf w : p.getWorld().getEntitiesByClass(Wolf.class)) {
 			if (w.hasMetadata(p.getName())) {
@@ -173,28 +214,39 @@ public class AbilityHandler implements Listener {
 			}
 		}
 	}
-	
+
 	private void clearLandmines(Player p) {
 		if (landmines.get(p.getUniqueId()) == null) {
 			return;
 		}
-		
+
 		for (Location l : landmines.get(p.getUniqueId())) {
 			l.getBlock().removeMetadata(p.getName(), plugin);
 			l.getBlock().setType(Material.AIR);
 		}
 		landmines.remove(p.getUniqueId());
 	}
-	
+
 	// --------------------------- //
 	// Getters
 	// --------------------------- //
-	
+
 	public Arena getArena() {
 		return arena;
 	}
-	
+
 	public KotH getPlugin() {
 		return plugin;
+	}
+
+	public boolean hasPermission(Player player, Class<? extends Ability> clazz) {
+		AbilityPermission perm = clazz.getAnnotation(AbilityPermission.class);
+		String permission = perm.value();
+
+		KotHUtils
+				.registerPermission(plugin, permission, PermissionDefault.TRUE)
+				.addParent("koth.abilities", true);
+
+		return plugin.has(player, permission);
 	}
 }

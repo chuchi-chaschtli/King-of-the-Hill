@@ -20,9 +20,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.PluginManager;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
@@ -240,7 +238,7 @@ public class ArenaManager {
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml",
 				makeSection(section, "prizes"));
 
-		registerPermission("koth.arenas." + arenaName, PermissionDefault.TRUE)
+		KotHUtils.registerPermission(plugin, "koth.arenas." + arenaName, PermissionDefault.TRUE)
 				.addParent("koth.arenas", true);
 
 		// Load the arena
@@ -260,7 +258,7 @@ public class ArenaManager {
 		config.set("arenas." + name, null);
 		plugin.saveConfig();
 
-		unregisterPermission("koth.arenas." + name);
+		KotHUtils.unregisterPermission(plugin, "koth.arenas." + name);
 		Messenger.info("The arena '" + name + "' has been removed.");
 	}
 
@@ -400,7 +398,7 @@ public class ArenaManager {
 		arenaClass.setBoots(boots);
 
 		// Register the permission.
-		registerPermission("koth.classes." + lowercase, PermissionDefault.TRUE)
+		KotHUtils.registerPermission(plugin, "koth.classes." + lowercase, PermissionDefault.TRUE)
 				.addParent("koth.classes", true);
 
 		// Finally add the class to the classes map.
@@ -465,36 +463,7 @@ public class ArenaManager {
 		// Remove the class from the map.
 		classes.remove(lowercase);
 
-		unregisterPermission("koth.classes." + lowercase);
-	}
-
-	/**
-	 * Register a permission when a new class or arena is added.
-	 * 
-	 * @param permString
-	 * @param value
-	 * @return
-	 */
-	private Permission registerPermission(String permString,
-			PermissionDefault value) {
-		PluginManager pm = plugin.getServer().getPluginManager();
-
-		Permission perm = pm.getPermission(permString);
-		if (perm == null) {
-			perm = new Permission(permString);
-			perm.setDefault(value);
-			pm.addPermission(perm);
-		}
-		return perm;
-	}
-
-	/**
-	 * Unregisters an existing per-arena / per-class permission.
-	 * 
-	 * @param s
-	 */
-	private void unregisterPermission(String s) {
-		plugin.getServer().getPluginManager().removePermission(s);
+		KotHUtils.unregisterPermission(plugin, "koth.classes." + lowercase);
 	}
 
 	// --------------------------- //

@@ -22,11 +22,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityPermission("koth.abilities.zombie")
 /**
  * @author Anand
  *

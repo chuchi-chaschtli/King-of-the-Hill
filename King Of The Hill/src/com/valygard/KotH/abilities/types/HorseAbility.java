@@ -16,10 +16,12 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityPermission("koth.abilities.horse")
 /**
  * @author Anand
  *
