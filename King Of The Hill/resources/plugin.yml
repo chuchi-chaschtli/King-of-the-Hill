@@ -28,6 +28,7 @@ permissions:
       koth.user.pickteam: true
       koth.user.signs: true
       koth.arenas: true
+      koth.abilities: true
       koth.classes: true
   koth.user.arenastats:
     default: false
