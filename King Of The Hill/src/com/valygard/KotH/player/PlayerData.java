@@ -4,6 +4,7 @@
 package com.valygard.KotH.player;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.bukkit.potion.PotionEffect;
 public class PlayerData {
 	private Player player;
 	
-	private ItemStack[] contents;
+	private Map<ItemStack, Integer> contents;
 	private ItemStack head, chest, legs, feet;
 	private Location loc = null;
 	private double health;
@@ -46,7 +47,10 @@ public class PlayerData {
 	public PlayerData(Player player) {
 		this.player 	= player;
 		
-		this.contents 	= player.getInventory().getContents();
+		this.contents = new HashMap<ItemStack, Integer>();
+		for (int i = 0; i < 36; i++) {
+			contents.put(player.getInventory().getItem(i), i);
+		}
 		
 		this.head		= player.getInventory().getHelmet();
 		this.chest		= player.getInventory().getChestplate();
@@ -87,9 +91,9 @@ public class PlayerData {
 		player.setExp(exp);
 		player.teleport(loc);
 		
-		for (ItemStack i : contents) {
+		for (ItemStack i : contents.keySet()) {
 			parseItem(i);
-			player.getInventory().setItem(player.getInventory().firstEmpty(), i);
+			player.getInventory().setItem(contents.get(i), i);
 		}
 		player.getInventory().setHelmet(parseItem(head));
 		player.getInventory().setChestplate(parseItem(chest));
@@ -140,7 +144,11 @@ public class PlayerData {
 		return player;
 	}
 
-	public ItemStack[] getContents() {
+	public Set<ItemStack> getItems() {
+		return contents.keySet();
+	}
+	
+	public Map<ItemStack, Integer> getContents() {
 		return contents;
 	}
 
