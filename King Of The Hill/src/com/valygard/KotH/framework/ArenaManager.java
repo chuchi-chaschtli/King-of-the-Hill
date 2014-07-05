@@ -639,7 +639,7 @@ public class ArenaManager {
 	 */
 	public Arena getArenaWithName(Collection<Arena> arenas, String arenaName) {
 		for (Arena arena : arenas)
-			if (arena.getName().equals(arenaName))
+			if (arena.getName().equalsIgnoreCase(arenaName))
 				return arena;
 		return null;
 	}
