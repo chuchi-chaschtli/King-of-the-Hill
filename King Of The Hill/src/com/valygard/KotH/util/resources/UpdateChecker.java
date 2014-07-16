@@ -58,6 +58,13 @@ public class UpdateChecker {
 			});
 			return true;
 		} else {
+			updater = new Updater(plugin, 71402, plugin.getPluginFile(),
+					UpdateType.NO_DOWNLOAD, false);
+			
+			if (updater.getResult() != UpdateResult.UPDATE_AVAILABLE) {
+				return false;
+			}
+			
 			String latest = getLatestVersionString();
 			String current = plugin.getDescription().getVersion();
 			if (!isUpdateReady(latest, current)) {
