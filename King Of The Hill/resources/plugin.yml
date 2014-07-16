@@ -138,7 +138,7 @@ permissions:
     description: Be able to place blocks during a match.
   koth.admin.update:
     default: false
-    description: Allow players to be notified of updates.
+    description: Allow players to be notified of updates or use the update command.
   koth.admin.signs:
     default: false
     description: Create class signs
