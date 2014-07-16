@@ -19,8 +19,8 @@ import com.valygard.KotH.util.resources.Updater.UpdateType;
 public class UpdateChecker {
 	static Updater updater;
 
-	public static boolean checkForUpdates(final KotH plugin, final Player player,
-			boolean downloadIfAvailable) {
+	public static boolean checkForUpdates(final KotH plugin,
+			final Player player, boolean downloadIfAvailable) {
 		if (!downloadIfAvailable) {
 			if (updater == null) {
 				updater = new Updater(plugin, 71402, plugin.getPluginFile(),
@@ -44,7 +44,10 @@ public class UpdateChecker {
 						else if (isUpdateReady(latest, current)) {
 							String msg1 = ChatColor.YELLOW
 									+ "King of the Hill v" + latest
-									+ ChatColor.RESET + " is now downloadable.";
+									+ ChatColor.RESET
+									+ " is now downloadable. Use "
+									+ ChatColor.YELLOW + "/koth update"
+									+ ChatColor.RESET + " to update.";
 							String msg2 = "This server is currently running "
 									+ ChatColor.YELLOW + "v" + current;
 							message(plugin, player, msg1, msg2);
@@ -56,10 +59,9 @@ public class UpdateChecker {
 			return true;
 		} else {
 			updater = new Updater(plugin, 71402, plugin.getPluginFile(),
-						UpdateType.DEFAULT, true);
+					UpdateType.DEFAULT, true);
 			String latest = getLatestVersionString();
-			String current = plugin.getDescription()
-					.getVersion();
+			String current = plugin.getDescription().getVersion();
 			return isUpdateReady(latest, current);
 		}
 	}
@@ -84,7 +86,7 @@ public class UpdateChecker {
 					}
 				}
 			}
-		}, (player == null) ? 0 : 45); 
+		}, (player == null) ? 0 : 45);
 	}
 
 	private static boolean isUpdateReady(String latestVersion,
