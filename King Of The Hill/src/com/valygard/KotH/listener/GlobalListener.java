@@ -258,7 +258,7 @@ public class GlobalListener implements Listener {
 		if (!plugin.getConfig().getBoolean("global.check-for-updates"))
 			return;
 
-		UpdateChecker.checkForUpdates(plugin, p);
+		UpdateChecker.checkForUpdates(plugin, p, false);
 	}
 	
 	@EventHandler (priority = EventPriority.HIGH)

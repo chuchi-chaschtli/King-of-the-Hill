@@ -21,6 +21,7 @@ import com.valygard.KotH.command.admin.DisableCmd;
 import com.valygard.KotH.command.admin.EnableCmd;
 import com.valygard.KotH.command.admin.ForceEndCmd;
 import com.valygard.KotH.command.admin.ForceStartCmd;
+import com.valygard.KotH.command.admin.UpdateCmd;
 import com.valygard.KotH.command.setup.ConfigCmd;
 import com.valygard.KotH.command.setup.CreateArenaCmd;
 import com.valygard.KotH.command.setup.LocationsCmd;
@@ -328,6 +329,7 @@ public class CommandManager implements CommandExecutor {
 		register(DisableCmd.class);
 		register(ForceStartCmd.class);
 		register(ForceEndCmd.class);
+		register(UpdateCmd.class);
 	}
 
 	/**
