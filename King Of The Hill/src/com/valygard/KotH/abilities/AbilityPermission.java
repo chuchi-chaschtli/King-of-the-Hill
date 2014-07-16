@@ -15,5 +15,5 @@ public @interface AbilityPermission {
 	 * 
 	 * @return a String permission
 	 */
-	public String value() default "koth.user";
+	public String value() default "koth.abilities";
 }
