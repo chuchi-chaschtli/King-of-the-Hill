@@ -60,7 +60,6 @@ public class UpdateChecker {
 			String latest = getLatestVersionString();
 			String current = plugin.getDescription()
 					.getVersion();
-			shutdown();
 			return isUpdateReady(latest, current);
 		}
 	}
