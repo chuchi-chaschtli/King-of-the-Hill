@@ -52,10 +52,10 @@ public class UpdateChecker {
 									+ ChatColor.YELLOW + "v" + current;
 							message(plugin, player, msg1, msg2);
 						}
+						shutdown();
 					}
 				}
 			});
-			shutdown();
 			return true;
 		} else {
 			updater = new Updater(plugin, 71402, plugin.getPluginFile(),
