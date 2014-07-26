@@ -49,9 +49,6 @@ public class KotH extends JavaPlugin {
 	public static File MESSAGES_FILE;
 	
 	public static int ECONOMY_ID = -69;
-	
-	// Static access of this class is needed for custom logging.
-	public static KotH plugin;
 
 	public void onEnable() {
 		// Load the regular configuration file
@@ -98,8 +95,6 @@ public class KotH extends JavaPlugin {
 		am = new ArenaManager(this);
 		cm = new CommandManager(this);
 		em = new EconomyManager(this);
-		
-		plugin = this;
 	}
 
 	private void registerCommands() {
