@@ -227,17 +227,17 @@ public class KotH extends JavaPlugin {
 			}
 			reloadConfig();
 		} catch (FileNotFoundException e) {
-			Messenger.info("Generating a new config.yml.");
+			getLogger().info("Generating a new config.yml.");
 			saveDefaultConfig();
 		} catch (IOException e) {
-			Messenger.severe("There was an error reading the config.yml.");
+			getLogger().severe("There was an error reading the config.yml.");
 			throw new RuntimeException(e);
 		 } finally {
 			if (reader != null) {
 				try {
 					reader.close();
 				} catch (IOException e) {
-					Messenger.severe("ERROR: Could not close BufferedReader!");
+					getLogger().severe("ERROR: Could not close BufferedReader!");
 					e.printStackTrace();
 				}
 			}
