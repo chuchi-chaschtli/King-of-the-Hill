@@ -221,7 +221,7 @@ public class CommandManager implements CommandExecutor {
 	private List<Command> getMatchingCommands(String arg) {
 		List<Command> result = new ArrayList<Command>();
 		for (Entry<String, Command> entry : commands.entrySet()) {
-			if (arg.matches(entry.getKey())) {
+			if (arg.toLowerCase().matches(entry.getKey())) {
 				result.add(entry.getValue());
 			}
 		}
