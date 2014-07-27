@@ -83,7 +83,7 @@ public class Arena {
 			bluePlayers;
 
 	// Get the winner later
-	private Set<Player> winner = new HashSet<Player>();
+	private Set<Player> winner;
 
 	// Some booleans that are configuration-critical.
 	private boolean running, enabled;
@@ -150,6 +150,8 @@ public class Arena {
 		this.specPlayers = new HashSet<Player>();
 		this.redPlayers = new HashSet<Player>();
 		this.bluePlayers = new HashSet<Player>();
+		
+		this.winner = new HashSet<Player>();
 
 		// Boolean values.
 		this.running = false;

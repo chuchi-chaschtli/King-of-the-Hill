@@ -95,7 +95,9 @@ public enum Msg {
 			"Friendly fire has been disabled for this arena."),
 	MISC_LIST_ARENAS("Available arenas: %"),
 	MISC_LIST_CLASSES("Available classes: %"),
+	
 	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
+	MISC_NO_SPAWN_CAMPING("You may not spawn camp!"),
 	MISC_NOT_ENOUGH_MONEY(
 			"You do not have enough money to perform this action!"),
 	MISC_TEAM_JOINED("You have joined the %&r team."),

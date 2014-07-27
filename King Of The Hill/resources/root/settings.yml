@@ -15,7 +15,8 @@ indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false
 safe-respawn-time: 3
-prevent-power-loss: true
+no-spawn-camping: true
+spawn-camp-distance: 4.75
 friendly-fire: false
 food-change: false
 one-life: false
