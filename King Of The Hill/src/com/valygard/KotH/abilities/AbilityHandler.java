@@ -83,21 +83,7 @@ public class AbilityHandler implements Listener {
 				break;
 			}
 
-			if (p.hasMetadata("cooldown")) {
-				Messenger.tell(p, Msg.ABILITY_CHAIN_COOLDOWN);
-				break;
-			}
-
-			boolean success = useAbility(arena, p, ChainAbility.class);
-			if (success) {
-				p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
-				arena.scheduleTask(new Runnable() {
-					public void run() {
-						p.removeMetadata("cooldown", plugin);
-						Messenger.tell(p, "You may now use chain-lightning.");
-					}
-				}, 400L);
-			}
+			useAbility(arena, p, ChainAbility.class);
 			break;
 		case BONE:
 			useAbility(arena, p, WolfAbility.class);

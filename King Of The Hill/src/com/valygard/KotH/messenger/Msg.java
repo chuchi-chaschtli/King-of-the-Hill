@@ -14,8 +14,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public enum Msg {
 	ABILITY_CHAIN_AMOUNT("Your chain lightning has struck &b% entities!"),
 	ABILITY_COOLDOWN("You are on cooldown for this ability!"),
-	ABILITY_CHAIN_COOLDOWN(
-			"You are on cooldown and may not use chain-lightning."),
 	ABILITY_FIREBALL_SHOOT("You have shot a fireball!"),
 	ABILITY_LANDMINE_EXPLODE("You triggered a landmine that &e%&r placed."),
 	ABILITY_LANDMINE_PLACE("You have placed a landmine!"),
