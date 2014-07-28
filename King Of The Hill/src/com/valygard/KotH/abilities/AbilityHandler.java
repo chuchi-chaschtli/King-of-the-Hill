@@ -3,12 +3,14 @@
  */
 package com.valygard.KotH.abilities;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Horse;
@@ -45,6 +47,8 @@ import com.valygard.KotH.messenger.Msg;
 public class AbilityHandler implements Listener {
 	private Arena arena;
 	private KotH plugin;
+
+	private Map<UUID, Long> cooldowns;
 
 	private Map<UUID, List<Location>> landmines;
 
@@ -83,43 +87,26 @@ public class AbilityHandler implements Listener {
 				Messenger.tell(p, Msg.ABILITY_CHAIN_COOLDOWN);
 				break;
 			}
-			
-			if (!hasPermission(p, ChainAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
 
-			new ChainAbility(arena, p, Material.GOLD_AXE);
-			p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
-			arena.scheduleTask(new Runnable() {
-				public void run() {
-					p.removeMetadata("cooldown", plugin);
-					Messenger.tell(p, "You may now use chain-lightning.");
-				}
-			}, 400L);
+			boolean success = useAbility(arena, p, ChainAbility.class);
+			if (success) {
+				p.setMetadata("cooldown", new FixedMetadataValue(plugin, ""));
+				arena.scheduleTask(new Runnable() {
+					public void run() {
+						p.removeMetadata("cooldown", plugin);
+						Messenger.tell(p, "You may now use chain-lightning.");
+					}
+				}, 400L);
+			}
 			break;
 		case BONE:
-			if (!hasPermission(p, WolfAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			
-			new WolfAbility(arena, p, Material.BONE);
+			useAbility(arena, p, WolfAbility.class);
 			break;
 		case ROTTEN_FLESH:
-			if (!hasPermission(p, ZombieAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			
-			new ZombieAbility(arena, p, Material.ROTTEN_FLESH);
+			useAbility(arena, p, ZombieAbility.class);
 			break;
 		case FIREBALL:
-			if (!hasPermission(p, FireballAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			new FireballAbility(arena, p, Material.FIREBALL);
+			useAbility(arena, p, FireballAbility.class);
 			break;
 		case HAY_BLOCK:
 			if (e.getAction() != Action.LEFT_CLICK_AIR
@@ -127,12 +114,7 @@ public class AbilityHandler implements Listener {
 				break;
 			}
 
-			if (!hasPermission(p, HorseAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			
-			new HorseAbility(arena, p, Material.HAY_BLOCK);
+			useAbility(arena, p, HorseAbility.class);
 			break;
 		default:
 			break;
@@ -157,26 +139,16 @@ public class AbilityHandler implements Listener {
 			}
 			// Remove from inventory
 			LandmineAbility la = new LandmineAbility(arena, p, e.getBlock()
-					.getLocation(), Material.STONE_PLATE);
+					.getLocation());
 			if (la.getLandmines(p) != null) {
 				landmines.put(p.getUniqueId(), la.getLandmines(p));
 			}
 			break;
 		case WEB:
-			if (!hasPermission(p, SnareAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			
-			new SnareAbility(arena, p, e.getBlock().getLocation(), Material.WEB);
+			useAbility(arena, p, SnareAbility.class);
 			break;
 		case HAY_BLOCK:
-			if (!hasPermission(p, HorseAbility.class)) {
-				Messenger.tell(p, Msg.ABILITY_NO_PERMISSION);
-				break;
-			}
-			
-			new HorseAbility(arena, p, Material.HAY_BLOCK);
+			useAbility(arena, p, HorseAbility.class);
 			e.setCancelled(true);
 			break;
 		default:
@@ -227,6 +199,10 @@ public class AbilityHandler implements Listener {
 		landmines.remove(p.getUniqueId());
 	}
 
+	public void clearCooldowns() {
+		cooldowns.clear();
+	}
+
 	// --------------------------- //
 	// Getters
 	// --------------------------- //
@@ -239,7 +215,7 @@ public class AbilityHandler implements Listener {
 		return plugin;
 	}
 
-	public boolean hasPermission(Player player, Class<? extends Ability> clazz) {
+	private boolean hasPermission(Player player, Class<? extends Ability> clazz) {
 		AbilityPermission perm = clazz.getAnnotation(AbilityPermission.class);
 		String permission = perm.value();
 
@@ -248,5 +224,62 @@ public class AbilityHandler implements Listener {
 				.addParent("koth.abilities", true);
 
 		return plugin.has(player, permission);
+	}
+
+	private boolean onCooldown(Player player, Class<? extends Ability> clazz) {
+		AbilityCooldown cooldown = clazz.getAnnotation(AbilityCooldown.class);
+		double cd = cooldown.value();
+
+		if (!cooldowns.containsKey(player.getUniqueId())) {
+			return false;
+		}
+
+		long timeStamp = cooldowns.get(player.getUniqueId());
+		return (timeStamp + (cd * 1000) < System.currentTimeMillis());
+	}
+
+	private boolean useAbility(Arena arena, Player player,
+			Class<? extends Ability> clazz) {
+		String exception = "Error! Could not use ability due to: ";
+		String key = clazz.getName().replace("Ability", "").toLowerCase()
+				+ "-cooldown";
+
+		if (!hasPermission(player, clazz)) {
+			Messenger.tell(player, Msg.ABILITY_NO_PERMISSION);
+			return false;
+		}
+
+		if (onCooldown(player, clazz)) {
+			if (player.hasMetadata(key)) {
+				Messenger.tell(player, Msg.ABILITY_COOLDOWN);
+				return false;
+			}
+		}
+
+		try {
+			if (cooldowns.containsKey(player.getUniqueId())) {
+				cooldowns.remove(player.getUniqueId());
+				if (player.hasMetadata(key)) {
+					player.removeMetadata(key, plugin);
+				}
+			}
+			cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+			
+			AbilityCooldown cooldown = clazz.getAnnotation(AbilityCooldown.class);
+			double cd = cooldown.value();
+			if (arena.getLength() - 0.5 > cd) {
+				player.setMetadata(key, new FixedMetadataValue(plugin, ""));
+			}
+
+			clazz.getConstructor(Arena.class, Player.class).newInstance(arena,
+					player);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			Messenger.severe(exception + e.getMessage());
+			Messenger.tell(player, ChatColor.RED + exception + e.getMessage());
+			return false;
+		}
+		return true;
 	}
 }

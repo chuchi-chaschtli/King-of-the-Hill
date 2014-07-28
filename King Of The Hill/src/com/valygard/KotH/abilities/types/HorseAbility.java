@@ -16,11 +16,13 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityCooldown(30)
 @AbilityPermission("koth.abilities.horse")
 /**
  * @author Anand
@@ -29,8 +31,8 @@ import com.valygard.KotH.messenger.Msg;
 public class HorseAbility extends Ability implements Listener {
 	private Horse horse;
 	
-	public HorseAbility(Arena arena, Player p, Material m) {
-		super(arena, p, m);
+	public HorseAbility(Arena arena, Player p) {
+		super(arena, p, Material.HAY_BLOCK);
 		
 		spawnHorse();
 		

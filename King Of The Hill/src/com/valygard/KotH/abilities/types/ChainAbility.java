@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
@@ -26,6 +27,7 @@ import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
 @AbilityPermission("koth.abilities.chain")
+@AbilityCooldown(11)
 /**
  * @author Anand
  *
@@ -33,8 +35,8 @@ import com.valygard.KotH.messenger.Msg;
 public class ChainAbility extends Ability implements Listener {
 	private Map<LivingEntity, Long> affected;
 	
-	public ChainAbility(Arena arena, Player player, Material mat) {
-		super(arena, player, mat);
+	public ChainAbility(Arena arena, Player player) {
+		super(arena, player, Material.GOLD_AXE);
 		
 		this.affected = new HashMap<LivingEntity, Long>();
 		

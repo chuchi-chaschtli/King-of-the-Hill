@@ -22,12 +22,14 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityCooldown()
 @AbilityPermission("koth.abilities.zombie")
 /**
  * @author Anand
@@ -36,8 +38,8 @@ import com.valygard.KotH.messenger.Msg;
 public class ZombieAbility extends Ability implements Listener {
 	private Set<Zombie> zombies;
 	
-	public ZombieAbility(Arena arena, Player player, Material m) {
-		super (arena, player, m);
+	public ZombieAbility(Arena arena, Player player) {
+		super (arena, player, Material.ROTTEN_FLESH);
 		
 		Zombie z = spawnZombie();
 		this.zombies = new HashSet<Zombie>();

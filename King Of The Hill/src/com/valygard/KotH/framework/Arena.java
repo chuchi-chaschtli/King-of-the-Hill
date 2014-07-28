@@ -464,6 +464,7 @@ public class Arena {
 			ah.cleanup(p);
 			removePlayer(p, true);
 		}
+		ah.clearCooldowns();
 
 		endTimer.halt();
 		running = false;

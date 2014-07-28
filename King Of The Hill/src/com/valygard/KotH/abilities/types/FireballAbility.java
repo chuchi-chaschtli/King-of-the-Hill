@@ -17,11 +17,13 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityCooldown(3)
 @AbilityPermission("koth.abilities.fireball")
 /**
  * @author Anand
@@ -29,8 +31,8 @@ import com.valygard.KotH.messenger.Msg;
  */
 public class FireballAbility extends Ability implements Listener {
 
-	public FireballAbility(Arena arena, Player player, Material m) {
-		super(arena, player, m);
+	public FireballAbility(Arena arena, Player player) {
+		super(arena, player, Material.FIREBALL);
 		
 		if (!shootFireball()) {
 			Messenger.tell(player, "Could not shoot fireball.");

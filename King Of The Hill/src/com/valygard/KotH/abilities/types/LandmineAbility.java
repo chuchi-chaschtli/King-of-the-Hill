@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
@@ -30,6 +31,7 @@ import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.UUIDUtil;
 
+@AbilityCooldown()
 @AbilityPermission("koth.abilities.landmine")
 /**
  * @author Anand
@@ -39,8 +41,8 @@ public class LandmineAbility extends Ability implements Listener {
 	private Map<UUID, List<Location>> landmines;
 	private Location l;
 	
-	public LandmineAbility(Arena arena, Player player, Location l, Material m) {
-		super(arena, player, m);
+	public LandmineAbility(Arena arena, Player player, Location l) {
+		super(arena, player, Material.STONE_PLATE);
 		
 		this.l = l;
 		this.landmines = new HashMap<UUID, List<Location>>();

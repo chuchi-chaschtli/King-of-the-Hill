@@ -21,12 +21,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.abilities.Ability;
+import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
 import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
+@AbilityCooldown()
 @AbilityPermission("koth.abilities.snare")
 /**
  * @author Anand
@@ -36,8 +38,8 @@ public class SnareAbility extends Ability implements Listener {
 	private Map<Block, Material> oldBlocks;
 	private boolean activated;
 
-	public SnareAbility(Arena arena, Player p, Location loc, Material mat) {
-		super(arena, p, mat);
+	public SnareAbility(Arena arena, Player p, Location loc) {
+		super(arena, p, Material.WEB);
 		
 		this.oldBlocks = new HashMap<Block, Material>();
 		this.activated = false;
