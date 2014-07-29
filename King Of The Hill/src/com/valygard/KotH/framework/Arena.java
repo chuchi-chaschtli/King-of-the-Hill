@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -140,6 +141,8 @@ public class Arena {
 		this.info = ConfigUtil.makeSection(config.getConfigurationSection("arenas." + arenaName), "info");
 
 		this.world = Bukkit.getWorld(settings.getString("world"));
+		
+		Validate.notNull(world, "Error! World '" + settings.getString("world") + "' does not exist!");
 
 		this.minPlayers = settings.getInt("min-players");
 		this.maxPlayers = settings.getInt("max-players");
