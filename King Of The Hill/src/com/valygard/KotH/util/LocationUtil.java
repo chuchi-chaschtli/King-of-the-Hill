@@ -31,8 +31,8 @@ public class LocationUtil {
 		List<Block> circle = new ArrayList<Block>();
 		for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
-            	if (distanceSq(x, z) <= MathUtil.getSquare(radius)){
-            		if (distanceSq(x, z) > MathUtil.getSquare(radius - 1)) {
+            	if (distanceSq(x, z) <= Math.pow(radius, 2)){
+            		if (distanceSq(x, z) > Math.pow(radius - 1, 2)) {
             			circle.add(center.getWorld().getBlockAt(x, y, z));
             		}
             	}
@@ -81,6 +81,6 @@ public class LocationUtil {
 	 * @return
 	 */
 	public static double distanceSq(double x, double z) {
-		return (MathUtil.getSquare(x) + MathUtil.getSquare(z));
+		return (Math.pow(x, 2) + Math.pow(z, 2));
 	}
 }

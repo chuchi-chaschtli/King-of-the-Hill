@@ -18,10 +18,6 @@ public class StringUtils {
 	}
 	
 	public static String trimByRegex(String string, String regex, int trimSize) {
-		return trimByRegex(string, regex, trimSize, true);
-	}
-	
-	public static String trimByRegex(String string, String regex, int trimSize, boolean reinsertRegex) {
 		String[] array = string.split(regex);
 		StringBuilder sb = new StringBuilder();
 		
@@ -30,7 +26,7 @@ public class StringUtils {
 		}
 		
 		for (int i = trimSize; i < array.length; i++) {
-			sb.append(array[i]).append(reinsertRegex ? regex : "");
+			sb.append(array[i]).append(regex);
 		}
 		return sb.toString().trim();
 	}

@@ -29,7 +29,6 @@ import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
-import com.valygard.KotH.util.UUIDUtil;
 
 @AbilityCooldown()
 @AbilityPermission("koth.abilities.landmine")
@@ -143,7 +142,7 @@ public class LandmineAbility extends Ability implements Listener {
 	private Player getWhoPlacedLandmine(Location l) {
 		for (Entry<UUID, List<Location>> entry : landmines.entrySet()) {
             if (entry.getValue().contains(l)) {
-            	return UUIDUtil.getPlayerFromUUID(entry.getKey());
+            	return getPlayerFromUUID(entry.getKey());
             }
         }
 		return null;
@@ -206,5 +205,16 @@ public class LandmineAbility extends Ability implements Listener {
 		landmines.put(player.getUniqueId(), locs);
 
 		e.setCancelled(true);
+	}
+	
+	/**
+	 * Get an online player from a specified UUID if possible.
+	 */
+	public static Player getPlayerFromUUID(UUID id) {
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (p.getUniqueId().equals(id))
+				return p;
+		}
+		return null;
 	}
 }

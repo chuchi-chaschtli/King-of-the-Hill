@@ -21,7 +21,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
-import com.valygard.KotH.util.UUIDUtil;
 
 /**
  * @author Anand
@@ -52,7 +51,7 @@ public class InventoryManager {
 		ItemStack[] items = p.getInventory().getContents();
 		ItemStack[] armor = p.getInventory().getArmorContents();
 
-		UUID uuid = UUIDUtil.getUUID(p);
+		UUID uuid = p.getUniqueId();
 
 		this.items.put(uuid, items);
 		this.armor.put(uuid, armor);
@@ -78,7 +77,7 @@ public class InventoryManager {
 	 */
 	public void restoreInventory(Player p) throws IOException,
 			InvalidConfigurationException {
-		UUID uuid = UUIDUtil.getUUID(p);
+		UUID uuid = p.getUniqueId();
 
 		// Grab disk file
 		File file = new File(dir, uuid.toString());
