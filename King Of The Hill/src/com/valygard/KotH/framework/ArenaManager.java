@@ -8,7 +8,6 @@ import static com.valygard.KotH.util.ConfigUtil.makeSection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,10 +50,10 @@ public class ArenaManager {
 	private boolean enabled;
 
 	// Commands that are allowed while playing koth.
-	private Set<String> allowedcmds;
+	private List<String> allowedcmds;
 	
 	// Missing Warps
-	private Set<String> missing;
+	private List<String> missing;
 
 	/**
 	 * Constructor
@@ -69,9 +68,9 @@ public class ArenaManager {
 
 		this.enabled = config.getBoolean("global.enabled", true);
 
-		this.allowedcmds = new HashSet<String>();
+		this.allowedcmds = new ArrayList<String>();
 		
-		this.missing = new HashSet<String>();
+		this.missing = new ArrayList<String>();
 	}
 
 	// --------------------------- //
@@ -521,7 +520,7 @@ public class ArenaManager {
 	 * 
 	 * @return
 	 */
-	public Set<String> getAllowedCmds() {
+	public List<String> getAllowedCmds() {
 		return allowedcmds;
 	}
 
@@ -668,7 +667,7 @@ public class ArenaManager {
 	 * @param arena
 	 * @param p
 	 */
-	public Set<String> getMissingWarps(Arena arena) {
+	public List<String> getMissingWarps(Arena arena) {
 		if (arena.getRedSpawn() == null)
 			missing.add("redspawn,");
 

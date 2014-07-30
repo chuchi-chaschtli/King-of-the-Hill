@@ -3,7 +3,7 @@
  */
 package com.valygard.KotH.event;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -14,7 +14,7 @@ import com.valygard.KotH.framework.Arena;
  *
  */
 public class ArenaEndEvent extends ArenaEvent {
-    private Set<Player> winner, loser;
+    private List<Player> winner, loser;
     private int winScore;
     
     public ArenaEndEvent(final Arena arena) {
@@ -30,30 +30,30 @@ public class ArenaEndEvent extends ArenaEvent {
     /**
      * Sets the winner of an arena.
      * 
-     * @param newWinner a Player set
+     * @param newWinner a Player list
      * @since v1.2.4
      */
-    public void setWinner(Set<Player> newWinner) {
+    public void setWinner(List<Player> newWinner) {
     	arena.setWinner(newWinner);
     }
    
     /**
      * Gets the winner of an arena.
      * 
-     * @return a Player set, null if a draw
-     * @since v1.2.1
+     * @return a Player list, null if a draw
+     * @since v1.2.11
      */
-    public Set<Player> getWinner() {
+    public List<Player> getWinner() {
     	return winner;
     }
     
     /**
      * Gets the winner of an arena.
      * 
-     * @return a Player set, null if a draw.
-     * @since v1.2.1
+     * @return a Player list, null if a draw.
+     * @since v1.2.11
      */
-    public Set<Player> getLoser() {
+    public List<Player> getLoser() {
     	return loser;
     }
     

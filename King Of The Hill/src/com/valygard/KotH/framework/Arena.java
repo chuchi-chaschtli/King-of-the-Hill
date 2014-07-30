@@ -35,6 +35,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import com.google.common.collect.Lists;
 import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.RewardManager;
@@ -84,7 +85,7 @@ public class Arena {
 			bluePlayers;
 
 	// Get the winner later
-	private Set<Player> winner;
+	private List<Player> winner;
 
 	// Some booleans that are configuration-critical.
 	private boolean running, enabled;
@@ -154,7 +155,7 @@ public class Arena {
 		this.redPlayers = new HashSet<Player>();
 		this.bluePlayers = new HashSet<Player>();
 		
-		this.winner = new HashSet<Player>();
+		this.winner = new ArrayList<Player>();
 
 		// Boolean values.
 		this.running = false;
@@ -445,16 +446,16 @@ public class Arena {
 		// Set the winner, to be declared and given different rewards.
 		winner = getWinnerByScore();
 		if (winner != null) {
-			if (winner.equals(redPlayers)) {
+			if (winner.equals(Lists.newArrayList(redPlayers))) {
 				if (redPlayers.size() <= 0)
-					winner = bluePlayers;
+					winner = Lists.newArrayList(bluePlayers);
 			}
-			if (winner.equals(bluePlayers)) {
+			if (winner.equals(Lists.newArrayList(bluePlayers))) {
 				if (bluePlayers.size() <= 0) {
 					if (redPlayers.size() <= 0)
 						winner = null;
 					else
-						winner = redPlayers;
+						winner = Lists.newArrayList(redPlayers);
 				}
 			}
 		}
@@ -1218,17 +1219,17 @@ public class Arena {
 	 * 
 	 * @return the team that won by score alone.
 	 */
-	public Set<Player> getWinnerByScore() {
+	public List<Player> getWinnerByScore() {
 		int minimum = settings.getInt("minimum-score");
 		if (hillTimer.getBlueScore() < minimum
 				&& hillTimer.getRedScore() < minimum) {
 			return null;
 		}
 		if (hillTimer.getBlueScore() > hillTimer.getRedScore()) {
-			winner = bluePlayers;
+			winner = Lists.newArrayList(bluePlayers);
 			return winner;
 		} else if (hillTimer.getRedScore() > hillTimer.getBlueScore()) {
-			winner = redPlayers;
+			winner = Lists.newArrayList(redPlayers);
 			return winner;
 		}
 		return null;
@@ -1239,7 +1240,7 @@ public class Arena {
 	 * 
 	 * @return the team that won.
 	 */
-	public Set<Player> getWinner() {
+	public List<Player> getWinner() {
 		return winner;
 	}
 
@@ -1251,7 +1252,7 @@ public class Arena {
 	 * @throws IllegalArgumentException if the winner specified is not a valid
 	 *             one.
 	 */
-	public Set<Player> setWinner(Set<Player> newWinner) {
+	public List<Player> setWinner(List<Player> newWinner) {
 		if (winner != newWinner) {
 			if (!newWinner.equals(redPlayers) || !newWinner.equals(bluePlayers)
 					|| !newWinner.equals(null))
@@ -1268,13 +1269,13 @@ public class Arena {
 	 * 
 	 * @return the team that lost.
 	 */
-	public Set<Player> getLoser() {
+	public List<Player> getLoser() {
 		if (winner == null)
 			return null;
-		if (winner.equals(redPlayers))
-			return bluePlayers;
-		if (winner.equals(bluePlayers))
-			return redPlayers;
+		if (winner.equals(Lists.newArrayList(redPlayers)))
+			return Lists.newArrayList(bluePlayers);
+		if (winner.equals(Lists.newArrayList(bluePlayers)))
+			return Lists.newArrayList(redPlayers);
 		return null;
 	}
 

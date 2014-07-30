@@ -3,7 +3,7 @@
  */
 package com.valygard.KotH.command.setup;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public class SetWarpCmd implements Command {
 		}
 		
 		if (args.length > 1) {
-			Set<String> missing = am.getMissingWarps(arena);
+			List<String> missing = am.getMissingWarps(arena);
 			switch (args[1]) {
 				case "red":
 				case "redspawn":
