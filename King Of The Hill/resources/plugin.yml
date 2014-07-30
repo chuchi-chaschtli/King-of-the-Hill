@@ -4,7 +4,6 @@ version: ${project.version}
 website: ${project.url}
 author: AoH_Ruthless
 description: ${project.description}
-softdepend: [Vault, Factions]
 
 commands:
   koth:
