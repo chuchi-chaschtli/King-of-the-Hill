@@ -153,6 +153,10 @@ public class AbilityHandler implements Listener {
 		clearWolves(p);
 		clearLandmines(p);
 
+		if (p.getVehicle() == null) {
+			return;
+		}
+		
 		if (p.getVehicle() instanceof Horse) {
 			p.getVehicle().remove();
 		}

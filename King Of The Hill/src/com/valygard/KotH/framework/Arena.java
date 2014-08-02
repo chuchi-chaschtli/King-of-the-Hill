@@ -392,9 +392,6 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
-
-			// Start adding seconds to their time-spent in the arena.
-			getStats(p).startTiming();
 			
 			// Collect player class data.
 			getStats(p).collectClassData();
@@ -410,6 +407,9 @@ public class Arena {
 				scoreboard.initialize(p, scoreboard.getBlueTeam());
 			} else
 				kickPlayer(p);
+			
+			// Start adding seconds to their time-spent in the arena.
+			getStats(p).startTiming();
 		}
 		endTimer.startTimer();
 		hillTimer.runTask();
@@ -417,13 +417,13 @@ public class Arena {
 		// Set running to true.
 		running = true;
 		
-		// Collect class data of players still remaining.
-		ai.collectClassData();
-		
 		ah = new AbilityHandler(this);
 
 		Messenger.announce(this, Msg.ARENA_START);	
 		playSound(Sound.WITHER_DEATH, 0.382F, 0.1F);
+		
+		// Collect data of players still remaining.
+		ai.collectData();
 		return true;
 	}
 
@@ -521,6 +521,17 @@ public class Arena {
 	 * @param p the player to be a spectator
 	 */
 	public void setSpectator(Player p) {
+		if (hasPlayer(p)) {
+			if (bluePlayers.contains(p))
+				bluePlayers.remove(p);
+			if (redPlayers.contains(p))
+				redPlayers.remove(p);
+			arenaPlayers.remove(p);
+		}
+		
+		if (lobbyPlayers.contains(p)) {
+			lobbyPlayers.remove(p);
+		}
 		p.teleport(spec);
 		specPlayers.add(p);
 		Messenger.tell(p, Msg.SPEC_JOIN);
@@ -737,7 +748,9 @@ public class Arena {
 				+ "Hill Locator");
 		compass.setItemMeta(im);
 		p.getInventory().addItem(new ItemStack[] { compass });
-		p.setCompassTarget(hillUtils.getCurrentHill() != null ? hillUtils.getCurrentHill() : null);
+		if (hillUtils.getCurrentHill() != null) {
+			p.setCompassTarget(hillUtils.getCurrentHill());
+		}
 	}
 
 	/**

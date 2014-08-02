@@ -4,8 +4,8 @@
 package com.valygard.KotH;
 
 import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -62,9 +62,7 @@ public class ArenaInfo {
 		this.bw = info.getInt("blue-wins");
 		this.draws = info.getInt("draws");
 		
-		this.classes = new TreeMap<ArenaClass, Integer>();
-		
-		addTimePlayed();
+		this.classes = new LinkedHashMap<ArenaClass, Integer>();
 
 		crunchPercentages();
 	}
@@ -98,22 +96,20 @@ public class ArenaInfo {
 	private void addTimePlayed() {
 		timesPlayed += 1;
 		info.set("times-played", timesPlayed);
-		arena.getPlugin().saveConfig();
 	}
 
 	/**
 	 * Add to the total amount of players who have ever played this arena.
 	 */
-	public void setNewPlayerTotal() {
+	private void setNewPlayerTotal() {
 		totalPlayers += arena.getPlayersInArena().size();
 		info.set("total-players", totalPlayers);
-		arena.getPlugin().saveConfig();
 	}
 	
 	/**
-	 * Gets the classes each player has and inputs it to config in ascending order.
+	 * Gets the classes each player has and inputs it to config.
 	 */
-	public void collectClassData() {
+	public void collectData() {
 		for (Player p : arena.getPlayersInArena()) {
 			ArenaClass ac = arena.getClass(p);
 			
@@ -127,6 +123,8 @@ public class ArenaInfo {
 		for (ArenaClass ac : classes.keySet()) {
 			data.set(ac.getLowercaseName(), classes.get(ac));
 		}
+		addTimePlayed();
+		setNewPlayerTotal();
 		arena.getPlugin().saveConfig();
 	}
 

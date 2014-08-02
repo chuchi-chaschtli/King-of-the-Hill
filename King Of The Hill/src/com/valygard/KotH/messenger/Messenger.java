@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
@@ -33,7 +32,7 @@ public class Messenger {
     private Messenger() {}
     
 	public static void log(String level, String msg) {
-		KotH plugin = JavaPlugin.getPlugin(KotH.class);
+		KotH plugin = KotH.getInstance();
 		if (plugin.getConfig().getBoolean("global.logging"))
 			return;
 		

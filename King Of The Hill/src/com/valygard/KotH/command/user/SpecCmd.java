@@ -47,18 +47,6 @@ public class SpecCmd implements Command {
 			return true;
 		}
 		
-		// Remove from team and arenaPlayers set
-		if (arena.hasPlayer(p)) {
-			if (arena.getBlueTeam().contains(p))
-				arena.getBlueTeam().remove(p);
-			if (arena.getRedTeam().contains(p))
-				arena.getRedTeam().remove(p);
-			arena.getPlayersInArena().remove(p);
-		}
-		
-		if (arena.getPlayersInLobby().contains(p))
-			arena.getPlayersInLobby().remove(p);
-		
 		arena.setSpectator(p);
 		
 		return true;
