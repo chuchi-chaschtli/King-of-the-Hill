@@ -728,6 +728,7 @@ public class GlobalListener implements Listener {
 		case "end":
 			Bukkit.dispatchCommand(p,
 					"koth force" + cmd + " " + arena.getName());
+			break;
 		case "red":
 		case "redteam":
 		case "blue":
