@@ -372,8 +372,8 @@ public class GlobalListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onArenaRespawn(PlayerRespawnEvent e) {
-		Player p = e.getPlayer();
-		Arena arena = am.getArenaWithPlayer(p);
+		final Player p = e.getPlayer();
+		final Arena arena = am.getArenaWithPlayer(p);
 
 		if (arena == null || !arena.isRunning()) {
 			return;
@@ -399,7 +399,12 @@ public class GlobalListener implements Listener {
 		else
 			arena.giveRandomClass(p);
 
-		arena.giveCompass(p);
+		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+			@Override
+			public void run() {
+				arena.giveCompass(p);
+			}
+		}, 2l);
 
 		int safe = arena.getSettings().getInt("safe-respawn-time");
 		p.setNoDamageTicks(safe * 20);
