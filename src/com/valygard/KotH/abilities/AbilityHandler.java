@@ -153,6 +153,7 @@ public class AbilityHandler implements Listener {
 		clearZombies(p);
 		clearWolves(p);
 		clearLandmines(p);
+		clearCooldowns(p);
 
 		if (p.getVehicle() == null) {
 			return;
@@ -189,9 +190,11 @@ public class AbilityHandler implements Listener {
 		}
 		landmines.remove(p.getUniqueId());
 	}
-
-	public void clearCooldowns() {
-		cooldowns.clear();
+	
+	private void clearCooldowns(Player p) {
+		if (cooldowns.containsKey(p.getUniqueId())) {
+			cooldowns.remove(p.getUniqueId());
+		}
 	}
 
 	// --------------------------- //
