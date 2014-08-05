@@ -69,13 +69,20 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- Jenkins -->
 
+
+	<distributionManagement>
+		<repository>
+			<url>https://repository-aohruthless.forge.cloudbees.com/release/</url>
+			<name>koth</name>
+		</repository>
+	</distributionManagement>
 	<ciManagement>
-        <system>jenkins</system>
-        <url>https://aohruthless.ci.cloudbees.com/job/King%20of%20the%20Hill/</url>
-    </ciManagement>
+		<system>jenkins</system>
+		<url>https://aohruthless.ci.cloudbees.com/job/KotH/</url>
+	</ciManagement>
 
 	<!-- Repositories -->
 
