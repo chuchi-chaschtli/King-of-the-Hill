@@ -63,7 +63,8 @@ public class AbilityHandler implements Listener {
 		this.plugin = arena.getPlugin();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 
-		this.landmines = new HashMap<UUID, List<Location>>();
+		this.landmines = new HashMap<UUID, List<Location>>(arena.getPlayersInArena().size());
+		this.cooldowns = new HashMap<UUID, Long>(arena.getPlayersInArena().size());
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
