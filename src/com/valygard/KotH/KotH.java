@@ -61,7 +61,7 @@ public class KotH extends JavaPlugin {
 		reloadConfig();
 
 		// Set the header and save
-		getConfig().options().header(getHeader());
+		cfg.options().header(getHeader());
 		saveConfig();
 
 		// Define all variables, such as class instances
@@ -172,7 +172,8 @@ public class KotH extends JavaPlugin {
 				yaml.save(file);
 				return;
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			Messenger.severe("Could not create messages.yml!");
 			Messenger
@@ -186,12 +187,29 @@ public class KotH extends JavaPlugin {
 			yaml.load(file);
 			ConfigUtil.addMissingRemoveObsolete(file, Msg.toYaml(), yaml);
 			Msg.load(yaml);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			Messenger.severe("Could not load messages.yml!");
 			Messenger
 					.severe("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
+		}
+	}
+
+	@Override
+	public FileConfiguration getConfig() {
+		return cfg;
+	}
+
+	@Override
+	public void saveConfig() {
+		try {
+			cfg.save(cfgFile);
+		}
+		catch (IOException e) {
+			getLogger().severe(
+					"Could not save config.yml due to: " + e.getMessage());
 		}
 	}
 
@@ -222,17 +240,22 @@ public class KotH extends JavaPlugin {
 				}
 			}
 			cfg.load(cfgFile);
-		} catch (FileNotFoundException ex) {
-			throw new IllegalStateException("Config-file unsuccessfully created!");
-		} catch (IOException e) {
+		}
+		catch (FileNotFoundException ex) {
+			throw new IllegalStateException(
+					"Config-file unsuccessfully created!");
+		}
+		catch (IOException e) {
 			getLogger().severe(
 					"There was an error reading the config-file:" + "\n"
 							+ e.getMessage());
-		} catch (InvalidConfigurationException e) {
+		}
+		catch (InvalidConfigurationException e) {
 			throw new RuntimeException(
 					"\n\n>>>\n>>> Error in your config! \n>>> SnakeYaml says:\n>>>\n\n"
 							+ e.getMessage());
-		} finally {
+		}
+		finally {
 			if (scan != null) {
 				scan.close();
 			}
