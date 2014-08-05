@@ -84,7 +84,11 @@ public class SetWarpCmd implements Command {
 					break;
 				case "end":
 				case "endwarp":
-					arena.setEndWarp(p.getLocation());
+					if (arena.getSettings().getBoolean("teleport-to-end")) {
+						arena.setEndWarp(p.getLocation());
+					} else {
+						Messenger.tell(p, "End warps are disabled for this arena.");
+					}
 					break;
 				default:
 					return false;

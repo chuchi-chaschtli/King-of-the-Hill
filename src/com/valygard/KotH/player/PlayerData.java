@@ -21,11 +21,11 @@ import org.bukkit.potion.PotionEffect;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class PlayerData {
 	private Player player;
-	
+
 	private Map<ItemStack, Integer> contents;
 	private ItemStack head, chest, legs, feet;
 	private Location loc = null;
@@ -36,61 +36,63 @@ public class PlayerData {
 	private Collection<PotionEffect> potions;
 	private boolean flying;
 	private Set<Player> blind;
-	
-	// Although it isn't necessary data, this is the fitting place for the player's class.
-	private ArenaClass arenaClass;
 
+	// Although it isn't necessary data, this is the fitting place for the
+	// player's class.
+	private ArenaClass arenaClass;
 
 	/**
 	 * Constructor to initialize all the variables.
 	 */
 	public PlayerData(Player player) {
-		this.player 	= player;
-		
+		this.player = player;
+
 		this.contents = new HashMap<ItemStack, Integer>();
 		for (int i = 0; i < 36; i++) {
 			contents.put(player.getInventory().getItem(i), i);
 		}
-		
-		this.head		= player.getInventory().getHelmet();
-		this.chest		= player.getInventory().getChestplate();
-		this.legs		= player.getInventory().getLeggings();
-		this.feet		= player.getInventory().getBoots();
-		
-		this.loc 		= player.getLocation();
-		this.mode 		= player.getGameMode();
-		this.potions 	= player.getActivePotionEffects();
-		
-		this.food		= player.getFoodLevel();
-		this.health		= player.getHealth();
-		this.level		= player.getLevel();
-		this.exp		= player.getExp();
-		
-		this.flying		= player.isFlying();
-		
-		this.blind		= new HashSet<Player>();
+
+		this.head = player.getInventory().getHelmet();
+		this.chest = player.getInventory().getChestplate();
+		this.legs = player.getInventory().getLeggings();
+		this.feet = player.getInventory().getBoots();
+
+		this.loc = player.getLocation();
+		this.mode = player.getGameMode();
+		this.potions = player.getActivePotionEffects();
+
+		this.food = player.getFoodLevel();
+		this.health = player.getHealth();
+		this.level = player.getLevel();
+		this.exp = player.getExp();
+
+		this.flying = player.isFlying();
+
+		this.blind = new HashSet<Player>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (!p.canSee(player)) {
 				blind.add(p);
 			}
 		}
-		
+
 		this.arenaClass = null;
 	}
 
 	/**
-	 * Restores health, food, and experience when a player
-	 * exits the arena, as per the stored data.
+	 * Restores health, food, and experience when a player exits the arena, as
+	 * per the stored data.
 	 */
 	@SuppressWarnings("deprecation")
-	public void restoreData() {
+	public void restoreData(boolean teleportToPriorLoc) {
 		player.setHealth(health);
 		player.setFoodLevel(food);
-		
+
 		player.setLevel(level);
 		player.setExp(exp);
-		player.teleport(loc);
-		
+		if (teleportToPriorLoc) {
+			player.teleport(loc);
+		}
+
 		for (ItemStack i : contents.keySet()) {
 			parseItem(i);
 			player.getInventory().setItem(contents.get(i), i);
@@ -99,36 +101,37 @@ public class PlayerData {
 		player.getInventory().setChestplate(parseItem(chest));
 		player.getInventory().setLeggings(parseItem(legs));
 		player.getInventory().setBoots(parseItem(feet));
-		
+
 		player.setGameMode(mode);
 		player.addPotionEffects(potions);
 		player.updateInventory();
-		
-		// In case they are no longer allowed to fly, even if they were flying they cannot anymore.
+
+		// In case they are no longer allowed to fly, even if they were flying
+		// they cannot anymore.
 		player.setFlying(!flying ? false : player.getAllowFlight());
-		
+
 		for (Player p : blind) {
 			p.hidePlayer(player);
 		}
 		blind.clear();
-		
+
 		setArenaClass(null);
 	}
-	
+
 	private ItemStack parseItem(ItemStack i) {
 		if (i == null)
 			return null;
 		ItemMeta im = i.getItemMeta();
-		
+
 		Map<Enchantment, Integer> enchants;
 		String name;
 		List<String> lore;
-		
+
 		if (im != null) {
-			enchants 	= (im.hasEnchants() ? im.getEnchants() : null);
-			name		= (im.hasDisplayName() ? im.getDisplayName() : null);
-			lore		= (im.hasLore() ? im.getLore() : null);
-			
+			enchants = (im.hasEnchants() ? im.getEnchants() : null);
+			name = (im.hasDisplayName() ? im.getDisplayName() : null);
+			lore = (im.hasLore() ? im.getLore() : null);
+
 			if (enchants != null)
 				i.addEnchantments(enchants);
 			if (name != null)
@@ -147,7 +150,7 @@ public class PlayerData {
 	public Set<ItemStack> getItems() {
 		return contents.keySet();
 	}
-	
+
 	public Map<ItemStack, Integer> getContents() {
 		return contents;
 	}
@@ -155,15 +158,15 @@ public class PlayerData {
 	public ItemStack getHelmet() {
 		return head;
 	}
-	
+
 	public ItemStack getChestplate() {
 		return chest;
 	}
-	
+
 	public ItemStack getLeggings() {
 		return legs;
 	}
-	
+
 	public ItemStack getBoots() {
 		return feet;
 	}
@@ -215,16 +218,16 @@ public class PlayerData {
 	public void setMode(GameMode mode) {
 		this.mode = mode;
 	}
-	
+
 	public boolean isFlying() {
 		return flying;
 	}
-	
-    public ArenaClass getArenaClass() {
-        return arenaClass;
-    }
 
-    public void setArenaClass(ArenaClass arenaClass) {
-        this.arenaClass = arenaClass;
-    }
+	public ArenaClass getArenaClass() {
+		return arenaClass;
+	}
+
+	public void setArenaClass(ArenaClass arenaClass) {
+		this.arenaClass = arenaClass;
+	}
 }

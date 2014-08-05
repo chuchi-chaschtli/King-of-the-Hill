@@ -70,6 +70,13 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>koth-repo</id>
+			<url>http://repository-aohruthless.forge.cloudbees.com/release/</url>
+			<name>King-of-the-Hill</name>
+		</repository>
+	</distributionManagement>
 
 	<!-- Repositories -->
 
