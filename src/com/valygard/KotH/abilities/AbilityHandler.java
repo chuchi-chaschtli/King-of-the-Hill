@@ -231,7 +231,7 @@ public class AbilityHandler implements Listener {
 		}
 
 		long timeStamp = cooldowns.get(player.getUniqueId());
-		return (timeStamp + (cd * 1000) < System.currentTimeMillis());
+		return (timeStamp + (cd * 1000) >= System.currentTimeMillis());
 	}
 
 	private boolean useAbility(Arena arena, Player player,
@@ -268,8 +268,8 @@ public class AbilityHandler implements Listener {
 				player.setMetadata(key, new FixedMetadataValue(plugin, ""));
 			}
 
-			boolean locParameter = clazz.getName().equalsIgnoreCase(
-					"SnareAbility");
+			boolean locParameter = clazz.getName().equals(
+					SnareAbility.class.getName());
 
 			Class<?>[] classArguments;
 			Object[] arguments;

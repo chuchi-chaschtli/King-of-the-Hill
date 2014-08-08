@@ -417,11 +417,11 @@ public class Arena {
 			// Start adding seconds to their time-spent in the arena.
 			getStats(p).startTiming();
 		}
-		endTimer.startTimer();
-		hillTimer.runTask();
-
 		// Set running to true.
 		running = true;
+		
+		endTimer.startTimer();
+		hillTimer.runTask();
 
 		ah = new AbilityHandler(this);
 

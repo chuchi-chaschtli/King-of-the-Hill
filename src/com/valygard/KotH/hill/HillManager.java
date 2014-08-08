@@ -269,6 +269,9 @@ public class HillManager {
 		if (!arena.getSettings().getBoolean("use-beacons")) {
 			return;
 		}
+		if (utils.getCurrentHill() == null) {
+			return;
+		}
 		Block b = utils.getCurrentHill().getBlock();
 		if (b != null) {
 			b.setType(Material.AIR);
