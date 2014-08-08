@@ -63,8 +63,10 @@ public class AbilityHandler implements Listener {
 		this.plugin = arena.getPlugin();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 
-		this.landmines = new HashMap<UUID, List<Location>>(arena.getPlayersInArena().size());
-		this.cooldowns = new HashMap<UUID, Long>(arena.getPlayersInArena().size());
+		this.landmines = new HashMap<UUID, List<Location>>(arena
+				.getPlayersInArena().size());
+		this.cooldowns = new HashMap<UUID, Long>(arena.getPlayersInArena()
+				.size());
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -158,7 +160,7 @@ public class AbilityHandler implements Listener {
 		if (p.getVehicle() == null) {
 			return;
 		}
-		
+
 		if (p.getVehicle() instanceof Horse) {
 			p.getVehicle().remove();
 		}
@@ -190,7 +192,7 @@ public class AbilityHandler implements Listener {
 		}
 		landmines.remove(p.getUniqueId());
 	}
-	
+
 	private void clearCooldowns(Player p) {
 		if (cooldowns.containsKey(p.getUniqueId())) {
 			cooldowns.remove(p.getUniqueId());
@@ -258,19 +260,37 @@ public class AbilityHandler implements Listener {
 				}
 			}
 			cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-			
-			AbilityCooldown cooldown = clazz.getAnnotation(AbilityCooldown.class);
+
+			AbilityCooldown cooldown = clazz
+					.getAnnotation(AbilityCooldown.class);
 			double cd = cooldown.value();
 			if (arena.getLength() - 0.5 > cd) {
 				player.setMetadata(key, new FixedMetadataValue(plugin, ""));
 			}
 
-			clazz.getConstructor(Arena.class, Player.class).newInstance(arena,
-					player);
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+			boolean locParameter = clazz.getName().equalsIgnoreCase(
+					"SnareAbility");
+
+			Class<?>[] classArguments;
+			Object[] arguments;
+
+			if (locParameter) {
+				classArguments = new Class[] { Arena.class, Player.class,
+						Location.class };
+				arguments = new Object[] { arena, player,
+						player.getTargetBlock(null, 100).getLocation() };
+			} else {
+				classArguments = new Class[] { Arena.class, Player.class };
+				arguments = new Object[] { arena, player };
+			}
+
+			clazz.getConstructor(classArguments).newInstance(arguments);
+		}
+		catch (IllegalArgumentException | SecurityException
+				| InstantiationException | IllegalAccessException
+				| InvocationTargetException | NoSuchMethodException e) {
 			Messenger.severe(exception + e.getMessage());
+			e.printStackTrace();
 			Messenger.tell(player, ChatColor.RED + exception + e.getMessage());
 			return false;
 		}
