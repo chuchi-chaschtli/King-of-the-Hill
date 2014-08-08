@@ -1,4 +1,4 @@
-<h2>King of the Hill</h2>
+<h2>King of the Hill</h2> [![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
 
 <h3>Welcome</h3>
 Welcome to the Github repository for King of the Hill, a plugin for Minecraft. This GitHub repository is provided to allow me, the author, to track 
