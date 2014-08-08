@@ -447,6 +447,8 @@ public class GlobalListener implements Listener {
 						.pow(arena.getSettings().getDouble(
 								"spawn-camp-distance"), 2)) {
 					Messenger.tell(d, Msg.MISC_NO_SPAWN_CAMPING);
+					e.setCancelled(true);
+					return;
 				}
 			}
 
