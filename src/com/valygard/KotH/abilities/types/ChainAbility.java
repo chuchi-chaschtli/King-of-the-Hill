@@ -99,9 +99,11 @@ public class ChainAbility extends Ability implements Listener {
 		for (LivingEntity e : affected.keySet()) {
 			Location loc = e.getLocation();
 			world.strikeLightningEffect(loc);
-			e.setHealth(e.getHealth() - (e.getMaxHealth() / 5.0));
+			double dmg = e.getHealth() - (e.getMaxHealth() / 5.0);
+			boolean fatal = dmg > 0;
+			e.setHealth(fatal ? 0 : dmg);
 
-			if (e.isDead()) {
+			if (fatal) {
 				if (!(e instanceof Player)) {
 					continue;
 				}
