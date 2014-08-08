@@ -1,9 +1,9 @@
-<h2>King of the Hill</h2> [![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
+<h2>King of the Hill</h2> 
+[![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
 
 <h3>Welcome</h3>
-Welcome to the Github repository for King of the Hill, a plugin for Minecraft. This GitHub repository is provided to allow me, the author, to track 
-commit history and progress of the plugin. Also, as licensed by MIT, and following the Open Source Definition, you are allowed to learn from the 
-code and reuse it to your heart's content provided you accredit me.
+Welcome to the Github repository for King of the Hill, a plugin for Minecraft. As per the MIT license, you may copy, edit and reuse this code
+provided you accredit me.
 
 <h3>About</h3>
 The existence of King of the Hill is meant to simulate the popular combative experience of the minigame within the confines of Minecraft. 
