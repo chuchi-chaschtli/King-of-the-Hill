@@ -315,11 +315,8 @@ public class Arena {
 		}
 
 		PlayerData data = getData(p);
-		if (settings.getBoolean("teleport-to-end") && this.end != null) {
-			data.restoreData(false);
-		} else {
-			data.restoreData(true);
-		}
+		data.restoreData(!settings.getBoolean("teleport-to-end")
+				|| this.end == null);
 
 		if (!end) {
 			if (arenaPlayers.contains(p))
@@ -399,9 +396,6 @@ public class Arena {
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
 
-			// Collect player class data.
-			getStats(p).collectClassData();
-
 			balanceTeams(p);
 
 			// Teleport players and initialize scoreboards
@@ -416,10 +410,12 @@ public class Arena {
 
 			// Start adding seconds to their time-spent in the arena.
 			getStats(p).startTiming();
+			// Collect player class data.
+			getStats(p).collectClassData();
 		}
 		// Set running to true.
 		running = true;
-		
+
 		endTimer.startTimer();
 		hillTimer.runTask();
 
@@ -618,7 +614,7 @@ public class Arena {
 	/**
 	 * Declare one team as victorious based on which set has a higher score.
 	 */
-	public void declareWinner() {
+	private void declareWinner() {
 		Set<Player> loser;
 		if (winner == null) {
 			Messenger.announce(this, Msg.ARENA_DRAW);
