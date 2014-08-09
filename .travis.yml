@@ -2,6 +2,14 @@ language: java
 notifications:
   email: false
 install: true
+deploy:
+  provider: releases
+  api-key: "GITHUB OAUTH TOKEN"
+  file: KotH.jar
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
 matrix:
   include:
   - jdk: oraclejdk7
