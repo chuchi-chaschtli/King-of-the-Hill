@@ -4,7 +4,7 @@ notifications:
 install: true
 deploy:
   provider: releases
-  api-key: "GITHUB OAUTH TOKEN"
+  api-key: 600256a1c5b19323d0a902c4e904490d1c6514d2
   file: KotH.jar
   skip_cleanup: true
   on:
