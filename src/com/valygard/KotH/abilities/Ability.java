@@ -6,6 +6,7 @@ package com.valygard.KotH.abilities;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -48,11 +49,16 @@ public class Ability {
 	 * Calling this constructor while the player is not on a team will also
 	 * result in an IllegalStateException.
 	 * 
-	 * @param arena a running arena
-	 * @param p a player
-	 * @param mat the material of the ability
+	 * @param arena
+	 *            a running arena
+	 * @param p
+	 *            a player
+	 * @param mat
+	 *            the material of the ability
 	 */
 	protected Ability(Arena arena, Player p, Material mat) {
+		Validate.isTrue(arena.hasPlayer(p), "The arena '" + arena.getName()
+				+ "' must contain player '" + p.getName() + "'");
 		if (!arena.isRunning()) {
 			throw new IllegalStateException(
 					"Arena must be running to use abilities!");
