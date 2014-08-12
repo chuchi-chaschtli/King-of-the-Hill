@@ -69,8 +69,8 @@ public class Ability {
 		this.team = arena.getTeam(p);
 		this.opponents = arena.getOpposingTeam(p);
 		
-		if (team.equals(null)) {
-			Messenger.severe("Player '" + player.getName() +"' is not on a team. Kicking...");
+		if (team == null) {
+			arena.getLogger().warn("Player '" + player.getName() +"' is not on a team. Kicking...");
 			arena.kickPlayer(player);
 			throw new IllegalStateException("Player '" + player.getName() +"' must be on a team to use abilities!");
 		}

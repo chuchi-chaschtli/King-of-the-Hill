@@ -85,13 +85,13 @@ public class UpdateChecker {
 		return latestName.substring("KotH v".length());
 	}
 
-	private static void message(KotH plugin, final Player player,
+	private static void message(final KotH plugin, final Player player,
 			final String... messages) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 			public void run() {
 				for (String message : messages) {
 					if (player == null) {
-						Messenger.info(message);
+						plugin.getKotHLogger().info(message);
 					} else if (player.isOnline()) {
 						Messenger.tell(player, message);
 					}

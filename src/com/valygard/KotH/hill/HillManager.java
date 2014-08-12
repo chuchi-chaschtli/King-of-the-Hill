@@ -53,7 +53,6 @@ public class HillManager {
 		HillChangeEvent event = new HillChangeEvent(arena);
 		arena.getPlugin().getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
-			Messenger.info("The hill change was cancelled by an external force.");
 			return;
 		}
 

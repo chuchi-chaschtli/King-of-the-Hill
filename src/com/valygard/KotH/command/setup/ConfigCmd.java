@@ -31,7 +31,7 @@ public class ConfigCmd implements Command {
 		if (args[0].startsWith("save")) {
 			am.getPlugin().saveConfig();
 			Messenger.tell(sender, "Config-file saved.");
-			Messenger.info("Config-file saved.");
+			am.getLogger().info("Config-file saved.");
 		}
 		
 
@@ -39,7 +39,7 @@ public class ConfigCmd implements Command {
 			try {
 				am.reloadConfig();
 				Messenger.tell(sender, "Config-file reloaded.");
-				Messenger.info("Config-file reloaded.");
+				am.getLogger().info("Config-file reloaded.");
 			} catch (Exception e) {
 				Messenger.tell(sender, ChatColor.RED
 						+ "Error discovered in config.yml!" + ChatColor.RESET

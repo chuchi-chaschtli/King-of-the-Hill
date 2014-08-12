@@ -50,6 +50,7 @@ import com.valygard.KotH.event.player.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
 import com.valygard.KotH.hill.HillUtils;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
@@ -69,6 +70,7 @@ public class Arena {
 	private KotH plugin;
 	private String arenaName;
 	private World world;
+	private KotHLogger logger;
 
 	// Configuration-important
 	private FileConfiguration config;
@@ -134,6 +136,7 @@ public class Arena {
 		// General stuff
 		this.plugin = plugin;
 		this.arenaName = arenaName;
+		this.logger = plugin.getKotHLogger();
 
 		// Settings from config
 		this.config = plugin.getConfig();
@@ -236,8 +239,8 @@ public class Arena {
 			invManager.storeInventory(p);
 		}
 		catch (IOException e) {
-			Messenger.warning("Could not store inventory of Player '"
-					+ p.getName() + "' (UUID: " + p.getUniqueId() + ")");
+			logger.error("Could not store inventory of Player '" + p.getName()
+					+ "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
 		invManager.clearInventory(p);
@@ -301,8 +304,8 @@ public class Arena {
 				// Take a fine for quitting.
 				String fee = settings.getString("quit-charge");
 				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-					Messenger.warning("Quit-charge setting for arena '"
-							+ arenaName + "' is incorrect!");
+					logger.error("Quit-charge setting for arena '" + arenaName
+							+ "' is broken! Fix this boo-boo.");
 					fee = String.valueOf(0.00);
 				}
 				if (fee.startsWith("$"))
@@ -382,9 +385,9 @@ public class Arena {
 			// Remove player from spec list to avoid invincibility issues
 			if (specPlayers.contains(p)) {
 				specPlayers.remove(p);
-				Messenger.info("Player " + p.getName()
+				logger.info("Player " + p.getName()
 						+ " joined the arena from the spec area!");
-				Messenger.info("Invincibility glitch attempt stopped!");
+				logger.info("Invincibility glitch attempt stopped!");
 			}
 
 			p.setHealth(p.getMaxHealth());
@@ -835,7 +838,7 @@ public class Arena {
 		String className = classes.remove(random.nextInt(classes.size()));
 		while (!plugin.has(p, "koth.classes." + className.toLowerCase())) {
 			if (classes.isEmpty()) {
-				Messenger.info("Player '" + p.getName()
+				logger.warn("Player '" + p.getName()
 						+ "' does not have access to any classes!");
 				removePlayer(p, false);
 				return;
@@ -879,6 +882,15 @@ public class Arena {
 	 */
 	public World getWorld() {
 		return world;
+	}
+
+	/**
+	 * Grabs the KotH logger.
+	 * 
+	 * @return a KotHLogger reference.
+	 */
+	public KotHLogger getLogger() {
+		return logger;
 	}
 
 	/**
@@ -1455,8 +1467,8 @@ public class Arena {
 			stats = new PlayerStats(p, this);
 		}
 		catch (IOException e) {
-			Messenger.severe("Could not get the stats of player '"
-					+ p.getName() + "'!");
+			logger.error("Could not get the stats of player '" + p.getName()
+					+ "'!");
 			e.printStackTrace();
 		}
 		return stats;

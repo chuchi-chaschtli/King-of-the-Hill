@@ -26,7 +26,7 @@ import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.listener.GlobalListener;
-import com.valygard.KotH.messenger.Messenger;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.ConfigUtil;
 
@@ -38,6 +38,9 @@ public class KotH extends JavaPlugin {
 	// Vault
 	private Economy econ;
 
+	// Logger
+	private KotHLogger logger;
+
 	// Classes
 	private ArenaManager am;
 	private CommandManager cm;
@@ -45,8 +48,6 @@ public class KotH extends JavaPlugin {
 
 	private File cfgFile;
 	private FileConfiguration cfg;
-
-	private static KotH instance;
 
 	// Messages related
 	public static YamlConfiguration MESSAGES;
@@ -100,16 +101,11 @@ public class KotH extends JavaPlugin {
 		}
 	}
 
-	public static KotH getInstance() {
-		return instance;
-	}
-
 	private void initializeVariables() {
 		am = new ArenaManager(this);
 		cm = new CommandManager(this);
 		em = new EconomyManager(this);
-
-		instance = this;
+		logger = new KotHLogger(this);
 	}
 
 	private void registerCommands() {
@@ -136,7 +132,7 @@ public class KotH extends JavaPlugin {
 	private void loadVault() {
 		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
 		if (vault == null) {
-			Messenger.warning("Economy rewards cannot function without vault.");
+			logger.warn("Economy rewards cannot function without vault.");
 			return;
 		}
 
@@ -146,11 +142,10 @@ public class KotH extends JavaPlugin {
 
 		if (e != null) {
 			econ = e.getProvider();
-			Messenger.info("Vault v" + vault.getDescription().getVersion()
+			logger.info("Vault v" + vault.getDescription().getVersion()
 					+ " has been found! Economy rewards enabled.");
 		} else {
-			Messenger
-					.warning("Vault found, but no economy plugin detected ... Economy rewards will not function!");
+			logger.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
 		}
 	}
 
@@ -167,7 +162,7 @@ public class KotH extends JavaPlugin {
 		File file = new File(getDataFolder(), "messages.yml");
 		try {
 			if (file.createNewFile()) {
-				Messenger.info("messages.yml created.");
+				logger.info("messages.yml created.");
 				YamlConfiguration yaml = Msg.toYaml();
 				yaml.save(file);
 				return;
@@ -175,9 +170,8 @@ public class KotH extends JavaPlugin {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			Messenger.severe("Could not create messages.yml!");
-			Messenger
-					.severe("The plugin cannot work without messages; disabling plugin.");
+			logger.error("Could not create messages.yml!");
+			logger.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 
@@ -190,9 +184,8 @@ public class KotH extends JavaPlugin {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			Messenger.severe("Could not load messages.yml!");
-			Messenger
-					.severe("The plugin cannot work without messages; disabling plugin.");
+			logger.error("Could not load messages.yml!");
+			logger.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 	}
@@ -283,13 +276,15 @@ public class KotH extends JavaPlugin {
 		return em;
 	}
 
-	// UpdateChecker
 	public File getPluginFile() {
 		return getFile();
 	}
 
-	// Economy
 	public Economy getEconomy() {
 		return econ;
+	}
+	
+	public KotHLogger getKotHLogger() {
+		return logger;
 	}
 }

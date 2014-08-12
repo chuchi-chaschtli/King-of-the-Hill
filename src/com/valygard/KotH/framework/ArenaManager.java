@@ -25,6 +25,7 @@ import org.bukkit.permissions.PermissionDefault;
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.event.ArenaLoadEvent;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
@@ -178,13 +179,13 @@ public class ArenaManager {
 		if (!worldName.equals("")) {
 			world = plugin.getServer().getWorld(worldName);
 			if (world == null) {
-				Messenger.warning("World '" + worldName + "' for arena '"
+				plugin.getKotHLogger().warn("World '" + worldName + "' for arena '"
 						+ arenaName + "' was not found...");
 				return null;
 			}
 		} else {
 			world = plugin.getServer().getWorlds().get(0);
-			Messenger.warning("Could not find the world for arena '"
+			plugin.getKotHLogger().warn("Could not find the world for arena '"
 					+ arenaName + "'. Using default world ('" + world.getName()
 					+ "')! Check the config-file!");
 		}
@@ -259,7 +260,7 @@ public class ArenaManager {
 		plugin.saveConfig();
 
 		KotHUtils.unregisterPermission(plugin, "koth.arenas." + name);
-		Messenger.info("The arena '" + name + "' has been removed.");
+		plugin.getKotHLogger().info("The arena '" + name + "' has been removed.");
 	}
 
 	/**
@@ -344,7 +345,7 @@ public class ArenaManager {
 
 		// If the section doesn't exist, the class doesn't either.
 		if (section == null) {
-			Messenger.severe("Failed to load class '" + classname + "'.");
+			plugin.getKotHLogger().warn("Failed to load class '" + classname + "'.");
 			return null;
 		}
 
@@ -477,6 +478,15 @@ public class ArenaManager {
 	 */
 	public KotH getPlugin() {
 		return plugin;
+	}
+	
+	/**
+	 * Grabs the KotHLogger.
+	 * 
+	 * @return
+	 */
+	public KotHLogger getLogger() {
+		return plugin.getKotHLogger();
 	}
 
 	/**

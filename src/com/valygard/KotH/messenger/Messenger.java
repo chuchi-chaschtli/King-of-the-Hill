@@ -3,21 +3,13 @@
  */
 package com.valygard.KotH.messenger;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
 
 /**
@@ -25,44 +17,8 @@ import com.valygard.KotH.framework.Arena;
  *
  */
 public class Messenger {
-	private static final Logger log = Logger.getLogger("Minecraft");
-
-    private static final String prefix = "[KotH] ";
 
     private Messenger() {}
-    
-	public static void log(String level, String msg) {
-		KotH plugin = KotH.getInstance();
-		if (plugin.getConfig().getBoolean("global.logging"))
-			return;
-		
-		File dataFolder = plugin.getDataFolder();
-		try {
-			if(!dataFolder.exists()) {
-				dataFolder.mkdir();
-			}
-			
-			File file = new File(dataFolder, "KotH.log") ;
-			if(!file.exists()){
-				file.createNewFile();		
-			}
-			
-			Date date = new Date();
-			SimpleDateFormat df = new SimpleDateFormat("[MM-dd-yyyy HH:mm:ss]");
-			String time = df.format(date);
-			
-			FileWriter fw = new FileWriter(file, true);	  
-			PrintWriter pw = new PrintWriter(fw);
-			pw.println(time + " [KotH] [" + level.toUpperCase() + "] : " + msg);
-			pw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void log(String msg) {
-		log("info", msg);
-	}
 
     public static boolean tell(CommandSender p, String msg) {
         // If the input sender is null or the string is empty, return.
@@ -99,20 +55,5 @@ public class Messenger {
 
     public static void announce(Arena arena, Msg msg) {
         announce(arena, msg.toString());
-    }
-
-    public static void info(String msg) {
-        log.info(prefix + msg);
-        log(msg);
-    }
-
-    public static void warning(String msg) {
-        log.warning(prefix + msg);
-        log("warning", msg);
-    }
-
-    public static void severe(String msg) {
-        log.severe(prefix + msg);
-        log("severe", msg);
     }
 }

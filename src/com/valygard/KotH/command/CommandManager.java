@@ -172,7 +172,7 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 		}
 
-		Messenger.log(sender.getName() + " has used command: " + "/koth "
+		plugin.getKotHLogger().info(sender.getName() + " has used command: " + "/koth "
 				+ info.name());
 		return false;
 	}

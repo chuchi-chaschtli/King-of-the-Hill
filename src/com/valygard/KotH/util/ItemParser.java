@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -16,7 +17,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
-import com.valygard.KotH.messenger.Messenger;
 
 /**
  * @author Anand
@@ -156,7 +156,7 @@ public class ItemParser {
                 break;
         }
         if (result == null || result.getType() == Material.AIR) {
-            Messenger.warning("Failed to parse item: " + item);
+            Logger.getLogger("Minecraft").warning("Failed to parse item: " + item);
             return null;
         }
 
@@ -195,7 +195,7 @@ public class ItemParser {
     
     private static String getType(String item) {
         if (!item.matches("[\\w[^d]]*")) {
-        	Messenger.warning("Material Type must be a string!");
+        	Logger.getLogger("Minecraft").warning("Material Type must be a string!");
             return null;
         }
         

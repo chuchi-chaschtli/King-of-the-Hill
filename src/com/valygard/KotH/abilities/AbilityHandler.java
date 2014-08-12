@@ -289,7 +289,7 @@ public class AbilityHandler implements Listener {
 		catch (IllegalArgumentException | SecurityException
 				| InstantiationException | IllegalAccessException
 				| InvocationTargetException | NoSuchMethodException e) {
-			Messenger.severe(exception + e.getMessage());
+			arena.getLogger().error(exception + e.getMessage());
 			e.printStackTrace();
 			Messenger.tell(player, ChatColor.RED + exception + e.getMessage());
 			return false;
