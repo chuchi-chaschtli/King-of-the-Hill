@@ -31,7 +31,7 @@ public class KotHLogger {
 	}
 
 	private static void logMessage(String level, String msg) {
-		if (plugin.getConfig().getBoolean("global.logging")) {
+		if (!plugin.getConfig().getBoolean("global.logging")) {
 			return;
 		}
 
