@@ -858,27 +858,27 @@ public class Arena {
 	// --------------------------- //
 
 	/**
-	 * Get the main class.
+	 * Grabs the main class.
 	 * 
-	 * @return the main class
+	 * @return a KotH instance.
 	 */
 	public KotH getPlugin() {
 		return plugin;
 	}
 
 	/**
-	 * Get the name of the arena as-per config.
+	 * Grabs the arena name.
 	 * 
-	 * @return the arena name
+	 * @return a String.
 	 */
 	public String getName() {
 		return arenaName;
 	}
 
 	/**
-	 * Get the world the arena is located in.
+	 * Grabs the world the arena is located in.
 	 * 
-	 * @return the arena world
+	 * @return a World.
 	 */
 	public World getWorld() {
 		return world;
@@ -894,50 +894,50 @@ public class Arena {
 	}
 
 	/**
-	 * Get the settings of the arena, located in the config.
+	 * Grabs the arena-settings.
 	 * 
-	 * @return the settings of an arena
+	 * @return a ConfigurationSection.
 	 */
 	public ConfigurationSection getSettings() {
 		return settings;
 	}
 
 	/**
-	 * Get important arena warps.
+	 * Grabs important arena warps.
 	 * 
-	 * @return the list of locations
+	 * @return a ConfigurationSection.
 	 */
 	public ConfigurationSection getWarps() {
 		return warps;
 	}
 
 	/**
-	 * Get some important information about the aerna.
+	 * Grabs some important information about the aerna.
 	 * 
-	 * @return a configuration section representing some arena data.
+	 * @return a ConfigurationSection.
 	 */
 	public ConfigurationSection getInfo() {
 		return info;
 	}
 
 	/**
-	 * Get a location based on our Location parser in our ConfigUtil.
+	 * Grabs a location based on the
+	 * {@link ConfigUtil#parseLocation(ConfigurationSection, String, World)}
 	 * 
 	 * @param path
-	 *            a config path
-	 * @return the location from the path
+	 *            a String configuration pathway.
+	 * @return a Location based on the given path.
 	 */
 	public Location getLocation(String path) {
 		return parseLocation(warps, path, world);
 	}
 
 	/**
-	 * Get the location of a hill, which is a sub-category of the warps and as
-	 * such, requires a different method.
+	 * Grabs the location of a specified hill pathway.
 	 * 
 	 * @param path
-	 *            a config path
-	 * @return the hill location from the path
+	 *            a String configuration pathway.
+	 * @return a Location reference to the hill.
 	 */
 	public Location getHillLocation(String path) {
 		return parseLocation(warps.getConfigurationSection("hills"), path,
@@ -945,29 +945,37 @@ public class Arena {
 	}
 
 	/**
-	 * Set an important location in the warps sub-section of an arena.
+	 * Sets an important location in the warps sub-section of an arena.
 	 * 
 	 * @param path
-	 *            a config path
+	 *            the String config path to change.
 	 * @param loc
-	 *            the location to be set
+	 *            the Location to be parsed and set.
 	 */
 	public void setLocation(String path, Location loc) {
 		if (loc.getBlock() != null) {
 			if (settings.getBoolean("location-fixer")) {
 				loc = loc.getWorld().getHighestBlockAt(loc).getLocation()
 						.add(0, 1, 0);
+				while (loc.getBlock().isLiquid()) {
+					loc.getBlock().setType(Material.STONE);
+					logger.warn("The block was raised due to lava or water being found. "
+							+ "If you did not want this, set 'location-fixer' to false for arena '"
+							+ arenaName + "'.");
+					loc = loc.add(0, 1, 0);
+				}
 			}
 		}
 		ConfigUtil.setLocation(warps, path, loc);
 	}
 
 	/**
-	 * Get the respective spawns of a player based on his/her team.
+	 * Grabs the respective spawns of a player based on his/her team. Returns
+	 * null if the player is not on the team (and therefore not in the arena).
 	 * 
 	 * @param p
-	 *            the player
-	 * @return the player's spawnpoint
+	 *            Player to grab spawn of.
+	 * @return a Location.
 	 */
 	public Location getSpawn(Player p) {
 		if (redPlayers.contains(p))
@@ -978,9 +986,12 @@ public class Arena {
 	}
 
 	/**
-	 * The location of the lobby.
+	 * Grabs location of the lobby. The lobby is where players wanting to
+	 * {@link #addPlayer(Player) join} the arena (while it is not in progress)
+	 * can choose their {@link #pickClass(Player, String) class} and
+	 * {@link #chooseTeam(Player, String) team.}
 	 * 
-	 * @return the lobby warp
+	 * @return a Location.
 	 */
 	public Location getLobby() {
 		try {
@@ -993,10 +1004,10 @@ public class Arena {
 	}
 
 	/**
-	 * Change the location of the lobby.
+	 * Changes the location of the lobby to a given Location.
 	 * 
 	 * @param lobby
-	 *            the new spawnpoint
+	 *            the new Location
 	 */
 	public void setLobby(Location lobby) {
 		this.lobby = lobby;
@@ -1005,9 +1016,10 @@ public class Arena {
 	}
 
 	/**
-	 * Get the spectator location.
+	 * Grabs the spectator location. This is where players not on the red or
+	 * blue tam can watch the match unfold.
 	 * 
-	 * @return the spec warp
+	 * @return a Location
 	 */
 	public Location getSpec() {
 		try {
@@ -1020,10 +1032,10 @@ public class Arena {
 	}
 
 	/**
-	 * Change the spectator warp.
+	 * Changes the spectator warp to a given Location.
 	 * 
 	 * @param spec
-	 *            the new spawnpoint
+	 *            the new Location
 	 */
 	public void setSpec(Location spec) {
 		this.spec = spec;
@@ -1032,9 +1044,11 @@ public class Arena {
 	}
 
 	/**
-	 * Get the location of the red spawn.
+	 * Grabs the location of the red spawn. This is where all blue players will
+	 * spawn when the arena begins and upon death, provided that 'one-life'
+	 * setting is false.
 	 * 
-	 * @returnthe red warp
+	 * @return a Location
 	 */
 	public Location getRedSpawn() {
 		try {
@@ -1047,10 +1061,10 @@ public class Arena {
 	}
 
 	/**
-	 * Change the locus of the red spawn.
+	 * Changes the locus of the red spawn to a given Location.
 	 * 
 	 * @param red
-	 *            the new spawnpoint
+	 *            the new Location
 	 */
 	public void setRedSpawn(Location red) {
 		this.red = red;
@@ -1059,9 +1073,11 @@ public class Arena {
 	}
 
 	/**
-	 * Get the blue spawn location.
+	 * Grabs the blue spawn location. This is where all blue players will spawn
+	 * when the arena begins and upon death, provided that 'one-life' setting is
+	 * false.
 	 * 
-	 * @return the blue warp
+	 * @return a Location
 	 */
 	public Location getBlueSpawn() {
 		try {
@@ -1074,10 +1090,10 @@ public class Arena {
 	}
 
 	/**
-	 * Change the blue spawn location.
+	 * Changes the blue spawn location to a given Location.
 	 * 
 	 * @param blue
-	 *            the new spawnpoint
+	 *            the new Location
 	 */
 	public void setBlueSpawn(Location blue) {
 		this.blue = blue;
@@ -1086,9 +1102,11 @@ public class Arena {
 	}
 
 	/**
-	 * Get the end warp location.
+	 * Grabs the end warp location. The end-warp location is a spot on the map
+	 * where players are teleported to after the arena finishes, and is the one
+	 * optional location in any arena.
 	 * 
-	 * @return the blue warp
+	 * @return a Location
 	 */
 	public Location getEndWarp() {
 		try {
@@ -1101,10 +1119,10 @@ public class Arena {
 	}
 
 	/**
-	 * Change the end warp location.
+	 * Changes the end warp location to a given Location.
 	 * 
 	 * @param the
-	 *            new end point
+	 *            new Location
 	 */
 	public void setEndWarp(Location end) {
 		this.end = end;
@@ -1113,52 +1131,59 @@ public class Arena {
 	}
 
 	/**
-	 * Get all players currently playing.
+	 * Grabs all players currently playing. This will return a set reflective of
+	 * both the blue and red teams.
 	 * 
-	 * @return both the red and the blue players
+	 * @return an unmodifiable Player Set.
 	 */
 	public Set<Player> getPlayersInArena() {
 		return Collections.unmodifiableSet(arenaPlayers);
 	}
 
 	/**
-	 * Get all the players that are playing but on the red team.
+	 * Grabs all red players. This set will return about half the players in the
+	 * arena. The other half will be on the {@link #bluePlayers blue team.}
 	 * 
-	 * @return the players on the red team
+	 * @return an unmodifiable Player Set.
 	 */
 	public Set<Player> getRedTeam() {
 		return Collections.unmodifiableSet(redPlayers);
 	}
 
 	/**
-	 * Get all the players that are playing but on the blue team.
+	 * Grabs all blue players. This set will return about half the players in
+	 * the arena. The remaining players in the arena will be on the
+	 * {@link #redPlayers red team.}
 	 * 
-	 * @return the players on the blue team
+	 * @return an unmodifiable Player Set.
 	 */
 	public Set<Player> getBlueTeam() {
 		return Collections.unmodifiableSet(bluePlayers);
 	}
 
 	/**
-	 * Get all the players in the queue to join an arena.
+	 * Grabs all queued players. Players can only be in the lobby prior to an
+	 * arena starting, so while the arena is in progress, this will return an
+	 * empty set.
 	 * 
-	 * @return an unmodifiable set of the players in the lobby.
+	 * @return an unmodifiable Player Set.
 	 */
 	public Set<Player> getPlayersInLobby() {
 		return Collections.unmodifiableSet(lobbyPlayers);
 	}
 
 	/**
-	 * Get all the players watching an arena.
+	 * Grabs all spectators of the arena. Players can only watch while the arena
+	 * is in progress, so at any other time this will return an empty set.
 	 * 
-	 * @return the players watching an arena.
+	 * @return an unmodifiable Player Set.
 	 */
 	public Set<Player> getSpectators() {
 		return Collections.unmodifiableSet(specPlayers);
 	}
 
 	/**
-	 * Check if the arena is in progress.
+	 * Checks if the arena is in progress.
 	 * 
 	 * @return true if enabled
 	 */
@@ -1167,7 +1192,7 @@ public class Arena {
 	}
 
 	/**
-	 * Change the progress status.
+	 * Changes the progress status.
 	 * 
 	 * @param running
 	 *            a boolean
@@ -1177,7 +1202,7 @@ public class Arena {
 	}
 
 	/**
-	 * Check if the arena is enabled AND if the whole plugin is enabled.
+	 * Checks if the arena is enabled <i>and</i> if the whole plugin is enabled.
 	 * 
 	 * @return true if enabled
 	 */
@@ -1186,7 +1211,7 @@ public class Arena {
 	}
 
 	/**
-	 * Set whether or not the arena is enabled.
+	 * Change the arena's enabled status to a specified boolean value.
 	 * 
 	 * @param enabled
 	 *            a boolean
@@ -1196,12 +1221,11 @@ public class Arena {
 	}
 
 	/**
-	 * Get the player's stored data; this includes weapons, armor, health, and
-	 * more.
+	 * Grabs the player's stored data model. Returns null if no data was found.
 	 * 
 	 * @param p
-	 *            the player
-	 * @return null if no data, otherwise return the player's data
+	 *            a Player
+	 * @return a PlayerData instance.
 	 */
 	public PlayerData getData(Player p) {
 		for (PlayerData pd : data) {
@@ -1212,65 +1236,67 @@ public class Arena {
 	}
 
 	/**
-	 * To check if an arena has a player, we check if the player has stored
-	 * data.
+	 * Checks if a player's data is stored. Useful to see if the player is
+	 * associated with this arena.
 	 * 
 	 * @param p
-	 *            the player
-	 * @return true if the player has data; false otherwise
+	 *            a Player
+	 * @return a boolean.
 	 */
 	public boolean hasPlayer(Player p) {
 		return getData(p) != null;
 	}
 
 	/**
-	 * Get the start timer class which initiates the start of the arena.
+	 * Grabs the start timer which automatically begins the arena after a
+	 * configurable period of time.
 	 * 
-	 * @return the start timer
+	 * @return an AutoStartTimer instance.
 	 */
 	public AutoStartTimer getStartTimer() {
 		return startTimer;
 	}
 
 	/**
-	 * Get the end timer, which runs from the beginning of the match, and when
-	 * it hits 0, the arena stops.
+	 * Grabs the end timer which calculates the remaining length of the arena
+	 * and runs in conjunction with the {@link #getHillTimer() hill timer.}
 	 * 
-	 * @return the end timer
+	 * @return an AutoEndTimer instance.
 	 */
 	public AutoEndTimer getEndTimer() {
 		return endTimer;
 	}
 
 	/**
-	 * Get the time at which the arena will run, in seconds.
+	 * Grabs the time for which the arena will run.
 	 * 
-	 * @return the amount of time in the arena
+	 * @return an Integer.
 	 */
 	public int getLength() {
 		return settings.getInt("arena-time");
 	}
 
 	/**
-	 * Get the class which manages our hill switching.
+	 * Grabs the manager for this arena's hills.
 	 * 
-	 * @return the hill manager.
+	 * @return a HillManager reference.
 	 */
 	public HillManager getHillManager() {
 		return hillManager;
 	}
 
 	/**
-	 * Get the HillUtils class.
+	 * Grabs the utility class that calculates hill math as well as basic hill
+	 * functions.
 	 * 
-	 * @return the utilities class for the Hills.
+	 * @return a HillUtils instance.
 	 */
 	public HillUtils getHillUtils() {
 		return hillUtils;
 	}
 
 	/**
-	 * Get the class responsible for telling the manager when to switch a hill.
+	 * Grabs the class that times hill switches and scoring.
 	 * 
 	 * @return an instance of the HillTask
 	 */
@@ -1279,8 +1305,10 @@ public class Arena {
 	}
 
 	/**
-	 * Our winner is defined as whichever team has the higher score. If there is
-	 * none, then we return null to mark a draw.
+	 * Grabs the winner by score. Returns null if both the blue and red team did
+	 * not reach the configurable score threshold. Otherwise, the winning team
+	 * is the one with the higher score. If both teams have th same score, the
+	 * outcome is a draw.
 	 * 
 	 * @return the team that won by score alone.
 	 */
@@ -1301,16 +1329,16 @@ public class Arena {
 	}
 
 	/**
-	 * Get the victor.
+	 * Grab the winning team.
 	 * 
-	 * @return the team that won.
+	 * @return a Player list.
 	 */
 	public List<Player> getWinner() {
 		return winner;
 	}
 
 	/**
-	 * Set the victor.
+	 * Changes the victor to a specified team.
 	 * 
 	 * @param newWinner
 	 *            a team
@@ -1320,10 +1348,12 @@ public class Arena {
 	 */
 	public List<Player> setWinner(List<Player> newWinner) {
 		if (winner != newWinner) {
-			if (!newWinner.equals(redPlayers) || !newWinner.equals(bluePlayers)
-					|| !newWinner.equals(null))
+			if (newWinner != redPlayers && newWinner != bluePlayers
+					&& newWinner != null) {
+				logger.error();
 				throw new IllegalArgumentException(
 						"Invalid winner! The winner must be the red team, blue team, or null.");
+			}
 			winner = newWinner;
 			declareWinner();
 		}
@@ -1331,9 +1361,9 @@ public class Arena {
 	}
 
 	/**
-	 * Get the opposite team of the winner.
+	 * Grabs the losing team.
 	 * 
-	 * @return the team that lost.
+	 * @return a Player list.
 	 */
 	public List<Player> getLoser() {
 		if (winner == null)
@@ -1346,78 +1376,75 @@ public class Arena {
 	}
 
 	/**
-	 * Get a player's team.
+	 * Grabs a player's team.
 	 * 
 	 * @param p
-	 *            the player
-	 * @return the player's team; null if the player has no team.
+	 *            a Player.
+	 * @return a Player set.
 	 */
 	public Set<Player> getTeam(Player p) {
 		if (redPlayers.contains(p))
 			return redPlayers;
-		if (bluePlayers.contains(p))
+		else if (bluePlayers.contains(p))
 			return bluePlayers;
 		return null;
 	}
 
 	/**
-	 * Get the team against a player.
+	 * Grabs the opposing team of a player. Returns null if the player is not on
+	 * a team.
 	 * 
 	 * @param p
 	 *            the player
-	 * @return the set of players on an opposing team; null if the player isn't
-	 *         on a team.
+	 * @return a Player set.
 	 */
 	public Set<Player> getOpposingTeam(Player p) {
-		if (getTeam(p).equals(null))
+		if (getTeam(p) == null)
 			return null;
-		if (getTeam(p).equals(bluePlayers))
+		else if (getTeam(p).equals(bluePlayers))
 			return redPlayers;
-		if (getTeam(p).equals(redPlayers))
+		else
 			return bluePlayers;
-		return null;
 	}
 
 	/**
-	 * Check if the player is waiting to join an arena.
+	 * Checks if a igiven player is waiting to join the arena.
 	 * 
 	 * @param p
-	 *            the player
-	 * @return true if the player is in the lobby.
+	 *            a Player
+	 * @return a boolean.
 	 */
 	public boolean inLobby(Player p) {
 		return lobbyPlayers.contains(p);
 	}
 
 	/**
-	 * Check if a player is spectating.
+	 * Checks if a given Player is watching the arena.
 	 * 
 	 * @param p
-	 *            the player
-	 * @return true if the player is spectating an arena.
+	 *            a Player
+	 * @return a boolean.
 	 */
 	public boolean isSpectating(Player p) {
 		return specPlayers.contains(p);
 	}
 
 	/**
-	 * The arena is ready to be used when all locations are defined.
+	 * Grabs an arena's readiness. If there are no missing warps and the arena
+	 * is enabled, this equates to true. Otherwise, the arena is unready.
 	 * 
-	 * @return true if no missing warps; otherwise false.
+	 * @return a boolean.
 	 */
 	public boolean isReady() {
-		ready = false;
+		ready = (!(red == null || blue == null || spec == null || lobby == null || warps
+				.getConfigurationSection("hills") == null) && enabled);
 
-		if (red == null || blue == null || spec == null || lobby == null
-				|| warps.getConfigurationSection("hills") == null)
-			return ready;
-
-		ready = true;
 		return ready;
 	}
 
 	/**
-	 * Set the arena to be ready when all locations are defined.
+	 * Changes an arena's ready status. The arena is ready when all locations,
+	 * save for the end warp, have been defined. and is enabled.
 	 * 
 	 * @param ready
 	 *            a boolean
@@ -1429,16 +1456,21 @@ public class Arena {
 	}
 
 	/**
-	 * Get our ArenaInfo instance.
+	 * Grabs the info tracker for this arena, which displays various information
+	 * such as times-played, wins by different teams, most classes used, etc.
+	 * and is displayed to anyone who types /koth info followed by the
+	 * {@link #arenaName}.
 	 * 
-	 * @return a new instance of ArenaInfo
+	 * @return an ArenaInfo instance.
 	 */
 	public ArenaInfo getArenaInfo() {
 		return ai;
 	}
 
 	/**
-	 * Get our scoreboard class.
+	 * Grabs the scoreboard instance for this arena. The scoreboard displays
+	 * various information such as time left in the arena, score for each team,
+	 * and how many players of each team are in the hill.
 	 * 
 	 * @return the ScoreboardManager
 	 */
@@ -1447,20 +1479,32 @@ public class Arena {
 	}
 
 	/**
-	 * Get the rewards class.
+	 * Grabs the rewards class instance of this arena. The RewardManager hands
+	 * out prizes to players under 1+ of several conditions:
+	 * <p>
+	 * 1) The player has received multiple kills in a row and is eligible for
+	 * killstreak rewards. <br>
+	 * 2) The player has been on the winning team multiple times in a row and is
+	 * eligible for winstreak rewards. <br>
+	 * 3) The player was part of the winning team at the end of the arena. <br>
+	 * 4) The player was part of the losing team at the end of the arena. <br>
+	 * 5) The player was playing in the arena at the end, and the arena outcome
+	 * was a draw.
+	 * </p>
 	 * 
-	 * @return the rewards class
+	 * @return a RewardManager reference.
 	 */
 	public RewardManager getRewards() {
 		return rewards;
 	}
 
 	/**
-	 * Get the stats of a player for an arena.
+	 * Grabs the player's statistics for the arena. In the case of IOException,
+	 * an error message is logged, and the stacktrace printed.
 	 * 
 	 * @param p
 	 *            the player
-	 * @return the player's stats
+	 * @return a PlayerStats reference.
 	 */
 	public PlayerStats getStats(Player p) {
 		try {
@@ -1475,27 +1519,33 @@ public class Arena {
 	}
 
 	/**
-	 * If the player has not chosen a team, place them in their desired choice.
-	 * Else, override their previous choice.
+	 * Chooses either the red or blue team for a given player based on a string
+	 * parameter.
+	 * <p>
+	 * If the given parameter is equivalent to "red", the player is added to the
+	 * red team. If the given parameter is equivalent to blue, the player is
+	 * added to blue team. If any other string parameter is passed, nothing
+	 * occurs.
+	 * </p>
 	 * 
 	 * @param p
 	 *            a player
 	 * @param team
-	 *            the team name
+	 *            a String name (red or blue).
 	 */
 	public void chooseTeam(Player p, String team) {
 		if (team.equalsIgnoreCase("red"))
 			redPlayers.add(p);
-		if (team.equalsIgnoreCase("blue"))
+		else if (team.equalsIgnoreCase("blue"))
 			bluePlayers.add(p);
 	}
 
 	/**
-	 * Get the ArenaClass based on the Player data.
+	 * Grabs a player's class for the arena.
 	 * 
 	 * @param p
 	 *            a player
-	 * @return the player's class
+	 * @return an ArenaClass, null if none is found.
 	 */
 	public ArenaClass getClass(Player p) {
 		PlayerData data = getData(p);
@@ -1503,7 +1553,9 @@ public class Arena {
 	}
 
 	/**
-	 * Set the arena class of the player.
+	 * Sets the arena class of a player in the lobby. If no class has been
+	 * selected, this is called for all undecided players when the arena
+	 * {@link #startArena() begins.}
 	 * 
 	 * @param p
 	 *            the player
