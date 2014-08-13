@@ -11,15 +11,11 @@ import com.valygard.KotH.command.CommandPermission;
 import com.valygard.KotH.command.CommandUsage;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
-@CommandInfo(
-		name = "enable", 
-		pattern = "enable|on",
-		desc = "Enable specific arenas or all of KotH.",
-		argsRequired = 0
-)
+@CommandInfo(name = "enable", pattern = "enable|on", desc = "Enable specific arenas or all of KotH.", argsRequired = 0)
 @CommandPermission("koth.admin.enable")
 @CommandUsage("/koth enable [arena|all]")
 /**
@@ -32,27 +28,29 @@ public class EnableCmd implements Command {
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		if (args.length == 0) {
 			am.setEnabled(true);
-		    Messenger.tell(sender, "KotH enabled.");
-		    am.getLogger().info("KotH has been enabled. Note: This is overriden by per-arena settings.");
-		    return true;
+			Messenger.tell(sender, "KotH enabled.");
+			KotHLogger
+					.info("KotH has been enabled. Note: This is overriden by per-arena settings.");
+			return true;
 		}
-		
+
 		if (args[0].equalsIgnoreCase("all")) {
 			am.setEnabled(true);
 			for (Arena arena : am.getArenas())
 				arena.setEnabled(true);
 			Messenger.tell(sender, "You have enabled all arenas.");
-		}
-		else {
+		} else {
 			Arena arena = am.getArenaWithName(args[0]);
 			if (arena == null) {
 				Messenger.tell(sender, Msg.ARENA_NULL);
 				return false;
 			}
-			
+
 			am.setEnabled(true);
 			arena.setEnabled(true);
-			Messenger.tell(sender, "You have enabled '" + arena.getName() + "'.");
+			KotHLogger.info("Arena '" + arena.getName() + "' enabled.");
+			Messenger.tell(sender, "You have enabled '" + arena.getName()
+					+ "'.");
 		}
 		return true;
 	}

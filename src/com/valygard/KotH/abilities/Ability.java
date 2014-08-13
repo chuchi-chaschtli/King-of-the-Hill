@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
@@ -76,7 +77,7 @@ public class Ability {
 		this.opponents = arena.getOpposingTeam(p);
 		
 		if (team == null) {
-			arena.getLogger().warn("Player '" + player.getName() +"' is not on a team. Kicking...");
+			KotHLogger.warn("Player '" + player.getName() +"' is not on a team. Kicking...");
 			arena.kickPlayer(player);
 			throw new IllegalStateException("Player '" + player.getName() +"' must be on a team to use abilities!");
 		}

@@ -70,7 +70,6 @@ public class Arena {
 	private KotH plugin;
 	private String arenaName;
 	private World world;
-	private KotHLogger logger;
 
 	// Configuration-important
 	private FileConfiguration config;
@@ -136,7 +135,6 @@ public class Arena {
 		// General stuff
 		this.plugin = plugin;
 		this.arenaName = arenaName;
-		this.logger = plugin.getKotHLogger();
 
 		// Settings from config
 		this.config = plugin.getConfig();
@@ -239,7 +237,7 @@ public class Arena {
 			invManager.storeInventory(p);
 		}
 		catch (IOException e) {
-			logger.error("Could not store inventory of Player '" + p.getName()
+			KotHLogger.error("Could not store inventory of Player '" + p.getName()
 					+ "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
@@ -304,7 +302,7 @@ public class Arena {
 				// Take a fine for quitting.
 				String fee = settings.getString("quit-charge");
 				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-					logger.error("Quit-charge setting for arena '" + arenaName
+					KotHLogger.error("Quit-charge setting for arena '" + arenaName
 							+ "' is broken! Fix this boo-boo.");
 					fee = String.valueOf(0.00);
 				}
@@ -385,9 +383,9 @@ public class Arena {
 			// Remove player from spec list to avoid invincibility issues
 			if (specPlayers.contains(p)) {
 				specPlayers.remove(p);
-				logger.info("Player " + p.getName()
+				KotHLogger.info("Player " + p.getName()
 						+ " joined the arena from the spec area!");
-				logger.info("Invincibility glitch attempt stopped!");
+				KotHLogger.info("Invincibility glitch attempt stopped!");
 			}
 
 			p.setHealth(p.getMaxHealth());
@@ -838,7 +836,7 @@ public class Arena {
 		String className = classes.remove(random.nextInt(classes.size()));
 		while (!plugin.has(p, "koth.classes." + className.toLowerCase())) {
 			if (classes.isEmpty()) {
-				logger.warn("Player '" + p.getName()
+				KotHLogger.warn("Player '" + p.getName()
 						+ "' does not have access to any classes!");
 				removePlayer(p, false);
 				return;
@@ -882,15 +880,6 @@ public class Arena {
 	 */
 	public World getWorld() {
 		return world;
-	}
-
-	/**
-	 * Grabs the KotH logger.
-	 * 
-	 * @return a KotHLogger reference.
-	 */
-	public KotHLogger getLogger() {
-		return logger;
 	}
 
 	/**
@@ -959,7 +948,7 @@ public class Arena {
 						.add(0, 1, 0);
 				while (loc.getBlock().isLiquid()) {
 					loc.getBlock().setType(Material.STONE);
-					logger.warn("The block was raised due to lava or water being found. "
+					KotHLogger.warn("The block was raised due to lava or water being found. "
 							+ "If you did not want this, set 'location-fixer' to false for arena '"
 							+ arenaName + "'.");
 					loc = loc.add(0, 1, 0);
@@ -1350,7 +1339,7 @@ public class Arena {
 		if (winner != newWinner) {
 			if (newWinner != redPlayers && newWinner != bluePlayers
 					&& newWinner != null) {
-				logger.error();
+				KotHLogger.error();
 				throw new IllegalArgumentException(
 						"Invalid winner! The winner must be the red team, blue team, or null.");
 			}
@@ -1511,7 +1500,7 @@ public class Arena {
 			stats = new PlayerStats(p, this);
 		}
 		catch (IOException e) {
-			logger.error("Could not get the stats of player '" + p.getName()
+			KotHLogger.error("Could not get the stats of player '" + p.getName()
 					+ "'!");
 			e.printStackTrace();
 		}

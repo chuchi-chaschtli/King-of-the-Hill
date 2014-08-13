@@ -37,6 +37,7 @@ import com.valygard.KotH.abilities.types.SnareAbility;
 import com.valygard.KotH.abilities.types.WolfAbility;
 import com.valygard.KotH.abilities.types.ZombieAbility;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
@@ -289,7 +290,7 @@ public class AbilityHandler implements Listener {
 		catch (IllegalArgumentException | SecurityException
 				| InstantiationException | IllegalAccessException
 				| InvocationTargetException | NoSuchMethodException e) {
-			arena.getLogger().error(exception + e.getMessage());
+			KotHLogger.error();
 			e.printStackTrace();
 			Messenger.tell(player, ChatColor.RED + exception + e.getMessage());
 			return false;

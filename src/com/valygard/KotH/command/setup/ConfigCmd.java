@@ -11,13 +11,10 @@ import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
 import com.valygard.KotH.command.CommandUsage;
 import com.valygard.KotH.framework.ArenaManager;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 
-@CommandInfo(
-		name = "config", 
-		pattern = "cfg|config",
-		desc = "Save or reload the config."
-)
+@CommandInfo(name = "config", pattern = "cfg|config", desc = "Save or reload the config.")
 @CommandPermission("koth.setup.config")
 @CommandUsage("/koth config <save|reload>")
 /**
@@ -31,30 +28,30 @@ public class ConfigCmd implements Command {
 		if (args[0].startsWith("save")) {
 			am.getPlugin().saveConfig();
 			Messenger.tell(sender, "Config-file saved.");
-			am.getLogger().info("Config-file saved.");
+			KotHLogger.info("Config-file saved.");
 		}
-		
 
 		else if (args[0].startsWith("reload")) {
 			try {
 				am.reloadConfig();
 				Messenger.tell(sender, "Config-file reloaded.");
-				am.getLogger().info("Config-file reloaded.");
-			} catch (Exception e) {
+				KotHLogger.info("Config-file reloaded.");
+			}
+			catch (Exception e) {
 				Messenger.tell(sender, ChatColor.RED
 						+ "Error discovered in config.yml!" + ChatColor.RESET
 						+ "\n" + e.getMessage());
 				Messenger.tell(sender, "King of the Hill has been disabled.");
-				Messenger
-						.tell(sender,
-								"Please fix your config.yml, reload it again, and re-enable King of the Hill by typing "
-										+ ChatColor.YELLOW + "/koth enable");
+				Messenger.tell(sender, "Please fix your config.yml, "
+						+ "reload it again, and re-enable "
+						+ "King of the Hill by typing " + ChatColor.YELLOW
+						+ "/koth enable");
 			}
 		}
-		
+
 		else
 			return false;
 		return true;
 	}
-	
+
 }

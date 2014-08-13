@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotH;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.util.resources.Updater.UpdateResult;
 import com.valygard.KotH.util.resources.Updater.UpdateType;
@@ -91,7 +92,7 @@ public class UpdateChecker {
 			public void run() {
 				for (String message : messages) {
 					if (player == null) {
-						plugin.getKotHLogger().info(message);
+						KotHLogger.info(message);
 					} else if (player.isOnline()) {
 						Messenger.tell(player, message);
 					}

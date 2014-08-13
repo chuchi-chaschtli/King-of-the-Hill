@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.TimeUtil;
 
@@ -274,7 +275,7 @@ public class PlayerStats {
 		try {
 			config.save(file);
 		} catch (IOException e) {
-			arena.getLogger().error("Could not save stats for player '" + player.getName() + "'.");
+			KotHLogger.error("Could not save stats for player '" + player.getName() + "'.");
 			e.printStackTrace();
 		}
 	}
@@ -283,7 +284,7 @@ public class PlayerStats {
 		try {
 			config.load(file);
 		} catch (IOException | InvalidConfigurationException e) {
-			arena.getLogger().error("Could not load stats for player '"
+			KotHLogger.error("Could not load stats for player '"
 					+ player.getName() + "'.");
 			e.printStackTrace();
 		}

@@ -179,13 +179,13 @@ public class ArenaManager {
 		if (!worldName.equals("")) {
 			world = plugin.getServer().getWorld(worldName);
 			if (world == null) {
-				plugin.getKotHLogger().warn("World '" + worldName + "' for arena '"
+				KotHLogger.warn("World '" + worldName + "' for arena '"
 						+ arenaName + "' was not found...");
 				return null;
 			}
 		} else {
 			world = plugin.getServer().getWorlds().get(0);
-			plugin.getKotHLogger().warn("Could not find the world for arena '"
+			KotHLogger.warn("Could not find the world for arena '"
 					+ arenaName + "'. Using default world ('" + world.getName()
 					+ "')! Check the config-file!");
 		}
@@ -260,7 +260,7 @@ public class ArenaManager {
 		plugin.saveConfig();
 
 		KotHUtils.unregisterPermission(plugin, "koth.arenas." + name);
-		plugin.getKotHLogger().info("The arena '" + name + "' has been removed.");
+		KotHLogger.info("The arena '" + name + "' has been removed.");
 	}
 
 	/**
@@ -345,7 +345,7 @@ public class ArenaManager {
 
 		// If the section doesn't exist, the class doesn't either.
 		if (section == null) {
-			plugin.getKotHLogger().warn("Failed to load class '" + classname + "'.");
+			KotHLogger.warn("Failed to load class '" + classname + "'.");
 			return null;
 		}
 
@@ -478,15 +478,6 @@ public class ArenaManager {
 	 */
 	public KotH getPlugin() {
 		return plugin;
-	}
-	
-	/**
-	 * Grabs the KotHLogger.
-	 * 
-	 * @return
-	 */
-	public KotHLogger getLogger() {
-		return plugin.getKotHLogger();
 	}
 
 	/**

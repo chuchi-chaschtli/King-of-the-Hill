@@ -19,18 +19,18 @@ import org.bukkit.plugin.Plugin;
  * 
  */
 public class KotHLogger {
-	private Plugin plugin;
+	private static Plugin plugin;
 
 	private static final Logger LOGGER = Logger.getLogger("Minecraft");
 	private static final String PREFIX = "[KotH] ";
 
 	public KotHLogger(Plugin plugin) {
-		this.plugin = plugin;
+		KotHLogger.plugin = plugin;
 
 		info("Logger successfully initialized!");
 	}
 
-	private void logMessage(String level, String msg) {
+	private static void logMessage(String level, String msg) {
 		if (plugin.getConfig().getBoolean("global.logging")) {
 			return;
 		}
@@ -61,22 +61,22 @@ public class KotHLogger {
 		}
 	}
 
-	public void info(String msg) {
+	public static void info(String msg) {
 		logMessage("info", msg);
 		LOGGER.log(Level.INFO, msg);
 	}
 
-	public void warn(String msg) {
+	public static void warn(String msg) {
 		LOGGER.log(Level.WARNING, msg);
 		logMessage("warn", msg);
 	}
 
-	public void error(String msg) {
+	public static void error(String msg) {
 		LOGGER.log(Level.SEVERE, msg);
 		logMessage("severe", msg);
 	}
 
-	public void error() {
+	public static void error() {
 		String errMsg = "ERROR FOUND! Tell AoH_Ruthless on the issue tracker that he screwed up! "
 				+ "Be sure to include the error log."
 				+ '\n'

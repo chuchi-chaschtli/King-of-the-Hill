@@ -42,6 +42,7 @@ import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.user.StatsCmd;
 import com.valygard.KotH.event.ArenaCommandEvent;
 import com.valygard.KotH.framework.ArenaManager;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.StringUtils;
@@ -172,7 +173,7 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 		}
 
-		plugin.getKotHLogger().info(sender.getName() + " has used command: " + "/koth "
+		KotHLogger.info(sender.getName() + " has used command: " + "/koth "
 				+ info.name());
 		return false;
 	}
