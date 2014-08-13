@@ -41,11 +41,16 @@ public class SetHillCmd implements Command {
 		Arena arena = am.getArenaWithName(args[0]);
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);
-			return false;
+			return true;
 		}
 		
 		if (arena.isRunning()) {
 			Messenger.tell(p, Msg.ARENA_IN_PROGRESS);
+			return true;
+		}
+		
+		if (!p.getLocation().getWorld().equals(arena.getWorld())) {
+			Messenger.tell(p, Msg.MISC_WRONG_WORLD, arena.getWorld().getName());
 			return true;
 		}
 		

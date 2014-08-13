@@ -100,6 +100,7 @@ public enum Msg {
 	MISC_NOT_ENOUGH_MONEY(
 			"You do not have enough money to perform this action!"),
 	MISC_TEAM_JOINED("You have joined the %&r team."),
+	MISC_WRONG_WORLD("You must go to the world &e'%'&r to use this command."),
 
 	REWARDS_GAINED("You have received rewards for playing!"),
 	REWARDS_KILLSTREAK_RECEIVED("You are on a &c%&r killstreak."),

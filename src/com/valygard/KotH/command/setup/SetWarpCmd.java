@@ -35,8 +35,7 @@ public class SetWarpCmd implements Command {
 	@Override
 	public boolean execute(ArenaManager am, CommandSender sender, String[] args) {
 		Player p = (Player) sender;
-		Arena arena;
-		arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
+		Arena arena = (args.length < 1 ? am.getOnlyArena() : am.getArenaWithName(args[0]));
 		
 		if (arena == null) {
 			Messenger.tell(p, Msg.ARENA_NULL);
@@ -49,6 +48,11 @@ public class SetWarpCmd implements Command {
 		
 		if (arena.isRunning()) {
 			Messenger.tell(p, Msg.ARENA_IN_PROGRESS);
+			return true;
+		}
+		
+		if (!p.getLocation().getWorld().equals(arena.getWorld())) {
+			Messenger.tell(p, Msg.MISC_WRONG_WORLD, arena.getWorld().getName());
 			return true;
 		}
 		
