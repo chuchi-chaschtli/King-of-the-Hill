@@ -97,6 +97,7 @@ public class CommandManager implements CommandExecutor {
 		String second = (args.length > 1 ? args[1] : "");
 
 		if (first.equals("?") || first.equalsIgnoreCase("help")) {
+			KotHLogger.info(sender.getName() + " has used command: /koth help");
 			if (!second.matches("\\d")) {
 				showHelp(sender);
 				return true;
@@ -173,7 +174,7 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 		}
 
-		KotHLogger.info(sender.getName() + " has used command: " + "/koth "
+		KotHLogger.info(sender.getName() + " has used command: /koth "
 				+ info.name());
 		return false;
 	}
@@ -181,7 +182,8 @@ public class CommandManager implements CommandExecutor {
 	/**
 	 * Trims the first argument, which eventually becomes the command name.
 	 * 
-	 * @param args the arguments to trim.
+	 * @param args
+	 *            the arguments to trim.
 	 * @return the new String array.
 	 */
 	private String[] trimFirstArg(String[] args) {
@@ -189,12 +191,15 @@ public class CommandManager implements CommandExecutor {
 	}
 
 	/**
-	 * Shows the usage information of a command to a sender upon incorrect
-	 * usage or when assistance is requested.
+	 * Shows the usage information of a command to a sender upon incorrect usage
+	 * or when assistance is requested.
 	 * 
-	 * @param command the Command given
-	 * @param sender a CommandSender
-	 * @param prefix a boolean: if true, we attach "Usage : " before the usage.
+	 * @param command
+	 *            the Command given
+	 * @param sender
+	 *            a CommandSender
+	 * @param prefix
+	 *            a boolean: if true, we attach "Usage : " before the usage.
 	 */
 	private void showUsage(Command command, CommandSender sender, boolean prefix) {
 		CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
@@ -206,6 +211,9 @@ public class CommandManager implements CommandExecutor {
 		if (!plugin.has(sender, perm.value()))
 			return;
 
+		KotHLogger.info(sender.getName()
+				+ " has triggered usage for command: /koth " + info.name());
+
 		sender.sendMessage((prefix ? "Usage: " : "") + usage.value() + " "
 				+ ChatColor.YELLOW + info.desc());
 	}
@@ -216,7 +224,8 @@ public class CommandManager implements CommandExecutor {
 	 * {@link #equals(Object)}, this helps ensures a command sent has no
 	 * conflicting commands.
 	 * 
-	 * @param arg a string representing the first argument in a command
+	 * @param arg
+	 *            a string representing the first argument in a command
 	 * @return a list of matching commands.
 	 */
 	private List<Command> getMatchingCommands(String arg) {
@@ -231,9 +240,10 @@ public class CommandManager implements CommandExecutor {
 	}
 
 	/**
-	 * Show the first page of helpful commands. 
+	 * Show the first page of helpful commands.
 	 * 
-	 * @param sender the CommandSender
+	 * @param sender
+	 *            the CommandSender
 	 * @see #showHelp(CommandSender, int)
 	 */
 	private void showHelp(CommandSender sender) {
@@ -244,8 +254,10 @@ public class CommandManager implements CommandExecutor {
 	 * Because there are so many commands, this method shows helpful information
 	 * in a paginated fashion so as not to spam chat.
 	 * 
-	 * @param sender the CommandSender
-	 * @param page an integer representing which commands to show to the player.
+	 * @param sender
+	 *            the CommandSender
+	 * @param page
+	 *            an integer representing which commands to show to the player.
 	 */
 	private void showHelp(CommandSender sender, int page) {
 		// Amount of commands
@@ -260,9 +272,10 @@ public class CommandManager implements CommandExecutor {
 
 		// Tell the sender if they asked for a page that was too high.
 		if (Math.ceil(cmds / 6.0) < page) {
-			Messenger.tell(sender, 
-					"Given: " + page + "; Expected integer 1 and " 
-							+ (int) Math.ceil(cmds / 6.0));
+			Messenger
+					.tell(sender,
+							"Given: " + page + "; Expected integer 1 and "
+									+ (int) Math.ceil(cmds / 6.0));
 			return;
 		}
 
@@ -337,7 +350,8 @@ public class CommandManager implements CommandExecutor {
 	 * Registers the commands by checking if the class implements Command and
 	 * then appending it based on the command name.
 	 * 
-	 * @param c a class that implements Command
+	 * @param c
+	 *            a class that implements Command
 	 */
 	public void register(Class<? extends Command> c) {
 		CommandInfo info = c.getAnnotation(CommandInfo.class);
@@ -346,7 +360,8 @@ public class CommandManager implements CommandExecutor {
 
 		try {
 			commands.put(info.pattern(), c.newInstance());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
