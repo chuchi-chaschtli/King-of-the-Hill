@@ -40,14 +40,21 @@ public class KotHLogger {
 			if (!dataFolder.exists()) {
 				dataFolder.mkdir();
 			}
-			
+
 			String fileName = plugin.getConfig().getString("global.log-file");
-			
-			String[] nameParts = fileName.split(".");
-			boolean tooLong = nameParts.length > 2;
-			boolean tooShort = nameParts.length < 2;
-			fileName = tooShort ? fileName + ".log" : fileName;
-			fileName = tooLong ? nameParts[0] + "." + nameParts[1] : fileName;
+
+			if (fileName == null) {
+				fileName = "koth.log";
+				plugin.getConfig().set("global.log-file", "koth.log");
+				plugin.saveConfig();
+			} else {
+				String[] nameParts = fileName.split(".");
+				boolean tooLong = nameParts.length > 2;
+				boolean tooShort = nameParts.length < 2;
+				fileName = tooShort ? fileName + ".log" : fileName;
+				fileName = tooLong ? nameParts[0] + "." + nameParts[1]
+						: fileName;
+			}
 
 			File file = new File(dataFolder, fileName);
 			if (!file.exists()) {
@@ -70,8 +77,8 @@ public class KotHLogger {
 	}
 
 	public static void info(String msg) {
-		logMessage("info", msg);
 		LOGGER.log(Level.INFO, msg);
+		logMessage("info", msg);
 	}
 
 	public static void warn(String msg) {

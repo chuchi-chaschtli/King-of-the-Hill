@@ -53,7 +53,7 @@ public class ArenaManager {
 
 	// Commands that are allowed while playing koth.
 	private List<String> allowedcmds;
-	
+
 	// Missing Warps
 	private Set<String> missing;
 
@@ -71,7 +71,7 @@ public class ArenaManager {
 		this.enabled = config.getBoolean("global.enabled", true);
 
 		this.allowedcmds = new ArrayList<String>();
-		
+
 		this.missing = new HashSet<String>(5);
 	}
 
@@ -185,8 +185,8 @@ public class ArenaManager {
 			}
 		} else {
 			world = plugin.getServer().getWorlds().get(0);
-			KotHLogger.warn("Could not find the world for arena '"
-					+ arenaName + "'. Using default world ('" + world.getName()
+			KotHLogger.warn("Could not find the world for arena '" + arenaName
+					+ "'. Using default world ('" + world.getName()
 					+ "')! Check the config-file!");
 		}
 
@@ -194,16 +194,17 @@ public class ArenaManager {
 		settings.set("world", world.getName());
 
 		Arena arena = new Arena(plugin, arenaName);
-		
+
 		ArenaLoadEvent e = new ArenaLoadEvent(arena);
 		plugin.getServer().getPluginManager().callEvent(e);
 		if (e.isCancelled()) {
 			arena = null;
 			return null;
 		}
-		
+
 		arenas.add(arena);
-		plugin.getLogger().info("Loaded arena '" + arenaName + "'");
+		KotHLogger.info("Loaded arena '" + arenaName + "' in world '"
+				+ worldName + "'.");
 		return arena;
 	}
 
@@ -218,7 +219,8 @@ public class ArenaManager {
 	/**
 	 * Create and optionally load the arena.
 	 */
-	private Arena createArena(ConfigurationSection arenas, String arenaName, boolean load) {
+	private Arena createArena(ConfigurationSection arenas, String arenaName,
+			boolean load) {
 		// We can't have two arenas of the same name ...
 		if (arenas.contains(arenaName)) {
 			loadArena(arenaName);
@@ -239,8 +241,8 @@ public class ArenaManager {
 		ConfigUtil.addMissingRemoveObsolete(plugin, "prizes.yml",
 				makeSection(section, "prizes"));
 
-		KotHUtils.registerPermission(plugin, "koth.arenas." + arenaName, PermissionDefault.TRUE)
-				.addParent("koth.arenas", true);
+		KotHUtils.registerPermission(plugin, "koth.arenas." + arenaName,
+				PermissionDefault.TRUE).addParent("koth.arenas", true);
 
 		// Load the arena
 		return (load ? loadArena(arenaName) : null);
@@ -399,8 +401,8 @@ public class ArenaManager {
 		arenaClass.setBoots(boots);
 
 		// Register the permission.
-		KotHUtils.registerPermission(plugin, "koth.classes." + lowercase, PermissionDefault.TRUE)
-				.addParent("koth.classes", true);
+		KotHUtils.registerPermission(plugin, "koth.classes." + lowercase,
+				PermissionDefault.TRUE).addParent("koth.classes", true);
 
 		// Finally add the class to the classes map.
 		classes.put(lowercase, arenaClass);
@@ -682,11 +684,12 @@ public class ArenaManager {
 		if (arena.getSpec() == null)
 			missing.add("spectator,");
 
-		if (arena.getWarps() == null || arena.getWarps().getConfigurationSection("hills") == null)
+		if (arena.getWarps() == null
+				|| arena.getWarps().getConfigurationSection("hills") == null)
 			missing.add("hills,");
 		return missing;
 	}
-	
+
 	/**
 	 * Tells a player which warps are missing.
 	 * 
