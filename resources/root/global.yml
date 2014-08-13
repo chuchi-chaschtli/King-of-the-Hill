@@ -3,3 +3,4 @@ check-for-updates: true
 update-cmd: true
 allowed-cmds: /koth, /list, /notarealcommand
 logging: true
+log-file: koth.log
