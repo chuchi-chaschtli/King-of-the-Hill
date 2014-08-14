@@ -67,7 +67,7 @@ public class GlobalListener implements Listener {
 	// Player Events
 	// --------------------------- //
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 
@@ -107,8 +107,7 @@ public class GlobalListener implements Listener {
 		if (b == null)
 			return;
 
-		if (b.getType() != Material.SIGN
-				&& b.getType() != Material.SIGN_POST
+		if (b.getType() != Material.SIGN && b.getType() != Material.SIGN_POST
 				&& b.getType() != Material.WALL_SIGN)
 			return;
 
@@ -193,10 +192,12 @@ public class GlobalListener implements Listener {
 
 		for (Arena a : am.getArenas()) {
 			if (p.hasMetadata("canRate" + a.getName())) {
-				if (e.getMessage().equalsIgnoreCase("dislike")) {
+				if (e.getMessage().toLowerCase()
+						.matches("dislike|no|bad|never")) {
 					a.getArenaInfo().addDislike();
 					Messenger.tell(p, Msg.ARENA_RATED, "disliked");
-				} else if (e.getMessage().equalsIgnoreCase("like")) {
+				} else if (e.getMessage().toLowerCase()
+						.matches("like|yes|fun|awesome|great")) {
 					a.getArenaInfo().addLike();
 					Messenger.tell(p, Msg.ARENA_RATED, "liked");
 				}
