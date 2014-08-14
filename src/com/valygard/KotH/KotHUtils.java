@@ -20,20 +20,17 @@ import org.bukkit.plugin.PluginManager;
 public class KotHUtils {
 
 	/**
-	 * Format a list into a string.
+	 * Formats a list into a string.
 	 * 
 	 * @param list
-	 *            a list
-	 * @param none
-	 *            a check to see if a player can join an arena.
+	 *            a generic List.
 	 * @param plugin
 	 *            the main class.
 	 * @return the string
 	 */
-	public static <E> String formatList(Collection<E> list, boolean none,
-			KotH plugin) {
+	public static <E> String formatList(Collection<E> list, KotH plugin) {
 		if (list == null || list.isEmpty()) {
-			return (none ? "You cannot join any arenas." : "");
+			return "";
 		}
 
 		StringBuffer buffy = new StringBuffer();
@@ -53,19 +50,6 @@ public class KotHUtils {
 		}
 
 		return buffy.toString().substring(0, buffy.length() - trimLength);
-	}
-
-	/**
-	 * Format a list into a string.
-	 * 
-	 * @param list
-	 *            any list
-	 * @param plugin
-	 *            the main class
-	 * @return
-	 */
-	public static <E> String formatList(Collection<E> list, KotH plugin) {
-		return formatList(list, true, plugin);
 	}
 
 	/**
@@ -102,7 +86,8 @@ public class KotHUtils {
 		if (c != null && string != null) {
 			try {
 				return Enum.valueOf(c, string.trim().toUpperCase());
-			} catch (IllegalArgumentException ex) {
+			}
+			catch (IllegalArgumentException ex) {
 			}
 		}
 		return null;

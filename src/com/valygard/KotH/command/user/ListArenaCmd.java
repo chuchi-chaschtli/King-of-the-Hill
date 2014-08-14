@@ -25,13 +25,7 @@ import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
-@CommandInfo(
-		name = "arenas", 
-		pattern = "arenas|lista.*|arenalist.*",
-		desc = "View all available arenas in an unordered list, by rating, or by times played.",
-		playerOnly = true,
-		argsRequired = 0
-	)
+@CommandInfo(name = "arenas", pattern = "arenas|lista.*|arenalist.*", desc = "View all available arenas in an unordered list, by rating, or by times played.", playerOnly = true, argsRequired = 0)
 @CommandPermission("koth.user.listarenas")
 @CommandUsage("/koth arenas [-r|-tp]")
 /**
@@ -55,9 +49,13 @@ public class ListArenaCmd implements Command {
 			}
 
 			String list = KotHUtils.formatList(names, am.getPlugin());
-			Messenger.tell(p, Msg.MISC_LIST_ARENAS.format(list));
-		// Sort arenas by rating
-		} else if (args[0].equalsIgnoreCase("-r")){
+			if (list.equals("")) {
+				Messenger.tell(p, "There are no available arenas.");
+			} else {
+				Messenger.tell(p, Msg.MISC_LIST_ARENAS.format(list));
+			}
+			// Sort arenas by rating
+		} else if (args[0].equalsIgnoreCase("-r")) {
 			// Get all arenas that have ratings available.
 			List<Arena> tmp = new ArrayList<Arena>();
 			for (Arena a : arenas) {
@@ -65,57 +63,63 @@ public class ListArenaCmd implements Command {
 					tmp.add(a);
 			}
 			arenas.clear();
-			
+
 			if (tmp.size() < 1) {
-				Messenger.tell(p, "There are no arenas that have enabled ratings.");
+				Messenger.tell(p,
+						"There are no arenas that have enabled ratings.");
 				return false;
 			}
-			
+
 			int lines = 0;
 			StringBuilder foo = new StringBuilder();
 			foo.append("Arenas sorted by rating:");
-			
+
 			for (int i = 100; i >= 0; i--) {
-				// We only want to view the top 20 arenas or the maximum amount of arenas.
+				// We only want to view the top 20 arenas or the maximum amount
+				// of arenas.
 				if (lines == 20 || lines >= tmp.size())
 					break;
-				
+
 				for (Arena arena : tmp) {
 					ArenaInfo ai = arena.getArenaInfo();
 					int rating = (int) Math.round(ai.getRating());
-					
+
 					// Sort by descending order
 					if (rating == i) {
 						lines++;
-						foo.append("\n").append(ChatColor.RED
-								+ String.valueOf(lines) + ". "
-								+ ChatColor.YELLOW + arena.getName()
-								+ ChatColor.GRAY + " - "
-								+ (rating >= 50 ? ChatColor.DARK_GREEN
-										: ChatColor.DARK_RED) + rating
-								+ ChatColor.YELLOW + " / 100");
+						foo.append("\n").append(
+								ChatColor.RED
+										+ String.valueOf(lines)
+										+ ". "
+										+ ChatColor.YELLOW
+										+ arena.getName()
+										+ ChatColor.GRAY
+										+ " - "
+										+ (rating >= 50 ? ChatColor.DARK_GREEN
+												: ChatColor.DARK_RED) + rating
+										+ ChatColor.YELLOW + " / 100");
 					}
 				}
 			}
 			Messenger.tell(p, foo.toString());
-		// Sort arenas by times played.
+			// Sort arenas by times played.
 		} else if (args[0].equalsIgnoreCase("-tp")) {
 			final Map<Arena, Integer> timesPlayed = new HashMap<Arena, Integer>();
 			for (Arena arena : arenas) {
 				if (!arena.getSettings().getBoolean("arena-stats"))
 					continue;
 				ArenaInfo ai = arena.getArenaInfo();
-				
+
 				timesPlayed.put(arena, ai.getTimesPlayed());
 			}
 			// Sort the map
 			List<Arena> list = new ArrayList<Arena>(timesPlayed.keySet());
-			
+
 			Comparator<Arena> cmp = new Comparator<Arena>() {
-			    @Override
-			    public int compare(Arena a1, Arena a2) {
-			        Integer timesPlayed1 = timesPlayed.get(a1);
-			        Integer timesPlayed2 = timesPlayed.get(a2);
+				@Override
+				public int compare(Arena a1, Arena a2) {
+					Integer timesPlayed1 = timesPlayed.get(a1);
+					Integer timesPlayed2 = timesPlayed.get(a2);
 					return timesPlayed1.compareTo(timesPlayed2);
 				}
 			};

@@ -55,11 +55,12 @@ public class ChooseClassCmd implements Command {
 			Messenger.tell(p, Msg.MISC_NO_ACCESS);
 			return true;
 		}
-		
+
 		if (args.length == 0 || args[0].matches("(unsure|idk|:/|gui).*")) {
 			if (arena.getSettings().getBoolean("classes-gui")) {
 				GUI gui = new GUI(am, p);
-				am.getPlugin().getServer().getPluginManager().registerEvents(gui, am.getPlugin());
+				am.getPlugin().getServer().getPluginManager()
+						.registerEvents(gui, am.getPlugin());
 				gui.openInv();
 				return true;
 			} else {
@@ -67,7 +68,7 @@ public class ChooseClassCmd implements Command {
 				return true;
 			}
 		}
-		
+
 		String lowercase = args[0].toLowerCase();
 		ArenaClass ac = am.getClasses().get(lowercase);
 
@@ -103,15 +104,12 @@ public class ChooseClassCmd implements Command {
 		}
 
 		String result = KotHUtils.formatList(classes, am.getPlugin());
-		Messenger.tell(p, Msg.MISC_LIST_CLASSES, result);
+		if (result.equals("")) {
+			Messenger.tell(p, "There are no available classes.");
+		} else {
+			Messenger.tell(p, Msg.MISC_LIST_CLASSES, result);
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
 
 	private class GUI implements Listener {
 		private ArenaManager am;
@@ -126,18 +124,18 @@ public class ChooseClassCmd implements Command {
 		public GUI(ArenaManager am, Player player) {
 			this.am = am;
 			this.plugin = am.getPlugin();
-			
+
 			this.player = player;
 
 			this.classSize = am.getClasses().size();
 			this.classes = plugin.getConfig()
 					.getConfigurationSection("classes");
-			
+
 			this.inv = Bukkit.createInventory(null, calculateInvSize(),
 					"Available Classes");
-			
+
 			Bukkit.getPluginManager().registerEvents(this, plugin);
-			
+
 			openInv();
 		}
 
@@ -154,55 +152,60 @@ public class ChooseClassCmd implements Command {
 			for (String className : classes.getKeys(false)) {
 				String gui = plugin.getConfig().getString(
 						"classes." + className + ".gui");
-				
+
 				ItemStack stack;
 				if (gui == null || gui.isEmpty()) {
 					stack = new ItemStack(Material.GRASS, 1);
 				} else {
-					// If the ItemParser detects more than one item, set to grass.
-					stack = gui.contains(",") ? new ItemStack(Material.GRASS, 1) : ItemParser.parseItem(gui);
+					// If the ItemParser detects more than one item, set to
+					// grass.
+					stack = gui.contains(",") ? new ItemStack(Material.GRASS, 1)
+							: ItemParser.parseItem(gui);
 				}
-				
+
 				ItemMeta im = stack.getItemMeta();
 				im.setDisplayName((player.hasPermission("koth.classes."
 						+ className.toLowerCase()) ? ChatColor.DARK_GREEN
 						: ChatColor.GRAY) + className);
 				stack.setItemMeta(im);
-				
+
 				inv.setItem(slot, stack);
 				slot++;
-				
+
 				if (classSize == slot) {
 					break;
 				}
 			}
 			player.openInventory(inv);
 		}
-		
+
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent e) {
-			if (!e.getInventory().getTitle().equalsIgnoreCase("Available Classes")) {
+			if (!e.getInventory().getTitle()
+					.equalsIgnoreCase("Available Classes")) {
 				return;
 			}
-			
+
 			player = (Player) e.getWhoClicked();
 			ItemStack stack = e.getCurrentItem();
-			
-			if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) {
+
+			if (e.getCurrentItem() == null
+					|| e.getCurrentItem().getType() == Material.AIR) {
 				e.setCancelled(true);
 				return;
 			}
-			
+
 			Arena arena = am.getArenaWithPlayer(player);
 			// No null checks required on arena
-			
+
 			if (!stack.getItemMeta().hasDisplayName()) {
 				e.setCancelled(true);
 				player.closeInventory();
 				return;
 			}
-			
-			String lowercase = ChatColor.stripColor(stack.getItemMeta().getDisplayName()).toLowerCase();
+
+			String lowercase = ChatColor.stripColor(
+					stack.getItemMeta().getDisplayName()).toLowerCase();
 			if (player.hasPermission("koth.classes." + lowercase)) {
 				arena.pickClass(player, lowercase);
 				Messenger.tell(player, Msg.CLASS_CHOSEN, lowercase);
