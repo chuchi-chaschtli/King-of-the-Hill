@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -50,7 +51,7 @@ public class KotH extends JavaPlugin {
 	public static YamlConfiguration MESSAGES;
 	public static File MESSAGES_FILE;
 
-	public static int ECONOMY_ID = -69;
+	public static final int ECONOMY_ID = -69;
 
 	public void onEnable() {
 		cfgFile = new File(getDataFolder(), "config.yml");
@@ -102,7 +103,7 @@ public class KotH extends JavaPlugin {
 		am = new ArenaManager(this);
 		cm = new CommandManager(this);
 		em = new EconomyManager(this);
-		
+
 		new KotHLogger(this);
 	}
 
@@ -121,7 +122,8 @@ public class KotH extends JavaPlugin {
 	}
 
 	public boolean has(CommandSender sender, String s) {
-		if (sender instanceof ConsoleCommandSender) {
+		if (sender instanceof ConsoleCommandSender
+				|| sender instanceof BlockCommandSender) {
 			return true;
 		}
 		return has((Player) sender, s);
@@ -143,7 +145,8 @@ public class KotH extends JavaPlugin {
 			KotHLogger.info("Vault v" + vault.getDescription().getVersion()
 					+ " has been found! Economy rewards enabled.");
 		} else {
-			KotHLogger.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
+			KotHLogger
+					.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
 		}
 	}
 
@@ -169,7 +172,8 @@ public class KotH extends JavaPlugin {
 		catch (Exception e) {
 			e.printStackTrace();
 			KotHLogger.error("Could not create messages.yml!");
-			KotHLogger.error("The plugin cannot work without messages; disabling plugin.");
+			KotHLogger
+					.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 
@@ -183,7 +187,8 @@ public class KotH extends JavaPlugin {
 		catch (Exception e) {
 			e.printStackTrace();
 			KotHLogger.error("Could not load messages.yml!");
-			KotHLogger.error("The plugin cannot work without messages; disabling plugin.");
+			KotHLogger
+					.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 	}
