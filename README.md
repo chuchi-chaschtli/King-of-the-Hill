@@ -1,5 +1,6 @@
 <h2>King of the Hill</h2> 
 [![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
+
 [![Build Status](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/status.png)](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/latest)
 
 <h3>Welcome</h3>
@@ -30,5 +31,4 @@ Code contributions:
 
 Issues:
 * For bugs, please include steps to reproduce the problem, stack-traces (error-logs in console) if available, and a thorough explanation of the bug.
-* For features, please be clear on what you wish included.
-* 
+* For features, please be clear on what you wish included in the plugin.
