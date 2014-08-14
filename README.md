@@ -20,7 +20,7 @@ You can use the GitHub <a href="https://github.com/AoHRuthless/King-of-the-Hill/
 
 To begin using the project, please take a look at our <a href="http://dev.bukkit.org/bukkit-plugins/king-of-the-hill/pages/wiki/"> wiki</a>.
 
-Before asking questions or reporting bugs, please take a look at the <a href="dev.bukkit.org/bukkit-plugins/king-of-the-hill/pages/frequently-asked-questions/"> FAQ</a>.
+Before asking questions or reporting bugs, please take a look at the <a href="http://dev.bukkit.org/bukkit-plugins/king-of-the-hill/pages/frequently-asked-questions/"> FAQ</a>.
 
 <h3>Contributing</h3>
 Code contributions:
