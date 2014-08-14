@@ -1,7 +1,7 @@
 /**
  * ArenaCommandEvent.java is part of King Of The Hill.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.arena;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

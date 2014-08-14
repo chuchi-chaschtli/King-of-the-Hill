@@ -1,7 +1,7 @@
 /**
  * ArenaLoadEvent.java is part of King Of The Hill.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.arena;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.valygard.KotH.event.ArenaScoreEvent;
+import com.valygard.KotH.event.arena.ArenaScoreEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**

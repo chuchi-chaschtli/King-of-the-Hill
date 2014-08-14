@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Cancellable;
 
-import com.valygard.KotH.event.ArenaEvent;
+import com.valygard.KotH.event.KotHEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
@@ -17,7 +17,7 @@ import com.valygard.KotH.hill.HillUtils;
  * @author Anand
  * 
  */
-public class HillEvent extends ArenaEvent implements Cancellable {
+public class HillEvent extends KotHEvent implements Cancellable {
 	protected HillManager hm;
 	protected HillUtils utils;
 	protected HillTask timer;

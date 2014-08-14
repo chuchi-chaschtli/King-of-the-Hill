@@ -40,7 +40,7 @@ import com.valygard.KotH.command.user.ListArenaCmd;
 import com.valygard.KotH.command.user.ListPlayersCmd;
 import com.valygard.KotH.command.user.SpecCmd;
 import com.valygard.KotH.command.user.StatsCmd;
-import com.valygard.KotH.event.ArenaCommandEvent;
+import com.valygard.KotH.event.arena.ArenaCommandEvent;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;

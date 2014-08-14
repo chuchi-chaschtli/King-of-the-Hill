@@ -24,7 +24,7 @@ import org.bukkit.permissions.PermissionDefault;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.KotHUtils;
-import com.valygard.KotH.event.ArenaLoadEvent;
+import com.valygard.KotH.event.arena.ArenaLoadEvent;
 import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;

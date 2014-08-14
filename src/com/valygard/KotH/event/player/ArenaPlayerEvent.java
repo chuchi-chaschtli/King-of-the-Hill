@@ -7,14 +7,14 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.event.ArenaEvent;
+import com.valygard.KotH.event.KotHEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**
  * @author Anand
  * 
  */
-public class ArenaPlayerEvent extends ArenaEvent {
+public class ArenaPlayerEvent extends KotHEvent {
 	protected Player player;
 
 	public ArenaPlayerEvent(Arena arena, Player player) {

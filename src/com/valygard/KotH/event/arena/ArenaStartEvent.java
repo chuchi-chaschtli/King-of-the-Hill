@@ -1,7 +1,7 @@
 /**
  * ArenaStartEvent.java is part of King of the Hill.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.arena;
 
 import org.bukkit.event.Cancellable;
 

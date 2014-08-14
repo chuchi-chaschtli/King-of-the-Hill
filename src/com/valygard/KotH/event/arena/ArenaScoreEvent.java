@@ -1,7 +1,7 @@
 /**
  * ArenaScoreEvent.java is part of King of the Hill.
  */
-package com.valygard.KotH.event;
+package com.valygard.KotH.event.arena;
 
 import java.util.HashSet;
 import java.util.Set;
