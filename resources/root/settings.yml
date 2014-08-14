@@ -14,6 +14,7 @@ minimum-score: 90
 indestructible-weapons: true
 indestructible-armor: true
 drop-xp: false
+auto-respawn: true
 safe-respawn-time: 3
 no-spawn-camping: true
 spawn-camp-distance: 4.75

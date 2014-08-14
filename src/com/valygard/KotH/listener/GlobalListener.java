@@ -385,14 +385,9 @@ public class GlobalListener implements Listener {
 			arena.kickPlayer(p);
 			return;
 		}
-
-		if (arena.getRedTeam().contains(p)) {
-			e.setRespawnLocation(arena.getRedSpawn());
-			p.teleport(arena.getRedSpawn());
-		} else if (arena.getBlueTeam().contains(p)) {
-			e.setRespawnLocation(arena.getBlueSpawn());
-			p.teleport(arena.getBlueSpawn());
-		}
+		
+		e.setRespawnLocation(arena.getSpawn(p));
+		p.teleport(arena.getSpawn(p));
 
 		ArenaClass ac = arena.getData(p).getArenaClass();
 		if (ac != null)
@@ -414,32 +409,28 @@ public class GlobalListener implements Listener {
 	@EventHandler
 	public void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
-			Player p = (Player) e.getEntity();
-			Player d = (Player) e.getDamager();
+			final Player p = (Player) e.getEntity();
+			final  Player d = (Player) e.getDamager();
 
-			Arena arena = am.getArenaWithPlayer(p);
-			if (arena == null)
+			final Arena arena = am.getArenaWithPlayer(p);
+
+			if (arena == null) {
 				return;
+			}
 
-			if (arena.inLobby(p) || arena.isSpectating(p)) {
+			if (!arena.isRunning()) {
 				e.setCancelled(true);
 				return;
 			}
 
-			// Only needed to see if the damager is trying to attack others.
-			Arena dArena = am.getArenaWithPlayer(d);
-
-			if (dArena == null)
-				return;
-
-			if (arena.inLobby(d) || arena.isSpectating(d)) {
+			if (arena.isSpectating(p) || arena.isSpectating(d)) {
 				e.setCancelled(true);
 				return;
 			}
 
-			// Make sure weapons and armor don't break.
-			if (!arena.getPlayersInArena().contains(d))
+			if (!arena.getPlayersInArena().contains(d)) {
 				return;
+			}
 
 			if (arena.getSettings().getBoolean("no-spawn-camping")) {
 				if (d.getLocation().distanceSquared(
@@ -459,14 +450,33 @@ public class GlobalListener implements Listener {
 			if (arena.getSettings().getBoolean("indestructible-armor"))
 				repairArmor(p);
 
-			if (arena.getSettings().getBoolean("friendly-fire")) {
-				e.setCancelled(false);
-				return;
+			if (!arena.getSettings().getBoolean("friendly-fire")) {
+				boolean disabled = arena.getTeam(p).equals(arena.getTeam(d));
+				e.setCancelled(disabled);
+				if (disabled) {
+					Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
+					return;
+				}
 			}
+			
+			if (arena.getSettings().getBoolean("auto-respawn") && e.getDamage() > p.getHealth()) {
+				p.teleport(arena.getSpawn(p));
 
-			if (arena.getSpawn(p).equals(arena.getSpawn(d))) {
-				e.setCancelled(true);
-				Messenger.tell(d, Msg.MISC_FRIENDLY_FIRE_DISABLED);
+				ArenaClass ac = arena.getData(p).getArenaClass();
+				if (ac != null)
+					ac.giveItems(p);
+				else
+					arena.giveRandomClass(p);
+
+				Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+					@Override
+					public void run() {
+						arena.giveCompass(p);
+					}
+				}, 2l);
+
+				int safe = arena.getSettings().getInt("safe-respawn-time");
+				p.setNoDamageTicks(safe * 20);
 			}
 		}
 	}
