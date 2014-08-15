@@ -21,11 +21,12 @@ import org.bukkit.plugin.Plugin;
 public class KotHLogger {
 	private static Plugin plugin;
 
-	private static final Logger LOGGER = Logger.getLogger("Minecraft");
+	private static Logger logger;
 	private static final String PREFIX = "[KotH] ";
 
 	public KotHLogger(Plugin plugin) {
 		KotHLogger.plugin = plugin;
+		KotHLogger.logger = plugin.getLogger();
 
 		info("Logger successfully initialized!");
 	}
@@ -100,7 +101,7 @@ public class KotHLogger {
 	 */
 	public static void info(String msg, boolean toConsole) {
 		if (toConsole) {
-			LOGGER.log(Level.INFO, msg);
+			logger.log(Level.INFO, msg);
 		}
 		logMessage("info", msg);
 	}
@@ -122,7 +123,7 @@ public class KotHLogger {
 	 *            the String to log.
 	 */
 	public static void warn(String msg) {
-		LOGGER.log(Level.WARNING, msg);
+		logger.log(Level.WARNING, msg);
 		logMessage("warn", msg);
 	}
 
@@ -134,7 +135,7 @@ public class KotHLogger {
 	 *            the String to log.
 	 */
 	public static void error(String msg) {
-		LOGGER.log(Level.SEVERE, msg);
+		logger.log(Level.SEVERE, msg);
 		logMessage("error", msg);
 	}
 
