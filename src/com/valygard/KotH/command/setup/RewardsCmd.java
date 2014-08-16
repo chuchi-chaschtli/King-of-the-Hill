@@ -3,15 +3,18 @@
  */
 package com.valygard.KotH.command.setup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
@@ -29,7 +32,7 @@ import com.valygard.KotH.util.ItemParser;
  */
 @CommandInfo(name = "rewards", pattern = "(manage|edit|list|view)rewards.*")
 @CommandPermission("koth.setup.rewards")
-@CommandUsage("/koth rewards <arena> [add <<all|winners|losers>|<kill|win> [#] [classname]> [hand|inventory]]")
+@CommandUsage("/koth rewards <arena> [add <<all|winners|losers>|<kill> [#] [classname]|<win> [#]> [hand|inventory]]")
 public class RewardsCmd implements Command {
 
 	@Override
@@ -124,13 +127,14 @@ public class RewardsCmd implements Command {
 				break;
 			}
 
-			boolean streakPrize = (prizeCat == PrizeCategory.KILLSTREAK || prizeCat == PrizeCategory.WINSTREAK);
-			int streakNumber = (streakPrize ? 5 : -1);
-			String className = (streakPrize ? "all" : "no-class");
+			boolean killstreak = (prizeCat == PrizeCategory.KILLSTREAK);
+			boolean winstreak = (prizeCat == PrizeCategory.WINSTREAK);
+			int streakNumber = (winstreak || killstreak ? 5 : -1);
+			String className = (killstreak ? "all" : "no-class");
 
 			if (args.length > 3) {
-				if (streakPrize) {
-					if (args.length < 5) {
+				if (killstreak || winstreak) {
+					if (args.length < (killstreak ? 5 : 4)) {
 						Messenger.tell(p, Msg.CMD_NOT_ENOUGH_ARGS);
 						return true;
 					}
@@ -143,24 +147,56 @@ public class RewardsCmd implements Command {
 								"Expected integer argument for streak prize.");
 						return false;
 					}
-					
-					className = args[4].toLowerCase();
-					
-					ArenaClass ac = am.getClasses().get(args[4]);
-					if (ac == null) {
-						className = "all";
+
+					if (killstreak) {
+						className = args[4].toLowerCase();
+
+						ArenaClass ac = am.getClasses().get(args[4]);
+						if (ac == null) {
+							className = "all";
+						}
 					}
 				}
 
-				if (streakPrize ? args.length > 5
-						&& args[5].equalsIgnoreCase("inventory") : args[3]
-						.equalsIgnoreCase("inventory")) {
+				if (killstreak ? args.length > 5
+						&& args[5].equalsIgnoreCase("inventory")
+						: winstreak ? args[4].equalsIgnoreCase("inventory")
+								: args[3].equalsIgnoreCase("inventory")) {
 					addType = AddType.INVENTORY;
 				}
 			}
-			
-			// TODO: AddPrize
 
+			boolean handOnly = (addType == AddType.HAND);
+			List<ItemStack> stacksToAdd = new ArrayList<ItemStack>(handOnly ? 1
+					: 36);
+
+			ItemStack hand = p.getItemInHand();
+			if (handOnly && hand == null) {
+				Messenger.tell(p, "You must add a non-null item!");
+				return true;
+			}
+
+			if (!handOnly) {
+				for (ItemStack item : p.getInventory().getContents()) {
+					if (item != null && item.getType() != Material.AIR) {
+						stacksToAdd.add(item);
+					}
+				}
+			} else {
+				stacksToAdd.add(hand);
+			}
+
+			RewardManager rewards = arena.getRewards();
+			for (ItemStack item : stacksToAdd) {
+				if (killstreak) {
+					rewards.addKillstreakPrize(item, className, streakNumber);
+				} else if (winstreak) {
+					rewards.addWinstreakPrize(item, streakNumber);
+				} else {
+					rewards.addRegularPrize(item, prizeCat.path);
+				}
+			}
+			Messenger.tell(p, Msg.REWARDS_ADDED);
 			am.saveConfig();
 			am.reloadArena(arena);
 			return true;
@@ -170,9 +206,9 @@ public class RewardsCmd implements Command {
 	}
 
 	private enum PrizeCategory {
-		COMPLETION_ALL("completion.all-players"),
-		COMPLETION_LOSER("completion.losers"),
-		COMPLETION_WINNER("completion.winners"),
+		COMPLETION_ALL("all-players"),
+		COMPLETION_LOSER("losers"),
+		COMPLETION_WINNER("winners"),
 		KILLSTREAK("killstreak"),
 		WINSTREAK("winstreak");
 
@@ -185,14 +221,6 @@ public class RewardsCmd implements Command {
 		@Override
 		public String toString() {
 			return path;
-		}
-
-		public ConfigurationSection getSection(Arena arena) {
-			return arena
-					.getPlugin()
-					.getConfig()
-					.getConfigurationSection(
-							"arenas." + arena.getName() + ".prizes." + path);
 		}
 	}
 
