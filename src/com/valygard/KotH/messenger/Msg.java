@@ -102,7 +102,7 @@ public enum Msg {
 	MISC_TEAM_JOINED("You have joined the %&r team."),
 	MISC_WRONG_WORLD("You must go to the world &e'%'&r to use this command."),
 
-	REWARDS_ADDED("You have added some rewards."),
+	REWARDS_CHANGED("You have changed the rewards for &e'%'."),
 	REWARDS_GAINED("You have received rewards for playing!"),
 	REWARDS_KILLSTREAK_RECEIVED("You are on a &c%&r killstreak."),
 	REWARDS_LEFT_EARLY("You will not receive rewards seeing as you quit."),

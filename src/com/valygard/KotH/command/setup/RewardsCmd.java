@@ -30,9 +30,9 @@ import com.valygard.KotH.util.ItemParser;
  * @author Anand
  * 
  */
-@CommandInfo(name = "rewards", pattern = "(manage|edit|list|view)rewards.*")
+@CommandInfo(name = "rewards", pattern = "(manage|edit|list|view)rewards.*", desc = "Manage the rewards for an arena.", argsRequired = 1, playerOnly = true)
 @CommandPermission("koth.setup.rewards")
-@CommandUsage("/koth rewards <arena> [add <<all|winners|losers>|<kill> [#] [classname]|<win> [#]> [hand|inventory]]")
+@CommandUsage("/koth rewards <arena> [<add|set> <<all|winners|losers>|<kill> [#] [classname]|<win> [#]> [hand|inventory]]")
 public class RewardsCmd implements Command {
 
 	@Override
@@ -96,113 +96,130 @@ public class RewardsCmd implements Command {
 			return true;
 		}
 
-		else if (args[1].equalsIgnoreCase("add")) {
-			if (args.length < 3) {
-				Messenger.tell(p, Msg.CMD_NOT_ENOUGH_ARGS);
-				return true;
-			}
+		if (!args[1].equalsIgnoreCase("set")
+				&& !args[1].equalsIgnoreCase("add")) {
+			return false;
+		}
 
-			AddType addType = AddType.HAND;
-			PrizeCategory prizeCat = PrizeCategory.COMPLETION_ALL;
-
-			switch (args[2].toLowerCase()) {
-			case "winner":
-			case "winners":
-				prizeCat = PrizeCategory.COMPLETION_WINNER;
-				break;
-			case "loser":
-			case "losers":
-				prizeCat = PrizeCategory.COMPLETION_LOSER;
-				break;
-			case "kill":
-			case "killstreak":
-				prizeCat = PrizeCategory.KILLSTREAK;
-				break;
-			case "winstreak":
-			case "win":
-				prizeCat = PrizeCategory.WINSTREAK;
-				break;
-			default:
-				prizeCat = PrizeCategory.COMPLETION_ALL;
-				break;
-			}
-
-			boolean killstreak = (prizeCat == PrizeCategory.KILLSTREAK);
-			boolean winstreak = (prizeCat == PrizeCategory.WINSTREAK);
-			int streakNumber = (winstreak || killstreak ? 5 : -1);
-			String className = (killstreak ? "all" : "no-class");
-
-			if (args.length > 3) {
-				if (killstreak || winstreak) {
-					if (args.length < (killstreak ? 5 : 4)) {
-						Messenger.tell(p, Msg.CMD_NOT_ENOUGH_ARGS);
-						return true;
-					}
-
-					try {
-						streakNumber = Integer.parseInt(args[3]);
-					}
-					catch (NumberFormatException ex) {
-						Messenger.tell(p,
-								"Expected integer argument for streak prize.");
-						return false;
-					}
-
-					if (killstreak) {
-						className = args[4].toLowerCase();
-
-						ArenaClass ac = am.getClasses().get(args[4]);
-						if (ac == null) {
-							className = "all";
-						}
-					}
-				}
-
-				if (killstreak ? args.length > 5
-						&& args[5].equalsIgnoreCase("inventory")
-						: winstreak ? args[4].equalsIgnoreCase("inventory")
-								: args[3].equalsIgnoreCase("inventory")) {
-					addType = AddType.INVENTORY;
-				}
-			}
-
-			boolean handOnly = (addType == AddType.HAND);
-			List<ItemStack> stacksToAdd = new ArrayList<ItemStack>(handOnly ? 1
-					: 36);
-
-			ItemStack hand = p.getItemInHand();
-			if (handOnly && hand == null) {
-				Messenger.tell(p, "You must add a non-null item!");
-				return true;
-			}
-
-			if (!handOnly) {
-				for (ItemStack item : p.getInventory().getContents()) {
-					if (item != null && item.getType() != Material.AIR) {
-						stacksToAdd.add(item);
-					}
-				}
-			} else {
-				stacksToAdd.add(hand);
-			}
-
-			RewardManager rewards = arena.getRewards();
-			for (ItemStack item : stacksToAdd) {
-				if (killstreak) {
-					rewards.addKillstreakPrize(item, className, streakNumber);
-				} else if (winstreak) {
-					rewards.addWinstreakPrize(item, streakNumber);
-				} else {
-					rewards.addRegularPrize(item, prizeCat.path);
-				}
-			}
-			Messenger.tell(p, Msg.REWARDS_ADDED);
-			am.saveConfig();
-			am.reloadArena(arena);
+		if (args.length < 3) {
+			Messenger.tell(p, Msg.CMD_NOT_ENOUGH_ARGS);
 			return true;
 		}
 
-		return false;
+		TransactionType type = TransactionType.HAND;
+		PrizeCategory prizeCat = PrizeCategory.COMPLETION_ALL;
+
+		switch (args[2].toLowerCase()) {
+		case "winner":
+		case "winners":
+			prizeCat = PrizeCategory.COMPLETION_WINNER;
+			break;
+		case "loser":
+		case "losers":
+			prizeCat = PrizeCategory.COMPLETION_LOSER;
+			break;
+		case "kill":
+		case "killstreak":
+			prizeCat = PrizeCategory.KILLSTREAK;
+			break;
+		case "winstreak":
+		case "win":
+			prizeCat = PrizeCategory.WINSTREAK;
+			break;
+		default:
+			prizeCat = PrizeCategory.COMPLETION_ALL;
+			break;
+		}
+
+		boolean killstreak = (prizeCat == PrizeCategory.KILLSTREAK);
+		boolean winstreak = (prizeCat == PrizeCategory.WINSTREAK);
+		int streakNumber = (winstreak || killstreak ? 5 : -1);
+		String className = (killstreak ? "all" : "no-class");
+
+		if (args.length > 3) {
+			if (killstreak || winstreak) {
+				if (args.length < (killstreak ? 5 : 4)) {
+					Messenger.tell(p, Msg.CMD_NOT_ENOUGH_ARGS);
+					return true;
+				}
+
+				try {
+					streakNumber = Integer.parseInt(args[3]);
+				}
+				catch (NumberFormatException ex) {
+					Messenger.tell(p,
+							"Expected integer argument for streak prize.");
+					return false;
+				}
+
+				if (killstreak) {
+					className = args[4].toLowerCase();
+
+					ArenaClass ac = am.getClasses().get(args[4]);
+					if (ac == null) {
+						className = "all";
+					}
+				}
+			}
+
+			if (killstreak ? args.length > 5
+					&& args[5].equalsIgnoreCase("inventory")
+					: winstreak ? args[4].equalsIgnoreCase("inventory")
+							: args[3].equalsIgnoreCase("inventory")) {
+				type = TransactionType.INVENTORY;
+			}
+		}
+
+		boolean handOnly = (type == TransactionType.HAND);
+		List<ItemStack> stacksToAdd = new ArrayList<ItemStack>(handOnly ? 1
+				: 36);
+
+		ItemStack hand = p.getItemInHand();
+		if (handOnly && hand == null) {
+			Messenger.tell(p, "You must add a non-null item!");
+			return true;
+		}
+
+		if (!handOnly) {
+			for (ItemStack item : p.getInventory().getContents()) {
+				if (item != null && item.getType() != Material.AIR) {
+					stacksToAdd.add(item);
+				}
+			}
+		} else {
+			stacksToAdd.add(hand);
+		}
+		RewardManager rewards = arena.getRewards();
+
+		if (args[1].equalsIgnoreCase("add")) {
+			for (ItemStack item : stacksToAdd) {
+				if (killstreak) {
+					rewards.setKillstreakPrize(item, className, streakNumber,
+							false);
+				} else if (winstreak) {
+					rewards.setWinstreakPrize(item, streakNumber, false);
+				} else {
+					rewards.setPrize(item, prizeCat.path, false);
+				}
+			}
+		}
+
+		else if (args[1].equalsIgnoreCase("set")) {
+			for (ItemStack item : stacksToAdd) {
+				if (killstreak) {
+					rewards.setKillstreakPrize(item, className, streakNumber,
+							true);
+				} else if (winstreak) {
+					rewards.setWinstreakPrize(item, streakNumber, true);
+				} else {
+					rewards.setPrize(item, prizeCat.path, true);
+				}
+			}
+		}
+		Messenger.tell(p, Msg.REWARDS_CHANGED, arena.getName());
+		am.saveConfig();
+		am.reloadArena(arena);
+		return true;
 	}
 
 	private enum PrizeCategory {
@@ -224,7 +241,7 @@ public class RewardsCmd implements Command {
 		}
 	}
 
-	private enum AddType {
+	private enum TransactionType {
 		HAND,
 		INVENTORY;
 	}

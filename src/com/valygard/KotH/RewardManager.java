@@ -253,16 +253,27 @@ public class RewardManager {
 	}
 
 	/**
-	 * Adds a prize to either winners, losers, or all players.
+	 * Changes the regular prizes for the arena by either setting, which
+	 * replaces existing prizes, or adding, which is simply adding new prizes to
+	 * an already defined list. A regular prize is one that is given every arena
+	 * to players that either won, lost, or received for being a good sport.
 	 * 
 	 * @param stack
 	 *            the ItemStack to be added
 	 * @param path
 	 *            a String path.
+	 * @param set
+	 *            a boolean
 	 */
-	public void addRegularPrize(ItemStack stack, String path) {
+	public void setPrize(ItemStack stack, String path, boolean set) {
 		List<ItemStack> stacks = parseItems(path);
 		stacks.add(stack);
+
+		if (set) {
+			prizes.set("completion." + path, null);
+			plugin.saveConfig();
+		}
+
 		String str = ItemParser.parseString(stacks.toArray(new ItemStack[stacks
 				.size()]));
 		prizes.set("completion." + path, str);
@@ -270,7 +281,11 @@ public class RewardManager {
 	}
 
 	/**
-	 * Adds a killstreak prize.
+	 * Changes the killstreak prizes for the arena by either setting, which
+	 * replaces existing prizes, or adding, which is simply adding new prizes to
+	 * an already defined list. Killstreak prizes require a valid classname or
+	 * the encompassing string 'all'; they also need a streak number, as do
+	 * winstreaks.
 	 * 
 	 * @param stack
 	 *            an ItemStack
@@ -278,30 +293,50 @@ public class RewardManager {
 	 *            an ArenaClass String name
 	 * @param streakNum
 	 *            an int
+	 * @param set
+	 *            a boolean
 	 */
-	public void addKillstreakPrize(ItemStack stack, String className,
-			int streakNum) {
+	public void setKillstreakPrize(ItemStack stack, String className,
+			int streakNum, boolean set) {
 		ConfigurationSection section = ConfigUtil.makeSection(prizes,
 				"killstreaks." + String.valueOf(streakNum));
-		List<ItemStack> stacks = ItemParser.parseItems(section
-				.getString(className.toLowerCase()));
+		String s = section.getString(className.toLowerCase());
+
+		if (set) {
+			prizes.set(s, null);
+			plugin.saveConfig();
+		}
+
+		List<ItemStack> stacks = (s.isEmpty() || s == null) ? new ArrayList<ItemStack>(
+				1) : ItemParser.parseItems(s);
 		stacks.add(stack);
-		section.set(section.getString(className.toLowerCase()), ItemParser
-				.parseString(stacks.toArray(new ItemStack[stacks.size()])));
+		section.set(s, ItemParser.parseString(stacks
+				.toArray(new ItemStack[stacks.size()])));
 		plugin.saveConfig();
 	}
 
 	/**
-	 * Adds a winstreak prize.
+	 * Changes the winstreak prizes for the arena by either setting, which
+	 * replaces existing prizes, or adding, which is simply adding new prizes to
+	 * an already defined list.
 	 * 
 	 * @param stack
 	 *            an ItemStack
 	 * @param streakNum
 	 *            an int
+	 * @param set
+	 *            a Boolean.
 	 */
-	public void addWinstreakPrize(ItemStack stack, int streakNum) {
+	public void setWinstreakPrize(ItemStack stack, int streakNum, boolean set) {
 		String s = prizes.getString("winstreaks." + String.valueOf(streakNum));
-		List<ItemStack> stacks = ItemParser.parseItems(s);
+
+		if (set) {
+			prizes.set(s, null);
+			plugin.saveConfig();
+		}
+
+		List<ItemStack> stacks = (s.isEmpty() || s == null) ? new ArrayList<ItemStack>(
+				1) : ItemParser.parseItems(s);
 		stacks.add(stack);
 		prizes.set(s, ItemParser.parseString(stacks
 				.toArray(new ItemStack[stacks.size()])));
