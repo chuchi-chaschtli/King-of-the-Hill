@@ -98,7 +98,8 @@ public class CommandManager implements CommandExecutor {
 		String second = (args.length > 1 ? args[1] : "");
 
 		if (first.equals("?") || first.equalsIgnoreCase("help")) {
-			KotHLogger.info(sender.getName() + " has used command: /koth help", false);
+			KotHLogger.info(sender.getName() + " has used command: /koth help",
+					false);
 			if (!second.matches("\\d")) {
 				showHelp(sender);
 				return true;
@@ -175,8 +176,9 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 		}
 
-		KotHLogger.info(sender.getName() + " has used command: /koth "
-				+ info.name(), false);
+		KotHLogger.info(
+				sender.getName() + " has used command: /koth " + info.name(),
+				false);
 		return false;
 	}
 
@@ -213,7 +215,8 @@ public class CommandManager implements CommandExecutor {
 			return;
 
 		KotHLogger.info(sender.getName()
-				+ " has triggered usage for command: /koth " + info.name(), false);
+				+ " has triggered usage for command: /koth " + info.name(),
+				false);
 
 		sender.sendMessage((prefix ? "Usage: " : "") + usage.value() + " "
 				+ ChatColor.YELLOW + info.desc());
@@ -273,10 +276,9 @@ public class CommandManager implements CommandExecutor {
 
 		// Tell the sender if they asked for a page that was too high.
 		if (Math.ceil(cmds / 6.0) < page) {
-			Messenger
-					.tell(sender,
-							"Given: " + page + "; Expected integer 1 and "
-									+ (int) Math.ceil(cmds / 6.0));
+			Messenger.tell(sender,
+					"Given: " + page + "; Expected integer between 1 and "
+							+ (int) Math.ceil(cmds / 6.0));
 			return;
 		}
 
