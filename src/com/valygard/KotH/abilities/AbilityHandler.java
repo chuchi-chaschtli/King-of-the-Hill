@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -280,9 +279,7 @@ public class AbilityHandler implements Listener {
 			if (locParameter) {
 				classArguments = new Class[] { Arena.class, Player.class,
 						Location.class };
-				Set<Material> bypassed = new HashSet<Material>();
-				bypassed.add(Material.AIR);
-				arguments = new Object[] { arena, player, player.getTargetBlock(bypassed, 100) };
+				arguments = new Object[] { arena, player, player.getTargetBlock(new HashSet<Material>(), 100) };
 			} else {
 				classArguments = new Class[] { Arena.class, Player.class };
 				arguments = new Object[] { arena, player };
