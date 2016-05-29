@@ -423,7 +423,7 @@ public class Arena {
 		ah = new AbilityHandler(this);
 
 		Messenger.announce(this, Msg.ARENA_START);
-		playSound(Sound.WITHER_DEATH, 0.382F, 0.1F);
+		playSound(Sound.ENTITY_WITHER_DEATH, 0.382F, 0.1F);
 
 		// Collect data of players still remaining.
 		ai.collectData();
@@ -464,7 +464,6 @@ public class Arena {
 			}
 		}
 		declareWinner();
-		playSound(Sound.BURP, 1F, 1F);
 
 		Set<Player> temp = new HashSet<Player>();
 		for (final Player p : arenaPlayers) {
@@ -711,7 +710,7 @@ public class Arena {
 	 * @return true if the sound was played.
 	 */
 	public boolean playSound(Player p) {
-		return playSound(p, Sound.NOTE_PLING, 3F, 1.2F);
+		return playSound(p, Sound.BLOCK_NOTE_PLING, 3F, 1.2F);
 	}
 
 	/**
