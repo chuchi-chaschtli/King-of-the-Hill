@@ -15,13 +15,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.KotHUtils;
+import com.valygard.KotH.messenger.KotHLogger;
 
 /**
  * @author Anand
@@ -58,7 +56,7 @@ public class ItemParser {
 		// <data> part
 		short durability = stack.getDurability();
 		short data = (durability != 0 ? durability : 0);
-		
+
 		// potion related
 		String effect = "";
 
@@ -68,13 +66,8 @@ public class ItemParser {
 		}
 
 		// Take potions into account
-		else if (stack.getType().name().endsWith("POTION")) {
-			PotionMeta pm = (PotionMeta) stack.getItemMeta();
-
-			PotionData pdata = pm.getBasePotionData();
-			PotionType ptype = pdata.getType();
-
-			effect = ptype.getEffectType().toString().toLowerCase()
+		else if (PotionUtils.isPotion(stack)) {
+			effect = PotionUtils.getEffectType(stack).toString().toLowerCase()
 					.replace("_", "-");
 		}
 
@@ -217,9 +210,12 @@ public class ItemParser {
 		int a = getAmount(amount);
 
 		if (d == Short.MIN_VALUE) {
-			ItemStack stack = new ItemStack(Material.matchMaterial(name.toUpperCase().replace("-", "_")));
+			ItemStack stack = new ItemStack(Material.matchMaterial(name
+					.toUpperCase().replace("-", "_")));
 			PotionMeta pm = (PotionMeta) stack.getItemMeta();
-			pm.addCustomEffect(new PotionEffect(PotionEffectType.getByName(data.toUpperCase().replace("-", "_")), 50, 1), true);
+			pm.addCustomEffect(
+					new PotionEffect(PotionEffectType.getByName(data
+							.toUpperCase().replace("-", "_")), 200, 1), true);
 			stack.setItemMeta(pm);
 			return stack;
 		} else {
@@ -230,8 +226,7 @@ public class ItemParser {
 
 	private static String getType(String item) {
 		if (!item.matches("[\\w[^d]]*")) {
-			Logger.getLogger("Minecraft").warning(
-					"Material Type must be a string!");
+			KotHLogger.warn("Material Type must be a string!");
 			return null;
 		}
 
@@ -244,12 +239,13 @@ public class ItemParser {
 	private static short getData(String data, String name) {
 		// Wool is special
 		if (name.equalsIgnoreCase("wool")) {
-			DyeColor dye = KotHUtils.getEnumFromString(DyeColor.class, data);
+			DyeColor dye = StringUtils.getEnumFromString(DyeColor.class, data);
 			if (dye == null)
 				dye = DyeColor.getByWoolData(Byte.parseByte(data));
 			return dye.getWoolData();
 		}
-		return (data.matches("(-)?[0-9]+") ? Short.parseShort(data) : Short.MIN_VALUE);
+		return (data.matches("(-)?[0-9]+") ? Short.parseShort(data)
+				: Short.MIN_VALUE);
 	}
 
 	private static int getAmount(String amount) {
