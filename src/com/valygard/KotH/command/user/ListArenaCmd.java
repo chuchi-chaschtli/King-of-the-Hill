@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.ArenaInfo;
-import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
@@ -24,6 +23,7 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.util.StringUtils;
 
 @CommandInfo(name = "arenas", pattern = "arenas|lista.*|arenalist.*", desc = "View all available arenas in an unordered list, by rating, or by times played.", playerOnly = true, argsRequired = 0)
 @CommandPermission("koth.user.listarenas")
@@ -48,7 +48,7 @@ public class ListArenaCmd implements Command {
 						+ ",");
 			}
 
-			String list = KotHUtils.formatList(names, am.getPlugin());
+			String list = StringUtils.formatList(names, am.getPlugin());
 			if (list.equals("")) {
 				Messenger.tell(p, "There are no available arenas.");
 			} else {

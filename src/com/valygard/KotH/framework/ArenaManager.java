@@ -32,6 +32,7 @@ import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.player.ArenaClass.ArmorType;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.ItemParser;
+import com.valygard.KotH.util.StringUtils;
 
 /**
  * @author Anand
@@ -698,7 +699,7 @@ public class ArenaManager {
 	 */
 	public void tellHowManyMissing(Arena arena, Player p) {
 		if (missing.size() > 0) {
-			String formatted = KotHUtils.formatList(missing, arena.getPlugin());
+			String formatted = StringUtils.formatList(missing, arena.getPlugin());
 			Messenger.tell(p, "Missing Warps: " + formatted);
 			// Although it should already be false, never hurts to be cautious.
 			arena.setReady(false);

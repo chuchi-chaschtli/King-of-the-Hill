@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.valygard.KotH.KotH;
-import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.command.Command;
 import com.valygard.KotH.command.CommandInfo;
 import com.valygard.KotH.command.CommandPermission;
@@ -31,6 +30,7 @@ import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.util.ItemParser;
+import com.valygard.KotH.util.StringUtils;
 
 @CommandInfo(name = "chooseclass", pattern = "(choose|pick)class.*|class", desc = "Choose a class", playerOnly = true, argsRequired = 0)
 @CommandPermission("koth.user.pickclass")
@@ -103,7 +103,7 @@ public class ChooseClassCmd implements Command {
 					+ s.toLowerCase() + ChatColor.RESET + ",");
 		}
 
-		String result = KotHUtils.formatList(classes, am.getPlugin());
+		String result = StringUtils.formatList(classes, am.getPlugin());
 		if (result.equals("")) {
 			Messenger.tell(p, "There are no available classes.");
 		} else {
