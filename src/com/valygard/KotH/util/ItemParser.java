@@ -253,7 +253,7 @@ public class ItemParser {
 			return Integer.parseInt(amount);
 		}
 
-		return Integer.MIN_VALUE;
+		return 1;
 	}
 
 	private static void addEnchantments(ItemStack stack, String list) {
