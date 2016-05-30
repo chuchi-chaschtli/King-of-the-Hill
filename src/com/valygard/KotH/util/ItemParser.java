@@ -244,8 +244,8 @@ public class ItemParser {
 				dye = DyeColor.getByWoolData(Byte.parseByte(data));
 			return dye.getWoolData();
 		}
-		return (data.matches("(-)?[0-9]+") ? Short.parseShort(data)
-				: Short.MIN_VALUE);
+		return (data.matches("(-)?[0-9]+") ? Short.parseShort(data) : (name
+				.toLowerCase().contains("potion") ? Short.MIN_VALUE : 0));
 	}
 
 	private static int getAmount(String amount) {
