@@ -48,20 +48,20 @@ public class ChainAbility extends Ability implements Listener {
 	/**
 	 * Strikes lightning on all nearby entities of the player. This lightning is
 	 * arbitrary and is a visual effect. Entities lose 20% of their maximum
-	 * health, and all players have reduced walking speed for 5 seconds. To
+	 * health, and all players have reduced walking speed for 4 seconds. To
 	 * strike lightning, players right click a golden axe, which has
-	 * approximately 11 total uses.
+	 * approximately 7 total uses.
 	 */
 	private void activateChainEffect() {
 		ItemStack hand = player.getItemInHand();
 		short durability = hand.getDurability();
-		if (durability + 3 > 32) {
+		if (durability + 3 > 20) {
 			removeMaterial();
 		} else {
 			hand.setDurability((short) (durability + 3));
 		}
 		
-		for (Entity e : player.getNearbyEntities(15, 15, 15)) {
+		for (Entity e : player.getNearbyEntities(13, 3, 13)) {
 			if (!(e instanceof LivingEntity)) {
 				continue;
 			}
@@ -71,7 +71,7 @@ public class ChainAbility extends Ability implements Listener {
 				Player p = (Player) e;
 				if (getOpposingTeamOfPlayer().contains(p)) {
 					affected.put(p, System.currentTimeMillis());
-					p.setWalkSpeed(0.04F);
+					p.setWalkSpeed(0.06F);
 				}
 				continue;
 			case ZOMBIE:
@@ -135,7 +135,7 @@ public class ChainAbility extends Ability implements Listener {
 		}
 		
 		long now = System.currentTimeMillis();
-		if (now >= affected.get(p) + 5 * 1000 || !arena.isRunning()) {
+		if (now >= affected.get(p) + 4 * 1000 || !arena.isRunning()) {
 			affected.remove(p);
 			p.setWalkSpeed(0.2F);
 		} else {

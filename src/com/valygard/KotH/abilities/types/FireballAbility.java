@@ -78,7 +78,7 @@ public class FireballAbility extends Ability implements Listener {
 				return;
 			}
 
-			for (Entity entity : f.getNearbyEntities(3.5, 3.5, 3.5)) {
+			for (Entity entity : f.getNearbyEntities(3, 3, 3)) {
 				if (entity instanceof LivingEntity) {
 					LivingEntity le = (LivingEntity) entity;
 					
@@ -89,9 +89,9 @@ public class FireballAbility extends Ability implements Listener {
 
 					double distance = f.getLocation()
 							.distance(le.getLocation());
-					le.damage(distance < 0.391 ? 0.6 * le.getMaxHealth()
-							: Math.min(7.6 / distance + 1.2,
-									0.4 * le.getMaxHealth()));
+					le.damage(distance < 0.4 ? 0.7 * le.getMaxHealth()
+							: Math.min(7.5 / (distance + 1.10),
+									0.375 * le.getMaxHealth()));
 				}
 			}
 		}
