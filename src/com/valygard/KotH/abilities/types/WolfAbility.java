@@ -81,7 +81,11 @@ public class WolfAbility extends Ability implements Listener {
 		// Misc
 		wolf.setBreed(false);
 		wolf.setSitting(false);
-
+		
+		// nerf health pool in normalized fashion
+		wolf.setMaxHealth(wolf.getMaxHealth() * (new Random().nextInt(3) + 7)/ 10D);
+		wolf.setHealth(wolf.getMaxHealth());
+		
 		Random random = new Random();
 		String name = names[random.nextInt(names.length)];
 		wolf.setCustomName(name);

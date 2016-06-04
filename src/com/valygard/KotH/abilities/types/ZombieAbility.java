@@ -84,8 +84,8 @@ public class ZombieAbility extends Ability implements Listener {
 		z.setCustomName(name);
 		z.setCustomNameVisible(true);
 
-		// Much more health to make the zombie formidable.
-		z.setMaxHealth(z.getMaxHealth() * 1.8);
+		// Decrease health pool of zombie so it is not overbearing
+		z.setMaxHealth(z.getMaxHealth() * 0.9);
 		z.setHealth(z.getMaxHealth());
 
 		// Add a tag so we know who the zombie belongs to.

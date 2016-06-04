@@ -117,8 +117,8 @@ public class HorseAbility extends Ability implements Listener {
 		horse.setOwner(player);
 		horse.setPassenger(player);
 
-		// Not invincible, but hard af to kill.
-		horse.setMaxHealth(horse.getMaxHealth() * 5);
+		// Buff health pool
+		horse.setMaxHealth(horse.getMaxHealth() * 2.75);
 		horse.setHealth(horse.getMaxHealth());
 
 		if (random.nextInt(15) == 0) {
