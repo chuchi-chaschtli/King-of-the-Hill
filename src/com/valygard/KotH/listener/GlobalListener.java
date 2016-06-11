@@ -71,10 +71,10 @@ public class GlobalListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 
-		if (p.getItemInHand().getType() == Material.COMPASS) {
-			if (!p.getItemInHand().hasItemMeta()
-					|| !p.getItemInHand().getItemMeta().hasDisplayName()
-					|| !p.getItemInHand().getItemMeta().getDisplayName()
+		if (p.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
+			if (!p.getInventory().getItemInMainHand().hasItemMeta()
+					|| !p.getInventory().getItemInMainHand().getItemMeta().hasDisplayName()
+					|| !p.getInventory().getItemInMainHand().getItemMeta().getDisplayName()
 							.contains("Hill Locator"))
 				return;
 			Arena arena = am.getArenaWithPlayer(p);
