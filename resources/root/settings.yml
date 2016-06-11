@@ -32,6 +32,7 @@ time-tracking-cycle: 3
 entry-fee: 0.00
 quit-charge: $50
 teleport-to-end: false
+time-to-rate-arena: 30
 use-scoreboard: true
 use-compasses: true
 give-prizes: true
