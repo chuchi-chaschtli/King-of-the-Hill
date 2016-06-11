@@ -6,11 +6,9 @@ package com.valygard.KotH.hill;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.event.hill.HillChangeEvent;
@@ -61,7 +59,6 @@ public class HillManager {
 				if (!p.getInventory().contains(Material.COMPASS))
 					arena.giveCompass(p);
 			}
-			createBeacon(utils.getCurrentHill());
 			status++;
 			return;
 		}
@@ -76,12 +73,6 @@ public class HillManager {
 			Messenger.announce(arena, Msg.HILLS_SWITCHED);
 		}
 		
-		removeBeacon();
-		if (utils.getNextHill() != null) {
-			createBeacon(utils.getNextHill());
-		} else {
-			createBeacon(utils.getHill(status));
-		}
 		arena.resetCompass();
 		
 		// Now, finally, change the status.
@@ -223,69 +214,5 @@ public class HillManager {
 
 		return (arena.getSettings().getBoolean("circular-hill") ? LocationUtil
 				.getCircle(l, radius) : LocationUtil.getSquare(l, radius));
-	}
-	
-	/**
-	 * Create a beacon on the hill, and add gold blocks to set the beacon effect.
-	 */
-	public void createBeacon(Location hill) {
-		if (!arena.getSettings().getBoolean("use-beacons")) {
-			return;
-		}
-		
-		hill.getBlock().setType(Material.BEACON);
-
-		int x = hill.getBlockX() - 1;
-		int y = hill.getBlockY() - 1;
-		int z = hill.getBlockZ() - 1;
-
-		for (int xn = x; xn <= x + 2; xn++) {
-			for (int zn = z; zn <= z + 2; zn++) {
-				Location l = new Location(hill.getWorld(), xn, y, zn);
-				if (l.getBlock() == null
-						|| l.getBlock().getType() != Material.GOLD_BLOCK)
-					l.getBlock().setType(Material.GOLD_BLOCK);
-			}
-		}
-		
-		for (int yn = y + 1; yn <= y + 61; yn++) {
-			Location l = new Location(hill.getWorld(), x, yn, z);
-			if (l.getBlock() != null)
-				l.getBlock().setType(Material.AIR);
-		}
-		
-		Bukkit.getScheduler().runTaskLater(arena.getPlugin(), new Runnable() {
-			public void run() {
-				removeBeacon();
-			}
-		}, (arena.getSettings().getInt("hill-clock") * 20) - 3);
-	}
-	
-	/**
-	 * Remove a beacon on a hill, if already a beacon.
-	 */
-	public void removeBeacon() {
-		if (!arena.getSettings().getBoolean("use-beacons")) {
-			return;
-		}
-		if (utils.getCurrentHill() == null) {
-			return;
-		}
-		Block b = utils.getCurrentHill().getBlock();
-		if (b != null) {
-			b.setType(Material.AIR);
-		}
-	}
-
-	/**
-	 * Clean up all beacons.
-	 */
-	public void cleanup() {
-		ConfigurationSection s = arena.getWarps().getConfigurationSection("hills");
-		for (String str : s.getKeys(false)) {
-			Location l = arena.getHillLocation(str);
-			if (l.getBlock() != null)
-				l.getBlock().setType(Material.AIR);
-		}
 	}
 }

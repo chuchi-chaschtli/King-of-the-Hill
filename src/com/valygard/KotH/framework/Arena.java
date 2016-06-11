@@ -481,8 +481,6 @@ public class Arena {
 		bluePlayers.clear();
 		specPlayers.clear();
 
-		hillManager.cleanup();
-
 		for (final Player p : temp) {
 			// Allow players to rate arena at the end.
 			if (settings.getBoolean("arena-stats")) {
