@@ -24,7 +24,8 @@ public class ArenaPlayerJoinEvent extends ArenaPlayerEvent implements
 	}
 
 	/**
-	 * Gets whether or not the player is to join the lobby or the spectator area.
+	 * Gets whether or not the player is to join the lobby or the spectator
+	 * area.
 	 * 
 	 * @return a location
 	 * @since v1.2.5
@@ -37,12 +38,24 @@ public class ArenaPlayerJoinEvent extends ArenaPlayerEvent implements
 	}
 
 	/**
-	 * Finds the distance the player is to either the lobby or spec area.
+	 * Finds the distance the player is to either the lobby or spec area. This
+	 * method is now deprecated, use {@link #getDistanceToArena()}
 	 * 
 	 * @return a double representing the distance
-	 * @since v1.2.5
+	 * @since v1.2.5, deprecated v1.2.11.3
 	 */
+	@Deprecated
 	public double getDistance() {
+		return getDistanceToArena();
+	}
+
+	/**
+	 * Returns the player's distance to the arena.
+	 * 
+	 * @return a double distance
+	 * @since v1.2.11.3
+	 */
+	public double getDistanceToArena() {
 		return player.getLocation().distance(getPlayerJoinOrSpec());
 	}
 
