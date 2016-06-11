@@ -8,7 +8,6 @@ arena-time: 900
 arena-auto-start: 50
 hill-clock: 60
 hill-radius: 5
-use-beacons: true
 score-to-win: 250
 minimum-score: 90
 indestructible-weapons: true
