@@ -24,6 +24,7 @@ import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
 import com.valygard.KotH.player.PlayerStats;
+import com.valygard.KotH.util.StringUtils;
 
 @CommandInfo(
 		name = "stats", 
@@ -112,21 +113,9 @@ public class StatsCmd implements Command {
 		foo.append("\n").append("You have").append(kills).append(deaths);
 		foo.append("\n").append("You have").append(wins).append(losses)
 				.append(draws);
-
-		foo.append("\n").append(" ");
-		foo.append("\n").append(kdr);
-		foo.append("\n").append(wlr);
-
-		foo.append("\n").append(" ");
-		foo.append("\n").append(killstreak);
-		foo.append("\n").append(winstreak);
-
-		foo.append("\n").append(" ");
-		foo.append("\n").append(timespent);
-
-		foo.append("\n").append(" ");
-		foo.append("\n").append(mostUsed);
-
+		
+		foo = StringUtils.appendWithNewLines(foo, " ", kdr, wlr, " ", killstreak, winstreak, " ", timespent, " ", mostUsed);
+		
 		Messenger.tell(p, Msg.STATS, foo.toString());
 		return true;
 	}

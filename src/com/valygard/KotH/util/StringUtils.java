@@ -13,10 +13,28 @@ import com.valygard.KotH.KotH;
 
 /**
  * @author Anand
- *
+ * 
  */
 public class StringUtils {
-	
+
+	/**
+	 * Creates a StringBuilder with line breaks between individual elements.
+	 * 
+	 * @param initial
+	 *            the initial StringBuilder
+	 * @param args
+	 *            the elements to be appended to the builder
+	 * @return a StringBuilder
+	 */
+	public static StringBuilder appendWithNewLines(StringBuilder initial,
+			String... args) {
+		for (String str : args) {
+			initial = initial.append("\n");
+			initial = initial.append(str);
+		}
+		return initial;
+	}
+
 	/**
 	 * Formats a list into a string.
 	 * 
@@ -98,15 +116,15 @@ public class StringUtils {
 		}
 		return sb.toString().trim();
 	}
-	
+
 	public static String trimByRegex(String string, String regex, int trimSize) {
 		String[] array = string.split(regex);
 		StringBuilder sb = new StringBuilder();
-		
+
 		if (trimSize > array.length || trimSize < 0) {
 			throw new IllegalArgumentException("Invalid trim size given!");
 		}
-		
+
 		for (int i = trimSize; i < array.length; i++) {
 			sb.append(array[i]).append(regex);
 		}
