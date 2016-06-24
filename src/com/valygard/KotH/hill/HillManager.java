@@ -46,6 +46,53 @@ public class HillManager {
 	}
 
 	/**
+	 * Grabs all the hills of this arena.
+	 * 
+	 * @return
+	 */
+	public List<Hill> getHills() {
+		return hills;
+	}
+
+	/**
+	 * Grabs the current hill.
+	 * 
+	 * @return the next hill
+	 */
+	public Hill getCurrentHill() {
+		return current;
+	}
+
+	/**
+	 * Updates the current hill
+	 * 
+	 * @param hill
+	 * @return
+	 */
+	public void setCurrentHill(Hill hill) {
+		current = hill;
+	}
+
+	/**
+	 * Grabs the next hill in the arena task
+	 * 
+	 * @return the next hill
+	 */
+	public Hill getNextHill() {
+		return (isLastHill() ? null : hills.get(hills.indexOf(current) + 1));
+	}
+
+	/**
+	 * Grabs the previous hill in the arena task, usually for correction
+	 * purposes
+	 * 
+	 * @return the previous hill
+	 */
+	public Hill getPreviousHill() {
+		return (isFirstHill() ? null : hills.get(hills.indexOf(current) - 1));
+	}
+
+	/**
 	 * Every second, this method is run to attempt to change the hills. However,
 	 * there is a series of checks that must be surpassed before the hill is
 	 * switched. In this event, if the HillChangeEvent is cancelled, then hills
@@ -182,11 +229,9 @@ public class HillManager {
 	}
 
 	/**
-	 * Gets the amount of hill rotations. To do this, we truncate the arena time
-	 * divided by the time loop of each rotation. Then we subtract 1, because we
-	 * don't want to rotate at 0. We also need to check how large the hills
-	 * configuration section is. If there is only 1 hill, there will obviously
-	 * be no rotations.
+	 * Grabs the amount of times the hill switches. The arena time divided by
+	 * the clock time of each rotation minus one is equivalent to the number of
+	 * rotations. There are no rotations in the event there is only one hill.
 	 * 
 	 * @return an integer; the total # of rotations
 	 */
@@ -199,9 +244,9 @@ public class HillManager {
 	}
 
 	/**
-	 * If there is more than one hill, the amount of rotations left is the
+	 * Grabs the number of rotations left: the amount of rotations left is the
 	 * truncated value of the time remaining divided by the # of seconds
-	 * per-hill.
+	 * allotted to each hill.
 	 * 
 	 * @return an integer; the # of rotations left
 	 */
@@ -211,53 +256,6 @@ public class HillManager {
 		return (int) (arena.getWarps().getConfigurationSection("hills")
 				.getKeys(false).size() > 1 ? Math.floor(timeLeft
 				/ arena.getSettings().getInt("hill-clock")) - 1 : 0);
-	}
-
-	/**
-	 * Grabs all the hills of this arena.
-	 * 
-	 * @return
-	 */
-	public List<Hill> getHills() {
-		return hills;
-	}
-
-	/**
-	 * Grabs the current hill.
-	 * 
-	 * @return the next hill
-	 */
-	public Hill getCurrentHill() {
-		return current;
-	}
-
-	/**
-	 * Updates the current hill
-	 * 
-	 * @param hill
-	 * @return
-	 */
-	public void setCurrentHill(Hill hill) {
-		current = hill;
-	}
-
-	/**
-	 * Grabs the next hill in the arena task
-	 * 
-	 * @return the next hill
-	 */
-	public Hill getNextHill() {
-		return (isLastHill() ? null : hills.get(hills.indexOf(current) + 1));
-	}
-
-	/**
-	 * Grabs the previous hill in the arena task, usually for correction
-	 * purposes
-	 * 
-	 * @return the previous hill
-	 */
-	public Hill getPreviousHill() {
-		return (isFirstHill() ? null : hills.get(hills.indexOf(current) - 1));
 	}
 
 	/**
@@ -284,10 +282,8 @@ public class HillManager {
 	}
 
 	/**
-	 * A very important method, this checks to make sure we are at a point where
-	 * the next hill becomes the current one, and the current one becomes the
-	 * previous one. We will actually change the hills in the HillManager class,
-	 * utilizing this method.
+	 * Determines if the hills should be switched by comparing the hill clock to
+	 * the time remaining
 	 * 
 	 * @return true / false
 	 */
