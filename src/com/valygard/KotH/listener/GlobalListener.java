@@ -41,7 +41,6 @@ import com.valygard.KotH.event.player.ArenaPlayerDeathEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.hill.HillManager;
-import com.valygard.KotH.hill.HillUtils;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
@@ -153,7 +152,6 @@ public class GlobalListener implements Listener {
 			return;
 
 		HillManager manager = arena.getHillManager();
-		HillUtils utils = arena.getHillUtils();
 
 		if (!manager.containsLoc(e.getFrom()) && manager.containsLoc(e.getTo())) {
 			Messenger.tell(p, Msg.HILLS_ENTERED);
@@ -163,7 +161,7 @@ public class GlobalListener implements Listener {
 		if (manager.containsLoc(e.getFrom()) && !manager.containsLoc(e.getTo())) {
 			// If the hill changed, don't send message, because chances are that
 			// the player moved somehow.
-			if (utils.isSwitchTime() || utils.isLastHill())
+			if (manager.isSwitchTime() || manager.isLastHill())
 				return;
 
 			Messenger.tell(p, Msg.HILLS_LEFT);

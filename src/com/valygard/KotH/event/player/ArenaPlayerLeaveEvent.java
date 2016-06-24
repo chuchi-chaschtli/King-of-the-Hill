@@ -36,11 +36,11 @@ public class ArenaPlayerLeaveEvent extends ArenaPlayerEvent {
 	/**
 	 * Checks if the player is in the hill when they leave.
 	 * 
-	 * @return true if the player is in the hill, false otherwise. 
+	 * @return true if the player is in the hill, false otherwise.
 	 * @since v1.2.5
 	 */
 	public boolean isInHill() {
-		return arena.getHillUtils().getCurrentHill()
+		return arena.getHillManager().getCurrentHill().getCenter()
 				.distance(player.getLocation()) <= arena.getSettings().getInt(
 				"hill-radius");
 	}

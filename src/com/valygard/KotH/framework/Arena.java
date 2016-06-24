@@ -49,7 +49,6 @@ import com.valygard.KotH.event.player.ArenaPlayerKickEvent;
 import com.valygard.KotH.event.player.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
-import com.valygard.KotH.hill.HillUtils;
 import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
@@ -97,7 +96,6 @@ public class Arena {
 
 	// Hill-relevant
 	private HillManager hillManager;
-	private HillUtils hillUtils;
 	private HillTask hillTimer;
 
 	// Is the arena ready to be used?
@@ -172,7 +170,6 @@ public class Arena {
 		this.endTimer = new AutoEndTimer(this, settings.getInt("arena-time"));
 
 		// Hills
-		this.hillUtils = new HillUtils(this);
 		this.hillManager = new HillManager(this);
 		this.hillTimer = new HillTask(this);
 
@@ -764,8 +761,8 @@ public class Arena {
 				+ "Hill Locator");
 		compass.setItemMeta(im);
 		p.getInventory().addItem(new ItemStack[] { compass });
-		if (hillUtils.getCurrentHill() != null) {
-			p.setCompassTarget(hillUtils.getCurrentHill());
+		if (hillManager.getCurrentHill() != null) {
+			p.setCompassTarget(hillManager.getCurrentHill().getCenter());
 		}
 	}
 
@@ -777,8 +774,8 @@ public class Arena {
 			return;
 
 		for (Player p : arenaPlayers) {
-			p.setCompassTarget(hillUtils.getNextHill() != null ? hillUtils
-					.getNextHill() : null);
+			p.setCompassTarget(hillManager.getNextHill() != null ? hillManager
+					.getNextHill().getCenter() : null);
 		}
 	}
 
@@ -1270,17 +1267,6 @@ public class Arena {
 	public HillManager getHillManager() {
 		return hillManager;
 	}
-
-	/**
-	 * Grabs the utility class that calculates hill math as well as basic hill
-	 * functions.
-	 * 
-	 * @return a HillUtils instance.
-	 */
-	public HillUtils getHillUtils() {
-		return hillUtils;
-	}
-
 	/**
 	 * Grabs the class that times hill switches and scoring.
 	 * 

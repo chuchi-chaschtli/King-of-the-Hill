@@ -3,8 +3,6 @@
  */
 package com.valygard.KotH.event.hill;
 
-import org.bukkit.Location;
-
 import com.valygard.KotH.framework.Arena;
 
 /**
@@ -24,7 +22,7 @@ public class HillChangeEvent extends HillEvent {
 	 * @since v1.2.1
 	 */
 	public int getHillsLeft() {
-		return utils.getRotationsLeft();
+		return hm.getRotationsLeft();
 	}
 
 	/**
@@ -34,16 +32,6 @@ public class HillChangeEvent extends HillEvent {
 	 * @since v1.2.1
 	 */
 	public boolean isLastHill() {
-		return utils.isLastHill();
-	}
-
-	/**
-	 * Obtains the location of the next hill.
-	 * 
-	 * @return a location
-	 * @since v1.2.1
-	 */
-	public Location getLocationOfNextHill() {
-		return utils.getNextHill();
+		return hm.isLastHill();
 	}
 }

@@ -3,19 +3,20 @@
  */
 package com.valygard.KotH.hill;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.event.hill.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
-import com.valygard.KotH.util.LocationUtil;
 
 /**
  * @author Anand
@@ -24,16 +25,24 @@ import com.valygard.KotH.util.LocationUtil;
 public class HillManager {
 	// Important classes
 	private Arena arena;
-	private HillUtils utils;
 
-	// Status, varies upon how many hills there are.
-	private int status;
+	private List<Hill> hills;
+
+	private Hill current;
 
 	public HillManager(Arena arena) {
 		this.arena = arena;
-		this.utils = arena.getHillUtils();
 
-		this.status = 1;
+		this.hills = new ArrayList<Hill>();
+
+		ConfigurationSection section = arena.getWarps()
+				.getConfigurationSection("hills");
+		for (String str : section.getKeys(false)) {
+			hills.add(new Hill(arena, arena.getHillLocation(String
+					.valueOf(arena.getWarps().getString("hills." + str)))));
+		}
+
+		this.current = hills.get(0);
 	}
 
 	/**
@@ -44,7 +53,7 @@ public class HillManager {
 	 */
 	public void changeHills() {
 		// We aren't going to change anymore if this is the last hill.
-		if (utils.isLastHill() || !arena.isRunning()) {
+		if (isLastHill() || !arena.isRunning()) {
 			return;
 		}
 
@@ -54,79 +63,66 @@ public class HillManager {
 			return;
 		}
 
-		if (utils.isFirstHill() && status == 1) {
+		// check for first hill
+		if (isFirstHill() && current == hills.get(0)) {
 			for (Player p : arena.getPlayersInArena()) {
 				if (!p.getInventory().contains(Material.COMPASS))
 					arena.giveCompass(p);
 			}
-			status++;
-			return;
-		}
-		
-		if (!utils.isSwitchTime()) {
+			current = hills.get(hills.indexOf(current) + 1);
 			return;
 		}
 
-		if (utils.getRotationsLeft() == 1) {
+		if (!isSwitchTime()) {
+			return;
+		}
+
+		if (getRotationsLeft() == 1) {
 			Messenger.announce(arena, Msg.HILLS_ONE_LEFT);
 		} else {
 			Messenger.announce(arena, Msg.HILLS_SWITCHED);
 		}
-		
+
 		arena.resetCompass();
-		
-		// Now, finally, change the status.
-		status++;
-		
-        for (Player p : arena.getPlayersInArena()) {
-        	arena.playSound(p);
-        }
-        for (Player p : arena.getSpectators()) {
-        	arena.playSound(p);
-        }
+
+		// now change the hill
+		current = hills.get(hills.indexOf(current) + 1);
+
+		for (Player p : arena.getPlayersInArena()) {
+			arena.playSound(p);
+		}
+		for (Player p : arena.getSpectators()) {
+			arena.playSound(p);
+		}
 	}
-	
+
 	/**
 	 * Check if any given player is inside of a hill.
 	 * 
-	 * @param p the player
+	 * @param p
+	 *            the player
 	 * @return boolean value
 	 */
 	public boolean containsPlayer(Player p) {
 		return containsLoc(p.getLocation());
 	}
-	
+
 	/**
 	 * Check if any given location is inside of a hill.
 	 * 
-	 * @param loc the location
+	 * @param loc
+	 *            the location
 	 * @return boolean value
 	 */
 	public boolean containsLoc(Location loc) {
-		Location l = utils.getCurrentHill();
-		
-		// Split second in which the hill is null at the very beginning of the arena.
-		if (l == null)
-			return false;
-		
-		int radius = arena.getSettings().getInt("hill-radius");
-		
-		if (arena.getSettings().getBoolean("circular-hill")) {
-			Location location = new Location(loc.getWorld(), loc.getBlockX(), l.getY(), loc.getBlockZ());
-			if (l.distance(location) - 0.5 > radius)
-				return false;
-			return true;
+		for (Block b : current.getHill()) {
+			if (b.getLocation().equals(loc)) {
+				return true;
+			}
 		}
-		// Otherwise the hill has to be a square.
-		if (loc.getBlockX() < l.getBlockX() - radius || loc.getBlockX() > l.getBlockX() + radius)
-			return false;
-		
-		if (loc.getBlockZ() < l.getBlockZ() - radius || loc.getBlockZ() > l.getBlockZ() + radius)
-			return false;
-		
-		return true;
+		return false;
 	}
-	
+
 	/**
 	 * Get the amount of players inside a hill.
 	 * 
@@ -140,7 +136,7 @@ public class HillManager {
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Get the amount of red players in a hill.
 	 * 
@@ -154,7 +150,7 @@ public class HillManager {
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Get the amount of blue players in a hill.
 	 * 
@@ -168,7 +164,7 @@ public class HillManager {
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Get the team whichever has the higher 'strength' value.
 	 * 
@@ -179,40 +175,128 @@ public class HillManager {
 			return arena.getRedTeam();
 		else if (getRedStrength() < getBlueStrength())
 			return arena.getBlueTeam();
-		// By the Trichotomy Property, the only option remaining if the strengths are equal.
+		// By the Trichotomy Property, the only option remaining if the
+		// strengths are equal.
 		else
 			return null;
 	}
 
 	/**
-	 * Get which number rotation we are currently at.
+	 * Gets the amount of hill rotations. To do this, we truncate the arena time
+	 * divided by the time loop of each rotation. Then we subtract 1, because we
+	 * don't want to rotate at 0. We also need to check how large the hills
+	 * configuration section is. If there is only 1 hill, there will obviously
+	 * be no rotations.
 	 * 
-	 * @return an integer.
+	 * @return an integer; the total # of rotations
 	 */
-	public int getHillStatus() {
-		return status;
+	public final int getHillRotations() {
+		int rotations = (int) Math.floor(arena.getLength()
+				/ arena.getSettings().getInt("hill-clock"));
+
+		return (arena.getWarps().getConfigurationSection("hills")
+				.getKeys(false).size() > 1 ? rotations - 1 : 0);
 	}
 
 	/**
-	 * If we want to set the current rotation via an external force, we can do so.
+	 * If there is more than one hill, the amount of rotations left is the
+	 * truncated value of the time remaining divided by the # of seconds
+	 * per-hill.
 	 * 
-	 * @param status
+	 * @return an integer; the # of rotations left
 	 */
-	public void setStatus(int status) {
-		this.status = status;
-	}
-	
-	/**
-	 * Get every block in the hill boundary. This is useful for checking if a
-	 * player is inside of a hill.
-	 * 
-	 * @return a block list.
-	 */
-	public List<Block> getHillBoundary() {
-		Location l = utils.getCurrentHill();
-		int radius = arena.getSettings().getInt("hill-radius");
+	public int getRotationsLeft() {
+		int timeLeft = arena.getEndTimer().getRemaining();
 
-		return (arena.getSettings().getBoolean("circular-hill") ? LocationUtil
-				.getCircle(l, radius) : LocationUtil.getSquare(l, radius));
+		return (int) (arena.getWarps().getConfigurationSection("hills")
+				.getKeys(false).size() > 1 ? Math.floor(timeLeft
+				/ arena.getSettings().getInt("hill-clock")) - 1 : 0);
+	}
+
+	/**
+	 * Grabs all the hills of this arena.
+	 * 
+	 * @return
+	 */
+	public List<Hill> getHills() {
+		return hills;
+	}
+
+	/**
+	 * Grabs the current hill.
+	 * 
+	 * @return the next hill
+	 */
+	public Hill getCurrentHill() {
+		return current;
+	}
+
+	/**
+	 * Updates the current hill
+	 * 
+	 * @param hill
+	 * @return
+	 */
+	public void setCurrentHill(Hill hill) {
+		current = hill;
+	}
+
+	/**
+	 * Grabs the next hill in the arena task
+	 * 
+	 * @return the next hill
+	 */
+	public Hill getNextHill() {
+		return (isLastHill() ? null : hills.get(hills.indexOf(current) + 1));
+	}
+
+	/**
+	 * Grabs the previous hill in the arena task, usually for correction
+	 * purposes
+	 * 
+	 * @return the previous hill
+	 */
+	public Hill getPreviousHill() {
+		return (isFirstHill() ? null : hills.get(hills.indexOf(current) - 1));
+	}
+
+	/**
+	 * Returns whether or not we are on the first hill.
+	 * 
+	 * @return true / false
+	 */
+	public boolean isFirstHill() {
+		return (getRotationsLeft() + 1 == getHillRotations());
+	}
+
+	/**
+	 * If there are no more rotations, we know we are on the last hill.
+	 * 
+	 * @return true / false
+	 */
+	public boolean isLastHill() {
+		if (hills.size() == 1) {
+			return (arena.getEndTimer().getRemaining() <= arena.getSettings()
+					.getInt("hill-clock"));
+		}
+
+		return (getRotationsLeft() <= 0);
+	}
+
+	/**
+	 * A very important method, this checks to make sure we are at a point where
+	 * the next hill becomes the current one, and the current one becomes the
+	 * previous one. We will actually change the hills in the HillManager class,
+	 * utilizing this method.
+	 * 
+	 * @return true / false
+	 */
+	public boolean isSwitchTime() {
+		if (isLastHill())
+			return false;
+
+		return ((getRotationsLeft() + 1)
+				* arena.getSettings().getInt("hill-clock") == arena
+				.getEndTimer().getRemaining());
 	}
 }

@@ -11,7 +11,6 @@ import com.valygard.KotH.event.KotHEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
-import com.valygard.KotH.hill.HillUtils;
 
 /**
  * @author Anand
@@ -19,7 +18,6 @@ import com.valygard.KotH.hill.HillUtils;
  */
 public class HillEvent extends KotHEvent implements Cancellable {
 	protected HillManager hm;
-	protected HillUtils utils;
 	protected HillTask timer;
 	
 	protected ConfigurationSection hills;
@@ -30,7 +28,6 @@ public class HillEvent extends KotHEvent implements Cancellable {
 		super(arena);
 
 		hm = arena.getHillManager();
-		utils = arena.getHillUtils();
 		timer = arena.getHillTimer();
 		
 		hills = arena.getWarps().getConfigurationSection("hills");
@@ -45,7 +42,7 @@ public class HillEvent extends KotHEvent implements Cancellable {
 	 * @since v1.2.5
 	 */
 	public Location getCurrentHill() {
-		return utils.getCurrentHill();
+		return hm.getCurrentHill().getCenter();
 	}
 
 	/**
@@ -55,7 +52,7 @@ public class HillEvent extends KotHEvent implements Cancellable {
 	 * @since v1.2.5
 	 */
 	public Location getNextHill() {
-		return utils.getNextHill();
+		return hm.getNextHill().getCenter();
 	}
 
 	/**
@@ -65,7 +62,7 @@ public class HillEvent extends KotHEvent implements Cancellable {
 	 * @since v1.2.5
 	 */
 	public Location getPreviousHill() {
-		return utils.getPreviousHill();
+		return hm.getPreviousHill().getCenter();
 	}
 
 	/**
@@ -76,16 +73,6 @@ public class HillEvent extends KotHEvent implements Cancellable {
 	 */
 	public HillManager getHillManager() {
 		return hm;
-	}
-
-	/**
-	 * Obtains an existing instance of HillUtils for modification and registry.
-	 * 
-	 * @return an instance of HillUtils
-	 * @since v1.2.5
-	 */
-	public HillUtils getHillUtils() {
-		return utils;
 	}
 
 	/**
