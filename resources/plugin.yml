@@ -111,6 +111,7 @@ permissions:
     default: op
     children:
       koth.setup: true
+      koth.admin.mmrbypass: true
       koth.admin.enable: true
       koth.admin.disable: true
       koth.admin.forcestart: true
@@ -121,6 +122,9 @@ permissions:
       koth.admin.dropitems: true
       koth.admin.update: true
       koth.admin.signs: true
+  koth.admin.mmrbypass:
+    default: false
+    description: Bypass mmr restrictions on arenas.
   koth.admin.enable:
     default: false
     description: Enable the plugin or individual arenas.

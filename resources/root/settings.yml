@@ -26,6 +26,8 @@ change-class-in-arena: false
 allow-lobby-team-change: true
 circular-hill: true
 drop-items: false
+enable-matchmaking-system: false
+mmr-threshold: 1200
 player-stats: true
 arena-stats: true
 time-tracking-cycle: 3

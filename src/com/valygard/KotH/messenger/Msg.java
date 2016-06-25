@@ -82,6 +82,7 @@ public enum Msg {
 	JOIN_ARENA("You have joined &e%."),
 	JOIN_ARENA_IS_FULL("Sorry, &e%&r is full."),
 	JOIN_ARENA_IS_RUNNING("This arena is already in progress."),
+	JOIN_ARENA_TOO_LOW_RATING("Your matchmaking rating is too low to join this arena."),
 	JOIN_ARENA_SPECTATOR("You are now watching! Enjoy!"),
 
 	LEAVE_ARENA("You have left the arena. Thanks for playing!"),

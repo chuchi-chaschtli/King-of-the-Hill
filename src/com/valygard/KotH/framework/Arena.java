@@ -49,6 +49,7 @@ import com.valygard.KotH.event.player.ArenaPlayerKickEvent;
 import com.valygard.KotH.event.player.ArenaPlayerLeaveEvent;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
+import com.valygard.KotH.matchmaking.KotHRatingSystem;
 import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
@@ -106,7 +107,10 @@ public class Arena {
 	private InventoryManager invManager;
 	private RewardManager rewards;
 	private ArrayList<PlayerData> data = new ArrayList<PlayerData>();
-	private PlayerStats stats;
+	private ArrayList<PlayerStats> stats = new ArrayList<PlayerStats>();
+
+	// Matchmaking System
+	private KotHRatingSystem matchmaking;
 
 	// Economy
 	private EconomyManager em;
@@ -176,6 +180,9 @@ public class Arena {
 		// Is the arena ready to be used?
 		this.ready = false;
 
+		// Matchmaking
+		this.matchmaking = new KotHRatingSystem(this);
+
 		// Economy
 		this.em = plugin.getEconomyManager();
 
@@ -208,6 +215,14 @@ public class Arena {
 			return;
 		}
 
+		if (isRated()) {
+			if (getStats(p).getMMR() < settings.getInt("mmr-threshold")
+					&& !plugin.has(p, "koth.admin.mmrbypass")) {
+				Messenger.tell(p, Msg.JOIN_ARENA_TOO_LOW_RATING);
+				return;
+			}
+		}
+
 		if (lobbyPlayers.size() >= maxPlayers) {
 			Messenger.tell(p, Msg.JOIN_ARENA_IS_FULL, arenaName);
 			return;
@@ -234,8 +249,8 @@ public class Arena {
 			invManager.storeInventory(p);
 		}
 		catch (IOException e) {
-			KotHLogger.error("Could not store inventory of Player '" + p.getName()
-					+ "' (UUID: " + p.getUniqueId() + ")");
+			KotHLogger.error("Could not store inventory of Player '"
+					+ p.getName() + "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
 		invManager.clearInventory(p);
@@ -283,6 +298,12 @@ public class Arena {
 
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
+		// decrease mmr if the player left arena by choice as punishment
+		if (!end) {
+			getStats(p)
+					.setMMR((int) (matchmaking.getNewRating(p,
+							KotHRatingSystem.LOSS) * 0.99D));
+		}
 
 		// Then give rewards, only if the arena is ending.
 		if (running) {
@@ -299,8 +320,8 @@ public class Arena {
 				// Take a fine for quitting.
 				String fee = settings.getString("quit-charge");
 				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-					KotHLogger.error("Quit-charge setting for arena '" + arenaName
-							+ "' is broken! Fix this boo-boo.");
+					KotHLogger.error("Quit-charge setting for arena '"
+							+ arenaName + "' is broken! Fix this boo-boo.");
 					fee = String.valueOf(0.00);
 				}
 				if (fee.startsWith("$"))
@@ -374,6 +395,14 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
+		matchmaking.updateReferences();
+		
+		// sort the arena players in descending order of rating
+		arenaPlayers.clear();
+		for (Player player : matchmaking.getRatings().keySet()) {
+			arenaPlayers.add(player);
+		}
+		
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
@@ -464,6 +493,7 @@ public class Arena {
 
 		Set<Player> temp = new HashSet<Player>();
 		for (final Player p : arenaPlayers) {
+			getStats(p).setMMR(matchmaking.getNewRating(p));
 			temp.add(p);
 			ah.cleanup(p);
 			removePlayer(p, true);
@@ -942,9 +972,10 @@ public class Arena {
 						.add(0, 1, 0);
 				while (loc.getBlock().isLiquid()) {
 					loc.getBlock().setType(Material.STONE);
-					KotHLogger.warn("The block was raised due to lava or water being found. "
-							+ "If you did not want this, set 'location-fixer' to false for arena '"
-							+ arenaName + "'.");
+					KotHLogger
+							.warn("The block was raised due to lava or water being found. "
+									+ "If you did not want this, set 'location-fixer' to false for arena '"
+									+ arenaName + "'.");
 					loc = loc.add(0, 1, 0);
 				}
 			}
@@ -1204,6 +1235,24 @@ public class Arena {
 	}
 
 	/**
+	 * Grabs if the arena uses matchmaking rating system built by KotH
+	 * 
+	 * @return boolean value
+	 */
+	public boolean isRated() {
+		return settings.getBoolean("enable-matchmaking-system");
+	}
+
+	/**
+	 * Grabs the matchmaking system
+	 * 
+	 * @return the matchmaking system instance
+	 */
+	public KotHRatingSystem getRatingSystem() {
+		return matchmaking;
+	}
+
+	/**
 	 * Grabs the player's stored data model. Returns null if no data was found.
 	 * 
 	 * @param p
@@ -1267,6 +1316,7 @@ public class Arena {
 	public HillManager getHillManager() {
 		return hillManager;
 	}
+
 	/**
 	 * Grabs the class that times hill switches and scoring.
 	 * 
@@ -1479,14 +1529,27 @@ public class Arena {
 	 * @return a PlayerStats reference.
 	 */
 	public PlayerStats getStats(Player p) {
+		for (PlayerStats ps : stats) {
+			if (ps.getPlayer().equals(p)) {
+				return ps;
+			}
+		}
+		
+		PlayerStats stat;
 		try {
-			stats = new PlayerStats(p, this);
+			stat = new PlayerStats(p, this);
+			stats.add(stat);
 		}
 		catch (IOException e) {
-			KotHLogger.error("Could not get the stats of player '" + p.getName()
-					+ "'!");
+			KotHLogger.error("Could not get the stats of player '"
+					+ p.getName() + "'!");
 			e.printStackTrace();
+			return null;
 		}
+		return stat;
+	}
+	
+	public ArrayList<PlayerStats> getStats() {
 		return stats;
 	}
 
