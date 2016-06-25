@@ -262,22 +262,22 @@ public class KotHRatingSystem {
 		int base = arena.getPlugin().getConfig().getInt("global.starting-mmr");
 
 		if (played < 12) {
-			return 30.0;
+			return 0.03 * base;
 		}
 		if (played > 120 && rating > 1.75 * base) {
-			return 10.0;
+			return 0.01 * base;
 		}
 
 		if (rating > 2.5 * base) {
-			return 10.0;
+			return 0.01 * base;
 		}
 		if (rating > 2.0 * base) {
-			return 16.0;
+			return 0.016 * base;
 		}
 		if (rating > 1.5 * base) {
-			return 22.5;
+			return 0.0225 * base;
 		}
-		return 30.0;
+		return 0.03 * base;
 	}
 
 	/**
