@@ -3,12 +3,14 @@
  */
 package com.valygard.KotH.event.hill;
 
-import org.bukkit.Location;
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Cancellable;
 
 import com.valygard.KotH.event.KotHEvent;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.hill.Hill;
 import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.hill.HillTask;
 
@@ -19,7 +21,7 @@ import com.valygard.KotH.hill.HillTask;
 public class HillEvent extends KotHEvent implements Cancellable {
 	protected HillManager hm;
 	protected HillTask timer;
-	
+
 	protected ConfigurationSection hills;
 
 	protected boolean cancelled;
@@ -29,7 +31,7 @@ public class HillEvent extends KotHEvent implements Cancellable {
 
 		hm = arena.getHillManager();
 		timer = arena.getHillTimer();
-		
+
 		hills = arena.getWarps().getConfigurationSection("hills");
 
 		cancelled = false;
@@ -38,31 +40,31 @@ public class HillEvent extends KotHEvent implements Cancellable {
 	/**
 	 * Gets the current hill in the arena.
 	 * 
-	 * @return a location, the center of the current hill.
+	 * @return the current hill.
 	 * @since v1.2.5
 	 */
-	public Location getCurrentHill() {
-		return hm.getCurrentHill().getCenter();
+	public Hill getCurrentHill() {
+		return hm.getCurrentHill();
 	}
 
 	/**
 	 * Gets the next hill in an arena.
 	 * 
-	 * @return a location, null if no next hill.
+	 * @return the no next hill.
 	 * @since v1.2.5
 	 */
-	public Location getNextHill() {
-		return hm.getNextHill().getCenter();
+	public Hill getNextHill() {
+		return hm.getNextHill();
 	}
 
 	/**
-	 * Gets the previous hill in an arena.
+	 * Grabs all the Hills in the Arena.
 	 * 
-	 * @return null if there was no previous hill, otherwise a location.
-	 * @since v1.2.5
+	 * @return a list of hills.
+	 * @since v1.2.12
 	 */
-	public Location getPreviousHill() {
-		return hm.getPreviousHill().getCenter();
+	public List<Hill> getAllHills() {
+		return hm.getHills();
 	}
 
 	/**

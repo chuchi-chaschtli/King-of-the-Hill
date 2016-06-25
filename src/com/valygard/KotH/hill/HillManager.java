@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,6 +31,11 @@ public class HillManager {
 
 	private Hill current;
 
+	/**
+	 * Creates new instance with an arena.
+	 * 
+	 * @param arena
+	 */
 	public HillManager(Arena arena) {
 		this.arena = arena;
 
@@ -41,6 +47,8 @@ public class HillManager {
 			hills.add(new Hill(arena, arena.getHillLocation(String
 					.valueOf(arena.getWarps().getString("hills." + str)))));
 		}
+		Validate.noNullElements(hills, "Error! One or more hills for arena '"
+				+ arena.getName() + "' could not be parsed! Check your config!");
 
 		this.current = hills.get(0);
 	}
@@ -80,16 +88,6 @@ public class HillManager {
 	 */
 	public Hill getNextHill() {
 		return (isLastHill() ? null : hills.get(hills.indexOf(current) + 1));
-	}
-
-	/**
-	 * Grabs the previous hill in the arena task, usually for correction
-	 * purposes
-	 * 
-	 * @return the previous hill
-	 */
-	public Hill getPreviousHill() {
-		return (isFirstHill() ? null : hills.get(hills.indexOf(current) - 1));
 	}
 
 	/**
@@ -239,8 +237,7 @@ public class HillManager {
 		int rotations = (int) Math.floor(arena.getLength()
 				/ arena.getSettings().getInt("hill-clock"));
 
-		return (arena.getWarps().getConfigurationSection("hills")
-				.getKeys(false).size() > 1 ? rotations - 1 : 0);
+		return (hills.size() > 1 ? rotations - 1 : 0);
 	}
 
 	/**
@@ -253,8 +250,7 @@ public class HillManager {
 	public int getRotationsLeft() {
 		int timeLeft = arena.getEndTimer().getRemaining();
 
-		return (int) (arena.getWarps().getConfigurationSection("hills")
-				.getKeys(false).size() > 1 ? Math.floor(timeLeft
+		return (int) (hills.size() > 1 ? Math.floor(timeLeft
 				/ arena.getSettings().getInt("hill-clock")) - 1 : 0);
 	}
 
@@ -264,6 +260,11 @@ public class HillManager {
 	 * @return true / false
 	 */
 	public boolean isFirstHill() {
+		if (hills.size() == 1) {
+			return (arena.getEndTimer().getRemaining() <= arena.getSettings()
+					.getInt("hill-clock"));
+		}
+
 		return (getRotationsLeft() + 1 == getHillRotations());
 	}
 
