@@ -16,6 +16,7 @@ permissions:
   koth.user:
     default: true
     children:
+      koth.user.checkrating: true
       koth.user.join: true
       koth.user.leave: true
       koth.user.listarenas: true
@@ -29,6 +30,9 @@ permissions:
       koth.arenas: true
       koth.abilities: true
       koth.classes: true
+  koth.user.checkrating:
+    default: false
+    description: View your matchmaking rating.
   koth.user.arenastats:
     default: false
     description: View your stats for an arena.

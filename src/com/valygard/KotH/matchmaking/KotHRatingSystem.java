@@ -21,10 +21,12 @@ import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.player.PlayerStats;
 
 /**
- * MMR is disabled fr all arenas and can be enabled as a per-arena setting.
- * Admins can setup minimum mmr requirements for arenas and bypass these with
- * koth.admin.mmrbypass permission, and the starting-mmr and minimum-mmr is
- * configurable. MMR for each player is stored in their personal stats file.
+ * MMR system similar to the ELO system devised for competitive chess, but
+ * modified for KotH, a team-based game. MMR is disabled for all arenas and can
+ * be enabled as a per-arena setting. Admins can setup minimum mmr requirements
+ * for arenas and bypass these with koth.admin.mmrbypass permission, and the
+ * starting-mmr and minimum-mmr is configurable. MMR for each player is stored
+ * in their personal stats file.
  * 
  * @author Anand
  * 
