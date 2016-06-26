@@ -78,7 +78,6 @@ permissions:
       koth.setup.removeclass: true
       koth.setup.location: true
       koth.setup.setting: true
-      koth.setup.rewards: true
   koth.setup.addarena:
     default: false
     description: Add a new arena.
@@ -106,9 +105,6 @@ permissions:
   koth.setup.location:
     default: false
     description: View arena locations.
-  koth.setup.rewards:
-    default: false
-    description: Edit or view existing rewards for a specified arena.
       
 # ---------- Admin ---------- #
   koth.admin:
