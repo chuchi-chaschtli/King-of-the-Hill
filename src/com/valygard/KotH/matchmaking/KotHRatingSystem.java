@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.player.PlayerStats;
 
 /**
@@ -37,21 +37,16 @@ public class KotHRatingSystem {
 	public final static double LOSS = 0.0;
 
 	// attributes
-	private Arena arena;
-	private Set<Player> players;
+	private ArenaManager manager;
 	private Map<Player, Integer> ratings;
 
 	/**
-	 * Constructor to KotH rating system initializes by arena
+	 * Constructor to KotH rating system initializes by arenamanager
 	 * 
-	 * @param arena
+	 * @param manager
 	 */
-	public KotHRatingSystem(Arena arena) {
-		Validate.isTrue(arena.isRated(), "The arena '" + arena.getName()
-				+ "' is not currently using the KotH MMR system!");
-
-		this.arena = arena;
-		this.players = arena.getPlayersInArena();
+	public KotHRatingSystem(ArenaManager manager) {
+		this.manager = manager;
 
 		this.ratings = new HashMap<Player, Integer>();
 	}
@@ -60,8 +55,8 @@ public class KotHRatingSystem {
 	 * Updates data from when the matchmaking system was initialized to arena
 	 * start.
 	 */
-	public void updateReferences() {
-		players = arena.getPlayersInArena();
+	public void updateReferences(Arena arena) {
+		Set<Player> players = arena.getPlayersInArena();
 		ratings.clear();
 		for (Player player : players) {
 			ratings.put(player, arena.getStats(player).getMMR());
@@ -72,9 +67,12 @@ public class KotHRatingSystem {
 	/**
 	 * Grabs the ratings
 	 * 
+	 * @param the
+	 *            arena to grab ratings for
 	 * @return a mapping Player->Integer
 	 */
-	public Map<Player, Integer> getRatings() {
+	public Map<Player, Integer> getRatings(Arena arena) {
+		updateReferences(arena);
 		return ratings;
 	}
 
@@ -86,10 +84,12 @@ public class KotHRatingSystem {
 	 * @return
 	 */
 	private int getTeamMMR(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
+
 		if (arena.getRedTeam().contains(player)) {
-			return getRedTeamMMR();
+			return getRedTeamMMR(arena);
 		}
-		return getBlueTeamMMR();
+		return getBlueTeamMMR(arena);
 	}
 
 	/**
@@ -99,18 +99,20 @@ public class KotHRatingSystem {
 	 * @return
 	 */
 	private int getOpponentMMR(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
+
 		if (arena.getRedTeam().contains(player)) {
-			return getBlueTeamMMR();
+			return getBlueTeamMMR(arena);
 		}
-		return getRedTeamMMR();
+		return getRedTeamMMR(arena);
 	}
 
 	/**
-	 * Calculates the average red team mmr
+	 * Calculates the average red team mmr for an arena
 	 * 
 	 * @return
 	 */
-	private int getRedTeamMMR() {
+	private int getRedTeamMMR(Arena arena) {
 		Set<Integer> ratings = new HashSet<Integer>();
 		for (Player player : arena.getRedTeam()) {
 			ratings.add(arena.getStats(player).getMMR());
@@ -119,11 +121,11 @@ public class KotHRatingSystem {
 	}
 
 	/**
-	 * Calculates the average blue team mmr
+	 * Calculates the average blue team mmr for an arena
 	 * 
 	 * @return
 	 */
-	private int getBlueTeamMMR() {
+	private int getBlueTeamMMR(Arena arena) {
 		Set<Integer> ratings = new HashSet<Integer>();
 		for (Player player : arena.getBlueTeam()) {
 			ratings.add(arena.getStats(player).getMMR());
@@ -185,6 +187,7 @@ public class KotHRatingSystem {
 	 * @return
 	 */
 	public int getNewRating(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
 		if (arena.getWinner() == null) {
 			return getNewRating(player, DRAW);
 		} else {
@@ -206,6 +209,7 @@ public class KotHRatingSystem {
 	 * @return the new rating
 	 */
 	public int getNewRating(Player player, double score) {
+		Arena arena = manager.getArenaWithPlayer(player);
 		double kFactor = getKFactor(player);
 		double expectedScore = getExpectedScore(getTeamMMR(player),
 				getOpponentMMR(player));
@@ -234,10 +238,8 @@ public class KotHRatingSystem {
 		int newRating = oldRating + (int) (kFactor * (score - expectedScore));
 
 		// soft-cap the player's minimum mmr.
-		if (newRating < arena.getPlugin().getConfig()
-				.getInt("global.minimum-mmr")) {
-			newRating = arena.getPlugin().getConfig()
-					.getInt("global.minimum-mmr");
+		if (newRating < manager.getConfig().getInt("global.minimum-mmr")) {
+			newRating = manager.getConfig().getInt("global.minimum-mmr");
 		}
 
 		return newRating;
@@ -254,12 +256,13 @@ public class KotHRatingSystem {
 	 * @return
 	 */
 	private double getKFactor(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
 		PlayerStats stats = arena.getStats(player);
 
 		int rating = stats.getMMR();
 		int played = stats.getGamesPlayed();
 
-		int base = arena.getPlugin().getConfig().getInt("global.starting-mmr");
+		int base = manager.getConfig().getInt("global.starting-mmr");
 
 		if (played < 12) {
 			return 0.03 * base;
@@ -294,7 +297,7 @@ public class KotHRatingSystem {
 	 */
 	private double getExpectedScore(int rating, int opponentRating) {
 		return 1.0 / (1.0 + Math.pow(10.0,
-				((double) (opponentRating - rating) / (arena.getPlugin()
-						.getConfig().getInt("global.starting-mmr") / 2D))));
+				((double) (opponentRating - rating) / (manager.getConfig()
+						.getInt("global.starting-mmr") / 2D))));
 	}
 }

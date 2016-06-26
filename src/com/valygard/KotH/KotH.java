@@ -27,6 +27,7 @@ import com.valygard.KotH.economy.EconomyManager;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.listener.GlobalListener;
+import com.valygard.KotH.matchmaking.KotHRatingSystem;
 import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.ConfigUtil;
@@ -43,6 +44,7 @@ public class KotH extends JavaPlugin {
 	private ArenaManager am;
 	private CommandManager cm;
 	private EconomyManager em;
+	private KotHRatingSystem matchmaking;
 
 	private File cfgFile;
 	private FileConfiguration cfg;
@@ -103,6 +105,7 @@ public class KotH extends JavaPlugin {
 		am = new ArenaManager(this);
 		cm = new CommandManager(this);
 		em = new EconomyManager(this);
+		matchmaking = new KotHRatingSystem(am);
 
 		new KotHLogger(this);
 	}
@@ -277,6 +280,10 @@ public class KotH extends JavaPlugin {
 
 	public EconomyManager getEconomyManager() {
 		return em;
+	}
+	
+	public KotHRatingSystem getRatingSystem() {
+		return matchmaking;
 	}
 
 	public File getPluginFile() {

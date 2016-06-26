@@ -181,7 +181,7 @@ public class Arena {
 		this.ready = false;
 
 		// Matchmaking
-		this.matchmaking = new KotHRatingSystem(this);
+		this.matchmaking = plugin.getRatingSystem();
 
 		// Economy
 		this.em = plugin.getEconomyManager();
@@ -395,11 +395,11 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
-		matchmaking.updateReferences();
+		matchmaking.updateReferences(this);
 		
 		// sort the arena players in descending order of rating
 		arenaPlayers.clear();
-		for (Player player : matchmaking.getRatings().keySet()) {
+		for (Player player : matchmaking.getRatings(this).keySet()) {
 			arenaPlayers.add(player);
 		}
 		
