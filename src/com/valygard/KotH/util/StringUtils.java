@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.bukkit.entity.Player;
 
 import com.valygard.KotH.KotH;
+import com.valygard.KotH.framework.Arena;
 
 /**
  * @author Anand
@@ -54,6 +55,11 @@ public class StringUtils {
 		if (type instanceof Player) {
 			for (E e : list) {
 				buffy.append(((Player) e).getName());
+				buffy.append(" ");
+			}
+		} else if (type instanceof Arena) {
+			for (E e : list) {
+				buffy.append(((Arena) e).getName());
 				buffy.append(" ");
 			}
 		} else {
