@@ -174,9 +174,9 @@ public class ArenaInfo {
 	 */
 	private void crunchPercentages() {
 		DecimalFormat df = new DecimalFormat("#.##");
-		rwp = Double.valueOf(df.format(100.0 * rw / timesPlayed == 0 ? 1 : timesPlayed));
-		bwp = Double.valueOf(df.format(100.0 * bw / timesPlayed == 0 ? 1 : timesPlayed));
-		dp = Double.valueOf(df.format(100.0 * draws / timesPlayed == 0 ? 1 : timesPlayed));
+		rwp = Double.valueOf(df.format(100D * rw / (timesPlayed == 0 ? 1D : timesPlayed)));
+		bwp = Double.valueOf(df.format(100D * bw / (timesPlayed == 0 ? 1D : timesPlayed)));
+		dp = Double.valueOf(df.format(100D * draws / (timesPlayed == 0 ? 1D : timesPlayed)));
 
 		info.set("red-win-percentage", rwp);
 		info.set("blue-win-percentage", bwp);
