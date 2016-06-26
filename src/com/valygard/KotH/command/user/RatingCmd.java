@@ -19,9 +19,9 @@ import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.util.StringUtils;
 
-@CommandInfo(name = "rating", pattern = "(check|view)(mmr|rating)", desc = "View your matchmaking rating.", playerOnly = true, argsRequired = 0)
+@CommandInfo(name = "checkrating", pattern = "(check|view)(mmr|rating)", desc = "View your matchmaking rating.", playerOnly = true, argsRequired = 0)
 @CommandPermission("koth.user.checkrating")
-@CommandUsage("/koth rating")
+@CommandUsage("/koth checkrating")
 /**
  * @author Anand
  *
@@ -42,21 +42,25 @@ public class RatingCmd implements Command {
 								"global.starting-mmr") ? ChatColor.DARK_GREEN
 								: ChatColor.RED) + rating + ".");
 
-		List<Arena> restricted = new ArrayList<Arena>();
+		List<String> restricted = new ArrayList<String>();
 		for (Arena arena : am.getArenas()) {
+			int threshold = arena.getSettings().getInt("mmr-threshold");
 			if (arena.isRated()
-					&& arena.getSettings().getInt("mmr-threshold") > rating) {
-				restricted.add(arena);
+					&& threshold > rating) {
+				restricted.add(arena.getName() + " (" + threshold + ")");
 			}
 		}
 
-		Messenger.tell(player, "");
-		Messenger.tell(
-				player,
-				"Your MMR prohibits you from playing the following arenas : "
-						+ ChatColor.RED
-						+ StringUtils.formatList(restricted, am.getPlugin()));
+		if (restricted.size() > 0) {
+			player.sendMessage(" ");
+			Messenger
+					.tell(player,
+							"Your MMR prohibits you from playing the following arenas : "
+									+ ChatColor.RED
+									+ StringUtils.formatList(restricted,
+											am.getPlugin()));
 
+		}
 		return true;
 	}
 

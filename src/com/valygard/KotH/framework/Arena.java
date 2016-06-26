@@ -298,12 +298,6 @@ public class Arena {
 
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
-		// decrease mmr if the player left arena by choice as punishment
-		if (!end) {
-			getStats(p)
-					.setMMR((int) (matchmaking.getNewRating(p,
-							KotHRatingSystem.LOSS) * 0.99D));
-		}
 
 		// Then give rewards, only if the arena is ending.
 		if (running) {
@@ -312,6 +306,10 @@ public class Arena {
 						: false);
 				rewards.giveWinstreakRewards(p);
 			} else {
+				// decrease mmr as punishment
+				getStats(p).setMMR(
+						(int) (matchmaking.getNewRating(p,
+								KotHRatingSystem.LOSS) * 0.99D));
 				// Else tell the player that they missed out.
 				Messenger.tell(p, Msg.REWARDS_LEFT_EARLY);
 				// Add a loss.
@@ -395,14 +393,13 @@ public class Arena {
 		if (arenaPlayers.isEmpty()) {
 			return false;
 		}
-		matchmaking.updateReferences(this);
-		
+		matchmaking.updateReferences();
+
 		// sort the arena players in descending order of rating
 		arenaPlayers.clear();
-		for (Player player : matchmaking.getRatings(this).keySet()) {
+		for (Player player : matchmaking.getRatings().keySet()) {
 			arenaPlayers.add(player);
 		}
-		
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
@@ -1534,7 +1531,7 @@ public class Arena {
 				return ps;
 			}
 		}
-		
+
 		PlayerStats stat;
 		try {
 			stat = new PlayerStats(p, this);
@@ -1548,7 +1545,7 @@ public class Arena {
 		}
 		return stat;
 	}
-	
+
 	public ArrayList<PlayerStats> getStats() {
 		return stats;
 	}
