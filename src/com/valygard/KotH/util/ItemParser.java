@@ -191,9 +191,7 @@ public class ItemParser {
 			int minor = ((int) (amount * 100D)) % 100;
 			return new ItemStack(KotH.ECONOMY_ID, major, (short) minor);
 		}
-		String name = getType(item);
-		return new ItemStack(Material.matchMaterial(name.toUpperCase().replace(
-				"-", "_")));
+		return new ItemStack(Material.matchMaterial(getType(item)));
 	}
 
 	private static ItemStack withAmount(String item, String amount) {

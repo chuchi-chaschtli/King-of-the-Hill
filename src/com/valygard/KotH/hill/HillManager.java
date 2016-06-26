@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import com.valygard.KotH.event.hill.HillChangeEvent;
 import com.valygard.KotH.framework.Arena;
+import com.valygard.KotH.messenger.KotHLogger;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
@@ -47,10 +47,12 @@ public class HillManager {
 			hills.add(new Hill(arena, arena.getHillLocation(String
 					.valueOf(arena.getWarps().getString("hills." + str)))));
 		}
-		Validate.noNullElements(hills, "Error! One or more hills for arena '"
-				+ arena.getName() + "' could not be parsed! Check your config!");
-
-		this.current = hills.get(0);
+		
+		try {
+			this.current = hills.get(0);
+		} catch (IndexOutOfBoundsException e) {
+			KotHLogger.error("There are no hills for arena '" + arena.getName() +"'! Check your config!");
+		}
 	}
 
 	/**
@@ -68,6 +70,9 @@ public class HillManager {
 	 * @return the next hill
 	 */
 	public Hill getCurrentHill() {
+		if (current == null) {
+			current = hills.get(0);
+		}
 		return current;
 	}
 

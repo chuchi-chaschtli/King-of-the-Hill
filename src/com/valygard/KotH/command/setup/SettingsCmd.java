@@ -108,6 +108,8 @@ public class SettingsCmd implements Command {
 		am.saveConfig();
 		am.reloadConfig();
 		am.reloadArena(arena);
+		// sometimes the arena bugs out even after the previous precautionary checks. Tell the command sender to manually reload the arena.
+		Messenger.tell(sender, "Use " + ChatColor.DARK_GREEN + " /koth cfg reload " + ChatColor.RESET + "to save your changes!");
 
 		foo.append("The ").append(ChatColor.DARK_GREEN).append(args[1])
 				.append(ChatColor.RESET).append(" setting for ");

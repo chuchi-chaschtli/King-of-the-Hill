@@ -18,8 +18,7 @@ public enum Msg {
 	ABILITY_LANDMINE_EXPLODE("You triggered a landmine that &e%&r placed."),
 	ABILITY_LANDMINE_PLACE("You have placed a landmine!"),
 	ABILITY_NO_PERMISSION("You do not have permission for this ability."),
-	ABILITY_NOT_ENOUGH_ITEMS(
-			"You do not have enough &e%&r to perform this ability."),
+	ABILITY_NOT_ENOUGH_ITEMS("You do not have enough &e%&r to perform this ability."),
 	ABILITY_HORSE_SPAWNED("You have spawned a customized horse!"),
 	ABILITY_SNARE_ACTIVATED("You have snared an enemy."),
 	ABILITY_SNARE_KILL("You have killed &e%&r with your snare!"),
@@ -27,8 +26,7 @@ public enum Msg {
 	ABILITY_SNARED("You have been snared by &e%."),
 	ABILITY_WOLF_LOST("You have lost a wolf! You have &b% wolves&r remaining."),
 	ABILITY_WOLF_SPAWNED("You have spawned a wolf!"),
-	ABILITY_ZOMBIE_LOST(
-			"You have lost a zombie! You have &b% zombies&r remaining."),
+	ABILITY_ZOMBIE_LOST("You have lost a zombie! You have &b% zombies&r remaining."),
 	ABILITY_ZOMBIE_SPAWNED("You have spawned a super-zombie!"),
 
 	ARENA_ADDED("You have added a new arena &e'%'."),
@@ -42,8 +40,7 @@ public enum Msg {
 	ARENA_NO_PERMISSION("You do not have permission to this arena."),
 	ARENA_NOT_READY("This arena is not ready."),
 	ARENA_NULL("You must specify an existing arena."),
-	ARENA_RATE(
-			"If you liked or disliked the arena, please type &elike&r or&e dislike &rin chat."),
+	ARENA_RATE("If you liked or disliked the arena, please type &elike&r or&e dislike &rin chat."),
 	ARENA_RATE_INVALID("You have given an invalid rating to &e%."),
 	ARENA_RATED("You have &e%&r the arena!"),
 	ARENA_READY("The arena is ready to be used!"),
@@ -54,8 +51,7 @@ public enum Msg {
 	CLASS_ADDED("You have created &e%&r with your inventory."),
 	CLASS_CHOSEN("You have chosen the &e%&r class."),
 	CLASS_EDITED("You have edited &e%&r with your inventory."),
-	CLASS_EXISTS(
-			"A class with name '&e%'&r was found. Specify the override flag to edit it."),
+	CLASS_EXISTS("A class with name '&e%'&r was found. Specify the override flag to edit it."),
 	CLASS_NO_ACCESS("Sorry, you can't use this class."),
 	CLASS_NULL("The class specified does not exist!"),
 	CLASS_RANDOM("You have chosen a random class!"),
@@ -82,7 +78,7 @@ public enum Msg {
 	JOIN_ARENA("You have joined &e%."),
 	JOIN_ARENA_IS_FULL("Sorry, &e%&r is full."),
 	JOIN_ARENA_IS_RUNNING("This arena is already in progress."),
-	JOIN_ARENA_TOO_LOW_RATING("Your matchmaking rating is too low to join this arena."),
+	JOIN_ARENA_TOO_LOW_RATING("Your MMR is too low to join this arena. Use &e/koth checkrating&r to view your MMR"),
 	JOIN_ARENA_SPECTATOR("You are now watching! Enjoy!"),
 
 	LEAVE_ARENA("You have left the arena. Thanks for playing!"),
@@ -91,15 +87,13 @@ public enum Msg {
 
 	MISC_ARENA_ITEM_DROP_DISABLED("You may not drop items whilst in the arena."),
 	MISC_CMD_NOT_ALLOWED("You may not use this command in the arena!"),
-	MISC_FRIENDLY_FIRE_DISABLED(
-			"Friendly fire has been disabled for this arena."),
+	MISC_FRIENDLY_FIRE_DISABLED("Friendly fire has been disabled for this arena."),
 	MISC_LIST_ARENAS("Available arenas: %"),
 	MISC_LIST_CLASSES("Available classes: %"),
-	
+
 	MISC_NO_ACCESS("Sorry, you cannot perform this action."),
 	MISC_NO_SPAWN_CAMPING("You may not spawn camp!"),
-	MISC_NOT_ENOUGH_MONEY(
-			"You do not have enough money to perform this action!"),
+	MISC_NOT_ENOUGH_MONEY("You do not have enough money to perform this action!"),
 	MISC_TEAM_JOINED("You have joined the %&r team."),
 	MISC_WRONG_WORLD("You must go to the world &e'%'&r to use this command."),
 
@@ -118,8 +112,7 @@ public enum Msg {
 	STATS("Your stats for %"),
 	STATS_NULL("You do not have stats for this arena. Play a few games first!"),
 
-	UPDATE_FOUND(
-			"An update was found! Downloaded &ev%.&r Please restart your server."),
+	UPDATE_FOUND("An update was found! Downloaded &ev%.&r Please restart your server."),
 	UPDATE_NOT_FOUND("No update was found!");
 
 	private String value;
