@@ -298,6 +298,11 @@ public class Arena {
 
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
+		
+		if (p.hasMetadata("ghost")) {
+			//p.setGameMode(getData(p).getMode());
+			p.removeMetadata("ghost", plugin);
+		}
 
 		// Then give rewards, only if the arena is ending.
 		if (running) {

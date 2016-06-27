@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,6 +35,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.economy.EconomyManager;
@@ -357,7 +359,7 @@ public class GlobalListener implements Listener {
 		}
 
 		if (arena.getSettings().getBoolean("one-life")) {
-			arena.removePlayer(p, false);
+			p.setMetadata("ghost", new FixedMetadataValue(plugin, "KotH"));
 		}
 
 		e.getDrops().clear();
@@ -386,6 +388,11 @@ public class GlobalListener implements Listener {
 		
 		e.setRespawnLocation(arena.getSpawn(p));
 		p.teleport(arena.getSpawn(p));
+		
+		if (p.hasMetadata("ghost")) {
+			p.setGameMode(GameMode.SPECTATOR);
+			return;
+		}
 
 		ArenaClass ac = arena.getData(p).getArenaClass();
 		if (ac != null)
