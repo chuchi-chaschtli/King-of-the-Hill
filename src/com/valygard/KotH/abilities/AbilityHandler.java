@@ -76,7 +76,7 @@ public class AbilityHandler implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		final Player p = e.getPlayer();
 		ItemStack hand = p.getInventory().getItemInMainHand();
-		
+
 		// fix double event fire
 		if (e.getHand() == EquipmentSlot.OFF_HAND) {
 			return;
@@ -285,7 +285,8 @@ public class AbilityHandler implements Listener {
 			if (locParameter) {
 				classArguments = new Class[] { Arena.class, Player.class,
 						Location.class };
-				arguments = new Object[] { arena, player, player.getTargetBlock(new HashSet<Material>(), 100) };
+				arguments = new Object[] { arena, player,
+						player.getTargetBlock(new HashSet<Material>(null), 100) };
 			} else {
 				classArguments = new Class[] { Arena.class, Player.class };
 				arguments = new Object[] { arena, player };
