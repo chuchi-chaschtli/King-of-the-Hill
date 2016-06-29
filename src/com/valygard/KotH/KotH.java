@@ -291,6 +291,10 @@ public class KotH extends JavaPlugin {
 	
 	private void initMetrics() {
         try {
+        	if (cfg.getBoolean("global.opt-out")) {
+        		KotHLogger.warn("Stat collection disabled :[");
+        		return;
+        	}
             Metrics m = new Metrics(this);
             m.start();
         } catch (Exception e) {

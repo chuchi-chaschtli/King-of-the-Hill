@@ -74,9 +74,10 @@ public class GlobalListener implements Listener {
 
 		if (p.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
 			if (!p.getInventory().getItemInMainHand().hasItemMeta()
-					|| !p.getInventory().getItemInMainHand().getItemMeta().hasDisplayName()
-					|| !p.getInventory().getItemInMainHand().getItemMeta().getDisplayName()
-							.contains("Hill Locator"))
+					|| !p.getInventory().getItemInMainHand().getItemMeta()
+							.hasDisplayName()
+					|| !p.getInventory().getItemInMainHand().getItemMeta()
+							.getDisplayName().contains("Hill Locator"))
 				return;
 			Arena arena = am.getArenaWithPlayer(p);
 			if (arena == null)
@@ -98,8 +99,8 @@ public class GlobalListener implements Listener {
 				Messenger.tell(
 						p,
 						Msg.HILLS_DISTANCE,
-						df.format(l.distance(temp)
-								- arena.getSettings().getInt("hill-radius")));
+						df.format(Math.abs(l.distance(temp)
+								- arena.getSettings().getInt("hill-radius"))));
 			e.setCancelled(true);
 			return;
 		}
@@ -385,10 +386,10 @@ public class GlobalListener implements Listener {
 			arena.kickPlayer(p);
 			return;
 		}
-		
+
 		e.setRespawnLocation(arena.getSpawn(p));
 		p.teleport(arena.getSpawn(p));
-		
+
 		if (p.hasMetadata("ghost")) {
 			p.setGameMode(GameMode.SPECTATOR);
 			return;
@@ -415,7 +416,7 @@ public class GlobalListener implements Listener {
 	public void onEntityDamage(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
 			final Player p = (Player) e.getEntity();
-			final  Player d = (Player) e.getDamager();
+			final Player d = (Player) e.getDamager();
 
 			final Arena arena = am.getArenaWithPlayer(p);
 
@@ -423,7 +424,8 @@ public class GlobalListener implements Listener {
 				return;
 			}
 
-			if (!arena.isRunning()) {
+			if (!arena.isRunning() || arena.getPlayersInLobby().contains(p)
+					|| arena.getPlayersInLobby().contains(d)) {
 				e.setCancelled(true);
 				return;
 			}
@@ -463,8 +465,9 @@ public class GlobalListener implements Listener {
 					return;
 				}
 			}
-			
-			if (arena.getSettings().getBoolean("auto-respawn") && e.getDamage() > p.getHealth()) {
+
+			if (arena.getSettings().getBoolean("auto-respawn")
+					&& e.getDamage() > p.getHealth()) {
 				p.teleport(arena.getSpawn(p));
 
 				ArenaClass ac = arena.getData(p).getArenaClass();

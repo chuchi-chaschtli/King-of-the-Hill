@@ -3,14 +3,11 @@
  */
 package com.valygard.KotH.matchmaking;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 
-import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.player.PlayerStats;
@@ -36,8 +33,6 @@ public class KotHRatingSystem {
 	// attributes
 	private ArenaManager manager;
 
-	private List<ArenaRatingSystem> arenas;
-
 	/**
 	 * Constructor to KotH rating system initializes by arenamanager
 	 * 
@@ -45,49 +40,78 @@ public class KotHRatingSystem {
 	 */
 	public KotHRatingSystem(ArenaManager manager) {
 		this.manager = manager;
-
-		this.arenas = new ArrayList<ArenaRatingSystem>();
-		for (Arena arena : manager.getArenas()) {
-			if (!arena.isRated())
-				continue;
-			arenas.add(new ArenaRatingSystem(arena));
-		}
 	}
 
 	/**
-	 * Grabs an ArenaRatingSystem by arena
+	 * Grabs the player's team mmr.
 	 * 
-	 * @param arena
+	 * @param player
+	 *            to check
 	 * @return
 	 */
-	public ArenaRatingSystem getArenaRatingSystem(Arena arena) {
-		for (ArenaRatingSystem a : arenas) {
-			if (a.getArena().equals(arena))
-				return a;
+	protected int getTeamMMR(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
+		if (arena.getRedTeam().contains(player)) {
+			return getRedTeamMMR(arena);
 		}
-		return null;
+		return getBlueTeamMMR(arena);
 	}
 
 	/**
-	 * Updates all references by updating each rated arena individually
-	 */
-	public void updateReferences() {
-		for (ArenaRatingSystem arena : arenas) {
-			arena.updateReferences();
-		}
-	}
-
-	/**
-	 * Grabs the ratings
+	 * Grabs the opponent team's mmr.
 	 * 
-	 * @return a mapping Player->Integer
+	 * @param player
+	 * @return
 	 */
-	public Map<Player, Integer> getRatings() {
-		Map<Player, Integer> result = new HashMap<Player, Integer>();
-		for (ArenaRatingSystem a : arenas) {
-			result.putAll(a.getRatings());
+	protected int getOpponentMMR(Player player) {
+		Arena arena = manager.getArenaWithPlayer(player);
+		if (arena.getRedTeam().contains(player)) {
+			return getBlueTeamMMR(arena);
 		}
-		return KotHUtils.sortMapByValue(result, true);
+		return getRedTeamMMR(arena);
+	}
+
+	/**
+	 * Calculates the average red team mmr for an arena
+	 * 
+	 * @return
+	 */
+	private int getRedTeamMMR(Arena arena) {
+		Set<Integer> ratings = new HashSet<Integer>();
+		for (Player player : arena.getRedTeam()) {
+			ratings.add(arena.getStats(player).getMMR());
+		}
+		return average(ratings);
+	}
+
+	/**
+	 * Calculates the average blue team mmr for an arena
+	 * 
+	 * @return
+	 */
+	private int getBlueTeamMMR(Arena arena) {
+		Set<Integer> ratings = new HashSet<Integer>();
+		for (Player player : arena.getBlueTeam()) {
+			ratings.add(arena.getStats(player).getMMR());
+		}
+		return average(ratings);
+	}
+
+	/**
+	 * Helper method to average ratings
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private int average(Set<Integer> data) {
+		int total = 0;
+		int elements = data.size();
+
+		for (int i : data) {
+			total += i;
+		}
+
+		return (int) ((total * 1D) / (elements * 1D));
 	}
 
 	// -------------------- //
@@ -124,8 +148,8 @@ public class KotHRatingSystem {
 	public int getNewRating(Player player, double score) {
 		Arena arena = manager.getArenaWithPlayer(player);
 		double kFactor = getKFactor(player);
-		double expectedScore = getExpectedScore(getArenaRatingSystem(arena)
-				.getTeamMMR(player), getArenaRatingSystem(arena).getOpponentMMR(player));
+		double expectedScore = getExpectedScore(getTeamMMR(player),
+				getOpponentMMR(player));
 		int newRating = calculateNewRating(arena.getStats(player).getMMR(),
 				score, expectedScore, kFactor);
 

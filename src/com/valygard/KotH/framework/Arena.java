@@ -8,9 +8,11 @@ import static com.valygard.KotH.util.ConfigUtil.parseLocation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -38,6 +40,7 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.Lists;
 import com.valygard.KotH.ArenaInfo;
 import com.valygard.KotH.KotH;
+import com.valygard.KotH.KotHUtils;
 import com.valygard.KotH.RewardManager;
 import com.valygard.KotH.ScoreboardManager;
 import com.valygard.KotH.abilities.AbilityHandler;
@@ -298,9 +301,9 @@ public class Arena {
 
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
-		
+
 		if (p.hasMetadata("ghost")) {
-			//p.setGameMode(getData(p).getMode());
+			// p.setGameMode(getData(p).getMode());
 			p.removeMetadata("ghost", plugin);
 		}
 
@@ -389,22 +392,17 @@ public class Arena {
 			}
 		}
 
-		// Has to be in this order, because if we clear lobbyPlayers first, we
-		// cannot add anyone to the game.
-		arenaPlayers.addAll(lobbyPlayers);
+		Map<Player, Integer> ratings = new HashMap<Player, Integer>();
+		for (Player p : lobbyPlayers) {
+			int mmr = getStats(p).getMMR();
+			ratings.put(p, mmr);
+		}
+		ratings = KotHUtils.sortMapByValue(ratings, true);
+
+		for (Player p : ratings.keySet()) {
+			arenaPlayers.add(p);
+		}
 		lobbyPlayers.clear();
-
-		// Then check if there are still players left.
-		if (arenaPlayers.isEmpty()) {
-			return false;
-		}
-		matchmaking.updateReferences();
-
-		// sort the arena players in descending order of rating
-		arenaPlayers.clear();
-		for (Player player : matchmaking.getRatings().keySet()) {
-			arenaPlayers.add(player);
-		}
 
 		// Teleport players, give full health, initialize map
 		for (Player p : arenaPlayers) {
@@ -441,6 +439,8 @@ public class Arena {
 			getStats(p).startTiming();
 			// Collect player class data.
 			getStats(p).collectClassData();
+			// give compass
+			giveCompass(p);
 		}
 		// Set running to true.
 		running = true;
@@ -792,7 +792,7 @@ public class Arena {
 		im.setDisplayName(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD
 				+ "Hill Locator");
 		compass.setItemMeta(im);
-		p.getInventory().addItem(new ItemStack[] { compass });
+		p.getInventory().addItem(compass);
 		if (hillManager.getCurrentHill() != null) {
 			p.setCompassTarget(hillManager.getCurrentHill().getCenter());
 		}
@@ -806,8 +806,16 @@ public class Arena {
 			return;
 
 		for (Player p : arenaPlayers) {
-			p.setCompassTarget(hillManager.getNextHill() != null ? hillManager
-					.getNextHill().getCenter() : null);
+			if (hillManager.getNextHill() == null) {
+				compass: for (ItemStack i : p.getInventory().getContents()) {
+					if (i.getType() == Material.COMPASS) {
+						p.getInventory().remove(i);
+						break compass;
+					}
+				}
+			} else {
+				p.setCompassTarget(hillManager.getNextHill().getCenter());
+			}
 		}
 	}
 

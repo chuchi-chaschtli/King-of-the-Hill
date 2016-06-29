@@ -3,13 +3,9 @@
  */
 package com.valygard.KotH.hill;
 
-import java.util.List;
-
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 import com.valygard.KotH.framework.Arena;
-import com.valygard.KotH.util.LocationUtil;
 
 /**
  * @author Anand
@@ -61,15 +57,5 @@ public class Hill {
 
 	public boolean isCircle() {
 		return circle;
-	}
-
-	/**
-	 * Grabs all the blocks in the hill
-	 * 
-	 * @return
-	 */
-	public List<Block> getHill() {
-		return (circle ? LocationUtil.getCircle(center, radius) : LocationUtil
-				.getSquare(center, radius));
 	}
 }

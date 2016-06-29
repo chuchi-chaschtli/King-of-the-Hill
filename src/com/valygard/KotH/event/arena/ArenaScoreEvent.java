@@ -26,8 +26,8 @@ public class ArenaScoreEvent extends ArenaEvent implements Cancellable {
 	public ArenaScoreEvent(Arena arena) {
 		super(arena);
 
-		this.manager = new HillManager(arena);
-		this.hill = new HillTask(arena);
+		this.manager = arena.getHillManager();
+		this.hill = arena.getHillTimer();
 
 		this.cancelled = false;
 	}

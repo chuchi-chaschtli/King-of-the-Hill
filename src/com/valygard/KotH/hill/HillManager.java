@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -39,19 +38,20 @@ public class HillManager {
 	public HillManager(Arena arena) {
 		this.arena = arena;
 
-		this.hills = new ArrayList<Hill>();
-
 		ConfigurationSection section = arena.getWarps()
 				.getConfigurationSection("hills");
+		this.hills = new ArrayList<Hill>(10);
+
 		for (String str : section.getKeys(false)) {
-			hills.add(new Hill(arena, arena.getHillLocation(String
-					.valueOf(arena.getWarps().getString("hills." + str)))));
+			hills.add(new Hill(arena, str));
 		}
-		
+
 		try {
-			this.current = hills.get(0);
-		} catch (IndexOutOfBoundsException e) {
-			KotHLogger.error("There are no hills for arena '" + arena.getName() +"'! Check your config!");
+			incrementHills();
+		}
+		catch (IndexOutOfBoundsException e) {
+			KotHLogger.error("There are no hills for arena '" + arena.getName()
+					+ "'! Check your config!");
 		}
 	}
 
@@ -71,7 +71,8 @@ public class HillManager {
 	 */
 	public Hill getCurrentHill() {
 		if (current == null) {
-			current = hills.get(0);
+			KotHLogger.error("Error! Hill is null!");
+			return null;
 		}
 		return current;
 	}
@@ -92,7 +93,8 @@ public class HillManager {
 	 * @return the next hill
 	 */
 	public Hill getNextHill() {
-		return (isLastHill() ? null : hills.get(hills.indexOf(current) + 1));
+		return (hills.indexOf(current) + 1 >= hills.size() ? null : hills
+				.get(hills.indexOf(current) + 1));
 	}
 
 	/**
@@ -119,7 +121,7 @@ public class HillManager {
 				if (!p.getInventory().contains(Material.COMPASS))
 					arena.giveCompass(p);
 			}
-			current = hills.get(hills.indexOf(current) + 1);
+			incrementHills();
 			return;
 		}
 
@@ -132,11 +134,10 @@ public class HillManager {
 		} else {
 			Messenger.announce(arena, Msg.HILLS_SWITCHED);
 		}
-
 		arena.resetCompass();
 
 		// now change the hill
-		current = hills.get(hills.indexOf(current) + 1);
+		incrementHills();
 
 		for (Player p : arena.getPlayersInArena()) {
 			arena.playSound(p);
@@ -165,12 +166,32 @@ public class HillManager {
 	 * @return boolean value
 	 */
 	public boolean containsLoc(Location loc) {
-		for (Block b : current.getHill()) {
-			if (b.getLocation().equals(loc)) {
-				return true;
-			}
+		Location l = current.getCenter();
+
+		// Split second in which the hill is null at the very beginning of the
+		// arena.
+		if (l == null)
+			return false;
+
+		int radius = current.getRadius();
+
+		if (current.isCircle()) {
+			Location location = new Location(loc.getWorld(), loc.getBlockX(),
+					l.getY(), loc.getBlockZ());
+			if (l.distance(location) - 0.5 > radius)
+				return false;
+			return true;
 		}
-		return false;
+		// Otherwise the hill has to be a square.
+		if (loc.getBlockX() < l.getBlockX() - radius
+				|| loc.getBlockX() > l.getBlockX() + radius)
+			return false;
+
+		if (loc.getBlockZ() < l.getBlockZ() - radius
+				|| loc.getBlockZ() > l.getBlockZ() + radius)
+			return false;
+
+		return true;
 	}
 
 	/**
@@ -300,5 +321,17 @@ public class HillManager {
 		return ((getRotationsLeft() + 1)
 				* arena.getSettings().getInt("hill-clock") == arena
 				.getEndTimer().getRemaining());
+	}
+
+	private void incrementHills() {
+		if (current == null) {
+			current = hills.get(0);
+			return;
+		}
+		if (current == hills.get(hills.size() - 1)) {
+			current = hills.get(0);
+		} else {
+			current = hills.get(hills.indexOf(current) + 1);
+		}
 	}
 }
