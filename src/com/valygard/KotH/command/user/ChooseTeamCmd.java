@@ -46,6 +46,12 @@ public class ChooseTeamCmd implements Command {
 			return true;
 		}
 		
+		// disable team choosing in rated arenas.
+		if (arena.isRated()) {
+			Messenger.tell(p, Msg.MISC_NO_ACCESS);
+			return true;
+		}
+		
 		String team = args[0].toLowerCase();
 		arena.chooseTeam(p, team.startsWith("blue") ? "blue" : "red");
 		
