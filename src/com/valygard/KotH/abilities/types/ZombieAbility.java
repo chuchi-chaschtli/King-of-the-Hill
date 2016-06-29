@@ -104,13 +104,22 @@ public class ZombieAbility extends Ability implements Listener {
 			return;
 		}
 		
+		// check if it has a target
+		if (opponents.contains(z.getTarget())) {
+			e.setCancelled(true);
+			return;
+		}
+		
 		if (opponents.size() <= 0) {
 			Messenger.tell(player, 
 					"Your zombie, " + z.getCustomName() + 
 					" was removed because there are no players for it to attack.");
 			z.remove();
+			e.setCancelled(true);
 			return;
 		}
+		
+		// set target to closest opponent
 		
 		Player opponent = Lists.newArrayList(opponents).get(0);
 		
