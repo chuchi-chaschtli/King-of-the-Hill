@@ -4,8 +4,6 @@
 package com.valygard.KotH.abilities.types;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -21,6 +19,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.google.common.collect.Lists;
 import com.valygard.KotH.abilities.Ability;
 import com.valygard.KotH.abilities.AbilityCooldown;
 import com.valygard.KotH.abilities.AbilityPermission;
@@ -105,10 +104,7 @@ public class ZombieAbility extends Ability implements Listener {
 			return;
 		}
 		
-		// Players the zombie can attack.
-		LinkedList<Player> attackable = new LinkedList<Player>(opponents);
-		
-		if (attackable.size() <= 0) {
+		if (opponents.size() <= 0) {
 			Messenger.tell(player, 
 					"Your zombie, " + z.getCustomName() + 
 					" was removed because there are no players for it to attack.");
@@ -116,15 +112,18 @@ public class ZombieAbility extends Ability implements Listener {
 			return;
 		}
 		
-		Random random = new Random();
-		Player opponent = attackable.get(random.nextInt(attackable.size()));
+		Player opponent = Lists.newArrayList(opponents).get(0);
 		
+		double distance = Double.MAX_VALUE;
+		double temp = 0D;
+		for (Player target : opponents) {
+			temp = target.getLocation().distanceSquared(z.getLocation());
+			if (temp < distance) {
+				distance = temp;
+				opponent = target;
+			}
+		}
 		e.setTarget(opponent);
-		// Teleport the zombie to the new opponent. Note that this is very
-		// glitchy and has been known to cause bugs.
-		z.teleport(opponent);
-		
-		attackable.clear();
 	}
 
 	@EventHandler
