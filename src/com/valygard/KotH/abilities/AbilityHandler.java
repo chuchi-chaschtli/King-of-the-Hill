@@ -24,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.permissions.PermissionDefault;
@@ -74,7 +75,12 @@ public class AbilityHandler implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		final Player p = e.getPlayer();
-		ItemStack hand = p.getItemInHand();
+		ItemStack hand = p.getInventory().getItemInMainHand();
+		
+		// fix double event fire
+		if (e.getHand() == EquipmentSlot.OFF_HAND) {
+			return;
+		}
 
 		if (hand == null || hand.getType() == Material.COMPASS
 				|| !arena.isRunning() || !arena.getPlayersInArena().contains(p)) {

@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -72,13 +73,20 @@ public class GlobalListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 
-		if (p.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
-			if (!p.getInventory().getItemInMainHand().hasItemMeta()
-					|| !p.getInventory().getItemInMainHand().getItemMeta()
-							.hasDisplayName()
-					|| !p.getInventory().getItemInMainHand().getItemMeta()
-							.getDisplayName().contains("Hill Locator"))
+		ItemStack main = p.getInventory().getItemInMainHand();
+
+		if (main.getType() == Material.COMPASS) {
+			if (!main.hasItemMeta()
+					|| !main.getItemMeta().hasDisplayName()
+					|| !main.getItemMeta().getDisplayName()
+							.contains("Hill Locator"))
 				return;
+			
+			// fix double event fire
+			if (e.getHand() == EquipmentSlot.OFF_HAND) {
+				return;
+			}
+			
 			Arena arena = am.getArenaWithPlayer(p);
 			if (arena == null)
 				return;
