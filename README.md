@@ -3,6 +3,8 @@
 
 **Development Builds** - [![Build Status](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/status.png)](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/latest)
 
+<a href="https://dl.bintray.com/aohruthless/maven/">**Maven Artifacts**</a>
+
 <h3>Welcome</h3>
 Welcome to the Github repository for King of the Hill, a plugin for Minecraft. This plugin follows MIT License and therefore Open-Source Definition. As such, you may copy and edit code as you wish. All I ask is that you please accredit me.
 

@@ -23,6 +23,16 @@
 		<url>https://github.com/AoHRuthless/King-of-the-Hill</url>
 	</organization>
 
+	<!-- Distribution -->
+	
+	<distributionManagement>
+		<repository>
+			<id>bintray-aohruthless-maven</id>
+			<name>bintray</name>
+			<url>https://api.bintray.com/maven/aohruthless/maven/King-of-the-Hill/;publish=0</url>
+		</repository>
+	</distributionManagement>
+
 	<!-- Issue Tracker -->
 
 	<issueManagement>
