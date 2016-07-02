@@ -29,7 +29,7 @@
 		<repository>
 			<id>bintray-aohruthless-maven</id>
 			<name>bintray</name>
-			<url>https://api.bintray.com/maven/aohruthless/maven/King-of-the-Hill/;publish=0</url>
+			<url>https://api.bintray.com/maven/aohruthless/maven/King-of-the-Hill/;publish=1</url>
 		</repository>
 	</distributionManagement>
 
