@@ -40,10 +40,10 @@ public class SnareAbility extends Ability implements Listener {
 
 	public SnareAbility(Arena arena, Player p, Location loc) {
 		super(arena, p, Material.WEB);
-		
+
 		this.oldBlocks = new HashMap<Block, Material>();
 		this.activated = false;
-		
+
 		if (placeSnare(loc)) {
 			Messenger.tell(player, Msg.ABILITY_SNARE_PLACED);
 		}
@@ -54,7 +54,8 @@ public class SnareAbility extends Ability implements Listener {
 	 * Places a 'snare' on a given location. This snare is a Cobweb, which is
 	 * meant to trap the player.
 	 * 
-	 * @param l a Location
+	 * @param l
+	 *            a Location
 	 * @return true if the snare was placed, false otherwise.
 	 */
 	private boolean placeSnare(Location l) {
@@ -69,13 +70,12 @@ public class SnareAbility extends Ability implements Listener {
 	}
 
 	/**
-	 * When a player enters a snare, a box of cobwebs forms (3x3x5, L x W x H)
-	 * centered on the player. If there are more than 4 seconds left in the
-	 * arena, the box waits 2 seconds before exploding. Otherwise, there is no
-	 * wait, to make sure the player does not die after the arena ends. The
-	 * player who enters the snare must be an enemy.
+	 * When a player enters a snare, it explodes. If there are less than 2
+	 * seconds in the arena, the web explodes immediately. Otherwise it explodes
+	 * after 1.25 seconds. The player who enters the snare must be an enemy.
 	 * 
-	 * @param l a Location
+	 * @param l
+	 *            a Location
 	 * @return true if the snare blew up, false otherwise.
 	 */
 	private boolean activateSnare(Location l) {
@@ -86,7 +86,7 @@ public class SnareAbility extends Ability implements Listener {
 		if (!l.getBlock().hasMetadata(player.getName())) {
 			return false;
 		}
-		
+
 		if (activated) {
 			return false;
 		} else {
@@ -97,25 +97,16 @@ public class SnareAbility extends Ability implements Listener {
 		final int y = l.getBlockY();
 		final int z = l.getBlockZ();
 
-		for (int xn = x - 1; xn <= x + 1; xn++) {
-			for (int yn = y - 2; yn <= y + 2; yn++) {
-				for (int zn = z - 1; zn <= z + 1; zn++) {
-					Block b = world.getBlockAt(xn, yn, zn);
-					oldBlocks.put(b, b.getType());
-					b.setType(Material.WEB);
-				}
-			}
-		}
-		if (arena.getEndTimer().getRemaining() >= 4) {
+		if (arena.getEndTimer().getRemaining() >= 2) {
 			arena.scheduleTask(new Runnable() {
 				public void run() {
 					createExplosion(x, y, z);
 				}
-			}, 40);
+			}, 25);
 		} else {
 			createExplosion(x, y, z);
 		}
-		
+
 		return true;
 	}
 
@@ -136,7 +127,7 @@ public class SnareAbility extends Ability implements Listener {
 			activateSnare(e.getTo());
 			Messenger.tell(player, Msg.ABILITY_SNARE_ACTIVATED);
 			Messenger.tell(p, Msg.ABILITY_SNARED, player.getName());
-			
+
 			Set<LivingEntity> affected = new HashSet<LivingEntity>();
 			affected.add(p);
 			for (Entity entity : p.getNearbyEntities(3.3, 3.3, 3.3)) {
@@ -153,8 +144,9 @@ public class SnareAbility extends Ability implements Listener {
 						|| (le.getPassenger() != null && arena.getTeam(p)
 								.contains(le.getPassenger()))) {
 					double maxHealth = le.getMaxHealth();
-					le.setHealth(le.getHealth() - (distance < 1.64 ? 0.68 * maxHealth : Math.min(
-							8.0 / distance + 1.3, 0.493 * maxHealth)));
+					le.setHealth(le.getHealth()
+							- (distance < 1.64 ? 0.68 * maxHealth : Math.min(
+									8.0 / distance + 1.3, 0.493 * maxHealth)));
 				}
 			}
 			affected.clear();
@@ -171,14 +163,17 @@ public class SnareAbility extends Ability implements Listener {
 			}
 		}
 	}
-	
+
 	/**
 	 * A helper method to create an explosion and regenerate the blocks that
 	 * were present before the snare.
 	 * 
-	 * @param x an x coordinate of a location (snare)
-	 * @param y a y coordinate of a location (snare)
-	 * @param z a z coordinate of a location (snare)
+	 * @param x
+	 *            an x coordinate of a location (snare)
+	 * @param y
+	 *            a y coordinate of a location (snare)
+	 * @param z
+	 *            a z coordinate of a location (snare)
 	 * @see #activateSnare(Location)
 	 */
 	private void createExplosion(int x, int y, int z) {

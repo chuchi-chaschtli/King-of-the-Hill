@@ -6,16 +6,12 @@ package com.valygard.KotH.abilities.types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.valygard.KotH.abilities.Ability;
@@ -32,7 +28,7 @@ import com.valygard.KotH.messenger.Msg;
  * @author Anand
  *
  */
-public class ChainAbility extends Ability implements Listener {
+public class ChainAbility extends Ability {
 	private Map<LivingEntity, Long> affected;
 	
 	public ChainAbility(Arena arena, Player player) {
@@ -42,7 +38,6 @@ public class ChainAbility extends Ability implements Listener {
 		
 		activateChainEffect();
 		Messenger.tell(player, Msg.ABILITY_CHAIN_AMOUNT, String.valueOf(affected.size()));
-		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
 	/**
@@ -123,23 +118,6 @@ public class ChainAbility extends Ability implements Listener {
 				plugin.getServer().getPluginManager()
 						.callEvent(new ArenaPlayerDeathEvent(arena, p, player));
 			}
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent e) {
-		Player p = e.getPlayer();
-		
-		if (affected.get(p) == null) {
-			return;
-		}
-		
-		long now = System.currentTimeMillis();
-		if (now >= affected.get(p) + 4 * 1000 || !arena.isRunning()) {
-			affected.remove(p);
-			p.setWalkSpeed(0.2F);
-		} else {
-			p.setWalkSpeed(0.04F);
 		}
 	}
 }
