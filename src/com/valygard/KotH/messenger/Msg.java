@@ -32,6 +32,7 @@ public enum Msg {
 	ARENA_ADDED("You have added a new arena &e'%'."),
 	ARENA_AUTO_END("The arena will end in &e%!"),
 	ARENA_AUTO_START("The arena will begin in &e%&r seconds!"),
+	ARENA_AUTO_START_STOPPED("The arena start timer was halted!"),
 	ARENA_DISABLED("This arena has been disabled."),
 	ARENA_DRAW("The arena ended in a draw."),
 	ARENA_END("Arena ended."),

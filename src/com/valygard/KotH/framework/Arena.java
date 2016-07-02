@@ -273,7 +273,7 @@ public class Arena {
 				Messenger.announce(this, Msg.ARENA_AUTO_START,
 						String.valueOf(settings.getInt("arena-auto-start")));
 			}
-			startTimer.startTimer();
+			startTimer.start();
 		}
 	}
 
@@ -444,12 +444,11 @@ public class Arena {
 		// Set running to true.
 		running = true;
 
-		endTimer.startTimer();
+		endTimer.start();
 		hillTimer.runTask();
 
 		ah = new AbilityHandler(this);
-
-		Messenger.announce(this, Msg.ARENA_START);
+		
 		playSound(Sound.ENTITY_WITHER_DEATH, 0.382F, 0.1F);
 
 		// Collect data of players still remaining.
@@ -498,7 +497,6 @@ public class Arena {
 			removePlayer(p, true);
 		}
 
-		endTimer.halt();
 		running = false;
 
 		// Tie up loose ends
@@ -529,7 +527,7 @@ public class Arena {
 	 * Force an arena to begin.
 	 */
 	public void forceStart() {
-		startTimer.halt();
+		startTimer.stop();
 		startArena();
 	}
 
@@ -538,7 +536,7 @@ public class Arena {
 	 * 
 	 */
 	public void forceEnd() {
-		endTimer.halt();
+		endTimer.stop();
 		endArena();
 	}
 

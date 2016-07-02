@@ -4,125 +4,132 @@
 package com.valygard.KotH.time;
 
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.util.TimeUtil;
 
 /**
+ * Self-contained countdown timer which automatically ends the arena on
+ * completion and runs for the course of the game.
+ * <p>
+ * If the timer is manually halted, the arena will end immediately and the
+ * winner will be determined.
+ * 
  * @author Anand
- *
+ * 
  */
-public class AutoEndTimer {
-	private KotH plugin;
+public class AutoEndTimer extends CountdownTimer {
+
 	private Arena arena;
 	private int seconds;
-	private Timer timer;
 
 	/**
-	 * Our primary constructor.
+	 * Default constructor for the end timer initialises by arena and duration.
 	 * 
+	 * @param arena
+	 *            the arena for the timer
+	 * @param seconds
+	 *            the duration of the timer in seconds
 	 */
 	public AutoEndTimer(Arena arena, int seconds) {
-		this.plugin		= arena.getPlugin();
-		this.arena		= arena;
-		this.seconds	= seconds;
-	}
+		super(arena.getPlugin(), Conversion.toTicks(seconds), new int[] { 1, 2,
+				3, 5, 10, 20, 30, 45, 60, 120, 180, 300, 600, 900, 1200 });
 
-	public void startTimer() {
-		if (seconds > 5 && timer == null) {
-			timer = new Timer(seconds);
-			timer.runTaskTimer(plugin, 20, 20);
-		}
+		this.arena = arena;
+		this.seconds = seconds;
 	}
-
-    public void halt() {
-        if (timer != null) {
-            timer.halt();
-        }
-    }
-    
-    public boolean isRunning() {
-        return (timer != null);
-    }
-    
-    public int getRemaining() {
-        return (isRunning() ? timer.getRemaining() : -1);
-    }
 
 	/**
-	 * The purpose of this is already outlined in 
-	 * AutoStartTimer.java and is extremely similar
-	 * in structure and purpose.
+	 * Returns the amount of seconds left in the game.
 	 * 
+	 * @return an int
 	 */
-	private class Timer extends BukkitRunnable {
-		private int remaining;
-		private int index;
-		private int[] intervals = new int[]{1, 2, 3, 5, 10, 20, 30, 60, 120, 300, 600};
+	public int getRemaining() {
+		return seconds;
+	}
 
-		private Timer(int seconds) {
-            this.remaining = seconds;
-            
-            for (int i = 0; i < intervals.length; i++) {
-                if (seconds > intervals[i]) {
-                    index = i;
-                } else {
-                    break;
-                }
-            }
-        }
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Update duration to proper timing
+	 */
+	@Override
+	public synchronized void onStart() {
+		setDuration(Conversion.toTicks(seconds));
+		Messenger.announce(arena, Msg.ARENA_START);
+	}
 
-		public int getRemaining() {
-			return remaining;
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The arena is ended when the timer is completed.
+	 */
+	@Override
+	public synchronized void onFinish() {
+		setDuration(0l);
+		arena.endArena();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The game cannot be paused. As such, when the timer is manually stopped
+	 * the arena is ended. This is already handled in the Arena class and to
+	 * avoid an infinite loop, nothing is done here.
+	 */
+	@Override
+	public synchronized void onStop() {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Series of checks to ensure the arena should stay running. If the score
+	 * cap is reached, the arena is finished and the timer is terminated.
+	 */
+	@Override
+	public synchronized void onTick() {
+		// Abort if the arena isn't running.
+		if (!arena.isRunning()) {
+			super.stop();
+			return;
 		}
 
-		/** When we do our checks in the BukkitRunnable, 
-		 * we'll want to have a way to halt the timer.
+		/*
+		 * End the arena and halt the timer if the score to win is reached or
+		 * there are no more players in the arena.
 		 */
-		public void halt() {
-            cancel();
-            AutoEndTimer.this.timer = null;
-        }
+		if (arena.getPlayersInArena().isEmpty()
+				|| arena.getBlueTeam().isEmpty()
+				|| arena.getRedTeam().isEmpty()) {
+			super.stop();
+			return;
+		}
 
-		public void run() {
-			// Abort if the arena isn't running.
-			if (!arena.isRunning()) {
-				halt();
-				return;
-			}
+		if (arena.scoreReached()) {
+			onFinish();
+			return;
+		}
+		seconds--;
+	}
 
-			/*
-			 * End the arena and halt the timer if the 
-			 * score to win is reached or there are no
-			 * more players in the arena.
-			 */
-			if (arena.getPlayersInArena().isEmpty() || arena.scoreReached() || arena.getBlueTeam().isEmpty() || arena.getRedTeam().isEmpty()) {
-				arena.forceEnd();
-				return;
-			}
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * At specific checkpoints, announce how much time is left in the arena.
+	 */
+	@Override
+	public synchronized void onCheckpoint(int remaining) {
+		String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
+		Messenger.announce(arena, Msg.ARENA_AUTO_END, timeLeft);
 
-			if (--remaining <= 0) {
-				arena.forceEnd();
-				return;
-			}
-
-			else if (remaining == intervals[index]) {
-				String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
-                Messenger.announce(arena, Msg.ARENA_AUTO_END, timeLeft);
-                
-                for (Player p : arena.getPlayersInArena()) {
-                	arena.playSound(p);
-                }
-                for (Player p : arena.getSpectators()) {
-                	arena.playSound(p);
-                }
-                
-                index--;
-            }
+		for (Player p : arena.getPlayersInArena()) {
+			arena.playSound(p);
+		}
+		for (Player p : arena.getSpectators()) {
+			arena.playSound(p);
 		}
 	}
 }

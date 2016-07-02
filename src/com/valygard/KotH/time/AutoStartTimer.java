@@ -1,130 +1,110 @@
 /**
- * AutoStartTimer.java is part of King of the Hill.
+ * AutoStartTimer.java is a part of King of the Hill. 
  */
 package com.valygard.KotH.time;
 
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import com.valygard.KotH.KotH;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
+import com.valygard.KotH.util.TimeUtil;
 
 /**
+ * Self-contained countdown timer which automatically starts the arena on
+ * completion.
+ * <p>
+ * If the timer is manually halted, the arena will not run.
+ * 
  * @author Anand
- *
+ * 
  */
-public class AutoStartTimer {
-	private KotH plugin;
+public class AutoStartTimer extends CountdownTimer {
+
 	private Arena arena;
 	private int seconds;
-	private Timer timer;
 
 	/**
-	 * Our primary constructor.
+	 * Default constructor for the end timer initialises by arena and duration.
 	 * 
+	 * @param arena
+	 *            the arena for the timer
+	 * @param seconds
+	 *            the duration of the timer in seconds
 	 */
 	public AutoStartTimer(Arena arena, int seconds) {
-		this.plugin		= arena.getPlugin();
-		this.arena		= arena;
-		this.seconds	= seconds;
+		super(arena.getPlugin(), Conversion.toTicks(seconds), new int[] { 1, 2,
+				3, 5, 10, 20, 30, 45, 60, 120, 180 });
+
+		this.arena = arena;
+		this.seconds = seconds;
 	}
 
 	/**
-	 * We need a way to start the timer from other 
-	 * classes, primarily our Arena class. With that
-	 * said, we want to make sure nothing happens if
-	 * the timer has been started and the method is
-	 * called again.
-	 *  
+	 * {@inheritDoc}
 	 */
-	public void startTimer() {
-		if (seconds > 5 && timer == null) {
-			timer = new Timer(seconds);
-			timer.runTaskTimer(plugin, 20, 20);
+	@Override
+	public synchronized void start() {
+		// Start auto-start-timer if arena has no start-delay
+		if (super.getDuration() > 0) {
+			super.start();
 		}
 	}
 
 	/**
-     * Halts the timer.
-     * 
-     */
-    public void halt() {
-        if (timer != null) {
-            timer.halt();
-        }
-    }
-    
-    public boolean isRunning() {
-        return (timer != null);
-    }
-    
-    public int getRemaining() {
-        return (isRunning() ? timer.getRemaining() : -1);
-    }
-
-	/**
-	 * The internal timer which actually auto-starts
-	 * the match. Using internal classes prevent
-	 * timers from ever interrupting each other.
-	 *
+	 * {@inheritDoc}
+	 * <p>
+	 * Update duration to proper timing
 	 */
-	private class Timer extends BukkitRunnable {
-		private int remaining;
-		private int index;
-		private int[] intervals = new int[]{1, 2, 3, 5, 10, 15, 30, 45};
-
-		private Timer(int seconds) {
-			this.remaining = seconds;
-
-			// We need to locate our first announcement value, otherwise break.
-			for (int i = 0; i < intervals.length; i++) {
-				if (seconds > intervals[i]) {
-					index = i;
-				} else {
-					break;
-				}
-			}
-		}
-
-		// We use this to get the amount of seconds left.
-		public int getRemaining() {
-			return remaining;
-		}
-
-		/** When we do our checks in the BukkitRunnable, 
-		 * we'll want to have a way to halt the timer.
-		 */
-		public void halt() {
-            cancel();
-            AutoStartTimer.this.timer = null;
-        }
-
-		@Override
-		public void run() {
-			// If the arena is in progress or there isn't any waiting players, abort.
-			if (arena.isRunning() || arena.getPlayersInLobby().size() < arena.getSettings().getInt("min-players")) {
-				halt();
-				return;
-			}
-
-			// Start the arena if the remaining seconds is 0.
-			if (--remaining <= 0) {
-				arena.forceStart();
-				return;
-			}
-
-			// Warn players in the arena how many seconds are remaining.
-			else if (remaining == intervals[index]) {
-                Messenger.announce(arena, Msg.ARENA_AUTO_START, String.valueOf(remaining));
-                
-                for (Player p : arena.getPlayersInLobby()) {
-                	arena.playSound(p);
-                }
-                
-                index--;
-            }
-		}	
+	@Override
+	public void onStart() {
+		setDuration(Conversion.toTicks(seconds));
 	}
+
+	/**
+	 * When the start timer is stopped, the arena should begin.
+	 */
+	@Override
+	public void onFinish() {
+		setDuration(0l);
+		arena.startArena();
+	}
+
+	/**
+	 * Checks if the timer is allowed to continue by making sure the arena is
+	 * "good" for play.
+	 */
+	@Override
+	public void onTick() {
+		if (arena.isRunning()
+				|| arena.getPlayersInLobby().size() < arena.getSettings()
+						.getInt("min-players")) {
+			super.stop();
+			return;
+		}
+		seconds--;
+	}
+
+	/**
+	 * Announce that the start timer was halted.
+	 */
+	@Override
+	public void onStop() {
+		Messenger.announce(arena, Msg.ARENA_AUTO_START_STOPPED);
+	}
+
+	/**
+	 * Announce to players various points in the timer how long until the arena
+	 * begins
+	 */
+	@Override
+	public void onCheckpoint(int remaining) {
+		String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
+		Messenger.announce(arena, Msg.ARENA_AUTO_START, timeLeft);
+
+		for (Player p : arena.getPlayersInLobby()) {
+			arena.playSound(p);
+		}
+	}
+
 }

@@ -13,6 +13,8 @@ import com.valygard.KotH.event.arena.ArenaScoreEvent;
 import com.valygard.KotH.framework.Arena;
 
 /**
+ * TODO: Implement new Timer framework into HillTask
+ * 
  * @author Anand
  * 
  */
