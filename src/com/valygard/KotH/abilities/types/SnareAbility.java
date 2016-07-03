@@ -130,7 +130,7 @@ public class SnareAbility extends Ability implements Listener {
 
 			Set<LivingEntity> affected = new HashSet<LivingEntity>();
 			affected.add(p);
-			for (Entity entity : p.getNearbyEntities(3.3, 3.3, 3.3)) {
+			for (Entity entity : p.getNearbyEntities(4, 4, 4)) {
 				if (!(entity instanceof LivingEntity)) {
 					continue;
 				}
@@ -144,9 +144,9 @@ public class SnareAbility extends Ability implements Listener {
 						|| (le.getPassenger() != null && arena.getTeam(p)
 								.contains(le.getPassenger()))) {
 					double maxHealth = le.getMaxHealth();
-					le.setHealth(le.getHealth()
-							- (distance < 1.64 ? 0.68 * maxHealth : Math.min(
-									8.0 / distance + 1.3, 0.493 * maxHealth)));
+					le.setHealth(Math.max(0, le.getHealth()
+							- (distance < 2.0 ? 0.5 * maxHealth
+									: (1.0 / distance) * maxHealth)));
 				}
 			}
 			affected.clear();

@@ -5,7 +5,6 @@ package com.valygard.KotH.abilities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -142,7 +141,7 @@ public class AbilityHandler implements Listener {
 			}
 			break;
 		case WEB:
-			useAbility(arena, p, SnareAbility.class);
+			useAbility(arena, p, e.getBlock().getLocation(), SnareAbility.class);
 			break;
 		case HAY_BLOCK:
 			useAbility(arena, p, HorseAbility.class);
@@ -241,8 +240,12 @@ public class AbilityHandler implements Listener {
 		long timeStamp = cooldowns.get(player.getUniqueId());
 		return (timeStamp + (cd * 1000) >= System.currentTimeMillis());
 	}
+	
+	private boolean useAbility(Arena arena, Player player, Class<? extends Ability> clazz) {
+		return useAbility(arena, player, null, clazz);
+	}
 
-	private boolean useAbility(Arena arena, Player player,
+	private boolean useAbility(Arena arena, Player player, Location loc,
 			Class<? extends Ability> clazz) {
 		String exception = "Error! Could not use ability due to: ";
 		String key = clazz.getName().replace("Ability", "").toLowerCase()
@@ -276,17 +279,13 @@ public class AbilityHandler implements Listener {
 				player.setMetadata(key, new FixedMetadataValue(plugin, ""));
 			}
 
-			boolean locParameter = clazz.getName().equals(
-					SnareAbility.class.getName());
-
 			Class<?>[] classArguments;
 			Object[] arguments;
 
-			if (locParameter) {
+			if (loc != null) {
 				classArguments = new Class[] { Arena.class, Player.class,
 						Location.class };
-				arguments = new Object[] { arena, player,
-						player.getTargetBlock(new HashSet<Material>(null), 100) };
+				arguments = new Object[] { arena, player, loc };
 			} else {
 				classArguments = new Class[] { Arena.class, Player.class };
 				arguments = new Object[] { arena, player };
