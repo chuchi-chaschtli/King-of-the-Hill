@@ -12,12 +12,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.KotHLogger;
-import com.valygard.KotH.time.Conversion;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.TimeUtil;
 
@@ -268,36 +266,32 @@ public class PlayerStats {
 	/**
 	 * Add time to the player's time spent in the arena.
 	 * 
-	 * @param timeToAdd
 	 */
-	public void addTime(int timeToAdd) {
-		loadFile();
-		timespent += timeToAdd;
+	private void addTime() {
+		timespent++;
 		config.set(path + "time-spent", timespent);
 		saveFile();
 	}
 
 	/**
-	 * Every x (configurable) seconds, add time to the player. The problem is
-	 * that this can get to be a very heavy task at low integers; saving time
-	 * for 20 players or more every second (persay) could get very tedious, so
-	 * by default the time interval is 10 seconds.
+	 * Tracks time spent in arena. Runs on a configurable interval for tracking.
+	 * While this creates imprecisions, it reduces server latency.
 	 */
-	public void startTiming() {
+	public synchronized void startTiming() {
 		if (!tracking)
 			return;
 
-		final int i = arena.getSettings().getInt("time-tracking-cycle");
-		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
-				new BukkitRunnable() {
+		loadFile();
+		task = Bukkit.getScheduler().runTaskTimerAsynchronously(
+				arena.getPlugin(), new Runnable() {
 					public void run() {
 						if (!arena.isRunning()) {
 							task.cancel();
 							return;
 						}
-						addTime(i);
+						addTime();
 					}
-				}, Conversion.toTicks(i), Conversion.toTicks(i));
+				}, 20l, 20l);
 	}
 
 	public void collectClassData() {

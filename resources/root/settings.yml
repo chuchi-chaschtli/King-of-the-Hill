@@ -30,7 +30,6 @@ enable-matchmaking-system: false
 mmr-threshold: 1200
 player-stats: true
 arena-stats: true
-time-tracking-cycle: 3
 entry-fee: 0.00
 quit-charge: $50
 teleport-to-end: false
