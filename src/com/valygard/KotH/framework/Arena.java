@@ -450,7 +450,7 @@ public class Arena {
 		running = true;
 
 		endTimer.start();
-		hillTimer.runTask();
+		hillTimer.start();
 
 		ah = new AbilityHandler(this);
 		

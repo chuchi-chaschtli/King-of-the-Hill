@@ -45,11 +45,25 @@ public abstract class CountdownTimer implements TimerStrategy {
 	 *            the interval checkpoints
 	 */
 	public CountdownTimer(KotH plugin, long duration, int[] intervals) {
+		this(plugin, duration);
+
+		this.intervals = intervals;
+	}
+
+	/**
+	 * Creates a countdown timer which will call {@code onTick()} every 20 ticks
+	 * (1 second) and {@code onStop()} when the timer is finished. For a timer
+	 * with no intervals, {@code onCheckpoint()} is never called.
+	 * 
+	 * @param plugin
+	 *            the instance of the plugin responsible for the countdown timer
+	 * @param duration
+	 *            the long duration of the timer
+	 */
+	public CountdownTimer(KotH plugin, long duration) {
 		this.plugin = plugin;
 		this.duration = duration;
 		this.remaining = 0l;
-
-		this.intervals = intervals;
 
 		this.timer = null;
 	}
@@ -113,6 +127,10 @@ public abstract class CountdownTimer implements TimerStrategy {
 		private int index;
 
 		public Timer() {
+			if (intervals == null || intervals.length == 0) {
+				index = -1;
+			}
+
 			for (int i = 0; i < intervals.length; i++) {
 				if (Conversion.toSeconds(remaining) > intervals[i]) {
 					index = i;
@@ -136,9 +154,11 @@ public abstract class CountdownTimer implements TimerStrategy {
 
 				onTick();
 
-				if (Conversion.toSeconds(remaining) == intervals[index]) {
-					onCheckpoint(Conversion.toSeconds(remaining));
-					index--;
+				if (index > -1) {
+					if (Conversion.toSeconds(remaining) == intervals[index]) {
+						onCheckpoint(Conversion.toSeconds(remaining));
+						index--;
+					}
 				}
 
 				if (task != null) {
