@@ -34,6 +34,10 @@ public class HillTask {
 	}
 
 	public void runTask() {
+		manager.setCurrentHill(manager.getHills().get(0));
+		redScore = 0;
+		blueScore = 0;
+		
 		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
 				new Runnable() {
 					public void run() {
@@ -63,11 +67,7 @@ public class HillTask {
 						}
 
 						// Tidy up
-						if (arena.scoreReached()
-								|| !arena.isRunning()
-								|| !arena.getEndTimer().isRunning()
-								|| arena.getScoreboard().getTimeLeft()
-										.getScore() <= 0
+						if (arena.scoreReached() || !arena.isRunning()
 								|| arena.getBlueTeam().size() <= 0
 								|| arena.getRedTeam().size() <= 0) {
 

@@ -57,6 +57,7 @@ public class AutoEndTimer extends CountdownTimer {
 	 */
 	@Override
 	public synchronized void onStart() {
+		this.seconds = arena.getSettings().getInt("arena-time");
 		setDuration(Conversion.toTicks(seconds));
 		Messenger.announce(arena, Msg.ARENA_START);
 	}
@@ -68,19 +69,9 @@ public class AutoEndTimer extends CountdownTimer {
 	 */
 	@Override
 	public synchronized void onFinish() {
-		setDuration(0l);
+		this.seconds = arena.getSettings().getInt("arena-time");
+		setDuration(Conversion.toTicks(seconds));
 		arena.endArena();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * The game cannot be paused. As such, when the timer is manually stopped
-	 * the arena is ended. This is already handled in the Arena class and to
-	 * avoid an infinite loop, nothing is done here.
-	 */
-	@Override
-	public synchronized void onStop() {
 	}
 
 	/**
@@ -93,7 +84,7 @@ public class AutoEndTimer extends CountdownTimer {
 	public synchronized void onTick() {
 		// Abort if the arena isn't running.
 		if (!arena.isRunning()) {
-			super.stop();
+			System.out.println(1);
 			return;
 		}
 
@@ -109,7 +100,7 @@ public class AutoEndTimer extends CountdownTimer {
 		}
 
 		if (arena.scoreReached()) {
-			onFinish();
+			super.stop();
 			return;
 		}
 		seconds--;

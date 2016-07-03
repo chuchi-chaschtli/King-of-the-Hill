@@ -39,12 +39,12 @@ public class AutoStartTimer extends CountdownTimer {
 		this.arena = arena;
 		this.seconds = seconds;
 	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public synchronized void start() {
+		this.seconds = arena.getSettings().getInt("arena-auto-start");
 		// Start auto-start-timer if arena has no start-delay
 		if (super.getDuration() > 0) {
 			super.start();
@@ -66,7 +66,8 @@ public class AutoStartTimer extends CountdownTimer {
 	 */
 	@Override
 	public void onFinish() {
-		setDuration(0l);
+		this.seconds = arena.getSettings().getInt("arena-auto-start");
+		setDuration(Conversion.toTicks(seconds));
 		arena.startArena();
 	}
 
@@ -83,14 +84,6 @@ public class AutoStartTimer extends CountdownTimer {
 			return;
 		}
 		seconds--;
-	}
-
-	/**
-	 * Announce that the start timer was halted.
-	 */
-	@Override
-	public void onStop() {
-		Messenger.announce(arena, Msg.ARENA_AUTO_START_STOPPED);
 	}
 
 	/**

@@ -27,11 +27,6 @@ public interface TimerStrategy {
 	public void onTick();
 
 	/**
-	 * Listens for premature timer stop.
-	 */
-	public void onStop();
-
-	/**
 	 * Listens for various points in the timer to perform a given action
 	 * 
 	 * @param remaining

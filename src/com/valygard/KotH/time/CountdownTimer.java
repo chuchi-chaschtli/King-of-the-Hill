@@ -78,7 +78,7 @@ public abstract class CountdownTimer implements TimerStrategy {
 		timer.stop();
 		timer = null;
 		remaining = 0l;
-		onStop();
+		onFinish();
 	}
 
 	/**
