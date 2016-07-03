@@ -81,12 +81,12 @@ public class GlobalListener implements Listener {
 					|| !main.getItemMeta().getDisplayName()
 							.contains("Hill Locator"))
 				return;
-			
+
 			// fix double event fire
 			if (e.getHand() == EquipmentSlot.OFF_HAND) {
 				return;
 			}
-			
+
 			Arena arena = am.getArenaWithPlayer(p);
 			if (arena == null)
 				return;
@@ -555,7 +555,7 @@ public class GlobalListener implements Listener {
 				break;
 			}
 
-			if (price != null
+			if ((price != null && !price.isEmpty())
 					&& (!price.startsWith("$") || price.split(".").length > 2)) {
 				Messenger.tell(p, "Invalid price option given!");
 				break;
@@ -702,8 +702,8 @@ public class GlobalListener implements Listener {
 		if (!plugin.has(p, "koth.classes." + formatted))
 			return;
 
-		double fee = (s.getLine(2) == null ? -10000000.00 : ItemParser
-				.parseMoney(s.getLine(2)));
+		double fee = (s.getLine(2) == null || s.getLine(2).isEmpty() ? 0
+				: ItemParser.parseMoney(s.getLine(2)));
 
 		if (em.getMoney(p) < fee) {
 			Messenger.tell(p, Msg.MISC_NOT_ENOUGH_MONEY);

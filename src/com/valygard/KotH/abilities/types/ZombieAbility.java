@@ -36,27 +36,27 @@ import com.valygard.KotH.messenger.Msg;
  */
 public class ZombieAbility extends Ability implements Listener {
 	private Set<Zombie> zombies;
-	
+
 	public ZombieAbility(Arena arena, Player player) {
-		super (arena, player, Material.ROTTEN_FLESH);
-		
+		super(arena, player, Material.ROTTEN_FLESH);
+
 		Zombie z = spawnZombie();
 		this.zombies = new HashSet<Zombie>();
-		
+
 		if (z == null) {
 			Messenger.tell(player, "Could not spawn zombie.");
 		} else {
 			Messenger.tell(player, Msg.ABILITY_ZOMBIE_SPAWNED);
 		}
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		
+
 		for (Zombie zombie : player.getWorld().getEntitiesByClass(Zombie.class)) {
 			if (zombie.hasMetadata(player.getName())) {
 				zombies.add(zombie);
 			}
 		}
 	}
-	
+
 	/**
 	 * Spawn a zombie on the player. These zombies are super strong with 1.8x
 	 * the health of normal zombies (therefore 38 hearts), in an attempt to
@@ -71,7 +71,8 @@ public class ZombieAbility extends Ability implements Listener {
 		if (!removeMaterial()) {
 			return null;
 		}
-		Zombie z = (Zombie) player.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
+		Zombie z = (Zombie) player.getWorld().spawnEntity(loc,
+				EntityType.ZOMBIE);
 
 		// Some settings
 		z.setBaby(false);
@@ -91,38 +92,41 @@ public class ZombieAbility extends Ability implements Listener {
 		z.setMetadata(player.getName(), new FixedMetadataValue(plugin, ""));
 		return z;
 	}
-	
+
 	@EventHandler
 	public void onEntityTarget(EntityTargetEvent e) {
 		if (!zombies.contains(e.getEntity()))
 			return;
-		
+
 		Zombie z = (Zombie) e.getEntity();
-		
-		if (arena == null || !arena.getPlayersInArena().contains(player) || !arena.isRunning()) {
+
+		if (arena == null || !arena.getPlayersInArena().contains(player)
+				|| !arena.isRunning()) {
 			z.remove();
 			return;
 		}
-		
+
 		// check if it has a target
 		if (opponents.contains(z.getTarget())) {
 			e.setCancelled(true);
 			return;
 		}
-		
+
 		if (opponents.size() <= 0) {
-			Messenger.tell(player, 
-					"Your zombie, " + z.getCustomName() + 
-					" was removed because there are no players for it to attack.");
+			Messenger
+					.tell(player,
+							"Your zombie, "
+									+ z.getCustomName()
+									+ " was removed because there are no players for it to attack.");
 			z.remove();
 			e.setCancelled(true);
 			return;
 		}
-		
+
 		// set target to closest opponent
-		
+
 		Player opponent = Lists.newArrayList(opponents).get(0);
-		
+
 		double distance = Double.MAX_VALUE;
 		double temp = 0D;
 		for (Player target : opponents) {
@@ -146,20 +150,21 @@ public class ZombieAbility extends Ability implements Listener {
 		Messenger.tell(player, Msg.ABILITY_ZOMBIE_LOST,
 				String.valueOf(zombies.size()));
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Player p = (Player) e.getEntity();
 		if (!zombies.contains(p.getKiller())) {
 			return;
 		}
-		
-		if (!arena.isRunning() || !arena.hasPlayer(p) || !arena.hasPlayer(player)) {
+
+		if (!arena.isRunning() || !arena.getPlayersInArena().contains(p)
+				|| !arena.getPlayersInArena().contains(player)) {
 			return;
 		}
-		
-		Messenger.tell(p, ChatColor.YELLOW + player.getName()
-				+ ChatColor.RESET + " has killed you with a zombie.");
+
+		Messenger.tell(p, ChatColor.YELLOW + player.getName() + ChatColor.RESET
+				+ " has killed you with a zombie.");
 
 		Bukkit.getPluginManager().callEvent(
 				new ArenaPlayerDeathEvent(arena, p, player));

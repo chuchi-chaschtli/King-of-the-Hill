@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.KotHLogger;
+import com.valygard.KotH.time.Conversion;
 import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.TimeUtil;
 
@@ -296,7 +297,7 @@ public class PlayerStats {
 						}
 						addTime(i);
 					}
-				}, 20 * i, 20 * i);
+				}, Conversion.toTicks(i), Conversion.toTicks(i));
 	}
 
 	public void collectClassData() {
@@ -359,7 +360,7 @@ public class PlayerStats {
 	public int getDraws() {
 		return draws;
 	}
-	
+
 	public int getGamesPlayed() {
 		return wins + losses + draws;
 	}

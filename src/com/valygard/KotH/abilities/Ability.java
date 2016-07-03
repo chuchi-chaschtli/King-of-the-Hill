@@ -28,20 +28,20 @@ public class Ability {
 	protected World world;
 	protected Player player;
 	protected Location loc;
-	
+
 	protected KotH plugin;
 	protected Material mat;
-	
+
 	protected Set<Player> team, opponents;
 
-	protected String[] names = new String[] { "Bobby", "Romaine",
-			"Watson", "Tricky Dicky", "Miley Cyrus", "Julio", "Quincy",
-			"Monroe", "Kermit", "Gilbert", "Spanky", "Ernest", "Garfield",
-			"Jasper", "Asher", "Atticus", "Matilda", "Cersei Lannister",
-			"Tyrion", "Tupac", "Dr. Jekyll", "Dr. Frankenstein", "Rasheed",
-			"Clementine", "Rupert", "Ronald", "Tobias", "Harold", "Phineas",
-			"Gene", "Milo", "Chief Keef" };
-	
+	protected String[] names = new String[] { "Bobby", "Romaine", "Watson",
+			"Tricky Dicky", "Miley Cyrus", "Julio", "Quincy", "Monroe",
+			"Kermit", "Gilbert", "Spanky", "Ernest", "Garfield", "Jasper",
+			"Asher", "Atticus", "Matilda", "Cersei Lannister", "Tyrion",
+			"Tupac", "Dr. Jekyll", "Dr. Frankenstein", "Rasheed", "Clementine",
+			"Rupert", "Ronald", "Tobias", "Harold", "Phineas", "Gene", "Milo",
+			"Chief Keef" };
+
 	protected Random random = new Random();
 
 	/**
@@ -58,31 +58,34 @@ public class Ability {
 	 *            the material of the ability
 	 */
 	protected Ability(Arena arena, Player p, Material mat) {
-		Validate.isTrue(arena.hasPlayer(p), "The arena '" + arena.getName()
-				+ "' must contain player '" + p.getName() + "'");
+		Validate.isTrue(arena.getPlayersInArena().contains(p), "The arena '"
+				+ arena.getName() + "' must contain player '" + p.getName()
+				+ "'");
 		if (!arena.isRunning()) {
 			throw new IllegalStateException(
 					"Arena must be running to use abilities!");
 		}
-		
+
 		this.arena = arena;
 		this.world = arena.getWorld();
 		this.player = p;
 		this.loc = p.getLocation();
-		
+
 		this.plugin = arena.getPlugin();
 		this.mat = mat;
-		
+
 		this.team = arena.getTeam(p);
 		this.opponents = arena.getOpposingTeam(p);
-		
+
 		if (team == null) {
-			KotHLogger.warn("Player '" + player.getName() +"' is not on a team. Kicking...");
+			KotHLogger.warn("Player '" + player.getName()
+					+ "' is not on a team. Kicking...");
 			arena.kickPlayer(player);
-			throw new IllegalStateException("Player '" + player.getName() +"' must be on a team to use abilities!");
+			throw new IllegalStateException("Player '" + player.getName()
+					+ "' must be on a team to use abilities!");
 		}
 	}
-	
+
 	/**
 	 * Gets the plugin.
 	 * 
@@ -91,7 +94,7 @@ public class Ability {
 	protected KotH getPlugin() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Gets the arena.
 	 * 
@@ -100,7 +103,7 @@ public class Ability {
 	protected Arena getArena() {
 		return arena;
 	}
-	
+
 	/**
 	 * Retrieves the world of an arena.
 	 * 
@@ -109,7 +112,7 @@ public class Ability {
 	protected World getArenaWorld() {
 		return world;
 	}
-	
+
 	/**
 	 * Gets the player currently using an ability.
 	 * 
@@ -118,7 +121,7 @@ public class Ability {
 	protected Player getPlayer() {
 		return player;
 	}
-	
+
 	/**
 	 * Gets the team of the player. This is useful for avoiding friendly-fire.
 	 * 
@@ -127,7 +130,7 @@ public class Ability {
 	protected Set<Player> getTeamWithPlayer() {
 		return team;
 	}
-	
+
 	/**
 	 * Obtains the players that can be attacked with most abilities.
 	 * 
@@ -136,7 +139,7 @@ public class Ability {
 	protected Set<Player> getOpposingTeamOfPlayer() {
 		return opponents;
 	}
-	
+
 	/**
 	 * Gets the player's location.
 	 * 
@@ -177,10 +180,11 @@ public class Ability {
 					new ItemStack[] { new ItemStack(mat, 1) });
 			return true;
 		}
-		Messenger.tell(player, Msg.ABILITY_NOT_ENOUGH_ITEMS, mat.name().toLowerCase());
+		Messenger.tell(player, Msg.ABILITY_NOT_ENOUGH_ITEMS, mat.name()
+				.toLowerCase());
 		return false;
 	}
-	
+
 	/**
 	 * Gets an array of names which can be used as custom names for mobs.
 	 * 
@@ -193,7 +197,8 @@ public class Ability {
 	/**
 	 * Acts as nextInt() for our globalized random.
 	 * 
-	 * @param i the max value of the random.
+	 * @param i
+	 *            the max value of the random.
 	 * @return a random integer.
 	 */
 	protected int nextInt(int i) {

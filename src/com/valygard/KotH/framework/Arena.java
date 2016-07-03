@@ -297,6 +297,14 @@ public class Arena {
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
+		
+		if (specPlayers.contains(p)) {
+			specPlayers.remove(p);
+			PlayerData data = getData(p);
+			data.restoreData(!settings.getBoolean("teleport-to-end")
+					|| this.end == null);
+			return;
+		}
 
 		// Reset their killstreak counter.
 		getStats(p).resetKillstreak();
@@ -355,9 +363,6 @@ public class Arena {
 
 		if (lobbyPlayers.contains(p))
 			lobbyPlayers.remove(p);
-
-		if (specPlayers.contains(p))
-			specPlayers.remove(p);
 
 		if (redPlayers.size() <= 0 || bluePlayers.size() <= 0) {
 			if (!end)
@@ -1281,7 +1286,7 @@ public class Arena {
 	 * @return a boolean.
 	 */
 	public boolean hasPlayer(Player p) {
-		return getData(p) != null;
+		return arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p);
 	}
 
 	/**
