@@ -129,6 +129,8 @@ public abstract class CountdownTimer implements TimerStrategy {
 		public Timer() {
 			if (intervals == null || intervals.length == 0) {
 				index = -1;
+				reschedule();
+				return;
 			}
 
 			for (int i = 0; i < intervals.length; i++) {
