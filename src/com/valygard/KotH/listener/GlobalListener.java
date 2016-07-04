@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,6 +38,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.economy.EconomyManager;
@@ -47,6 +49,7 @@ import com.valygard.KotH.hill.HillManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 import com.valygard.KotH.player.ArenaClass;
+import com.valygard.KotH.time.Conversion;
 import com.valygard.KotH.util.ItemParser;
 import com.valygard.KotH.util.resources.UpdateChecker;
 
@@ -422,9 +425,21 @@ public class GlobalListener implements Listener {
 
 	@EventHandler
 	public void onEntityDamage(EntityDamageByEntityEvent e) {
-		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+		Player d = null;
+		if (e.getDamager() instanceof Player) {
+			d = (Player) e.getDamager();
+		} else if (e.getDamager() instanceof Arrow) {
+			Arrow arrow = (Arrow) e.getDamager();
+			if ((ProjectileSource) arrow.getShooter() instanceof Player) {
+				d = (Player) arrow.getShooter();
+			}
+		}
+		if (d == null) {
+			return;
+		}
+
+		if (e.getEntity() instanceof Player) {
 			final Player p = (Player) e.getEntity();
-			final Player d = (Player) e.getDamager();
 
 			final Arena arena = am.getArenaWithPlayer(p);
 
@@ -448,11 +463,11 @@ public class GlobalListener implements Listener {
 			}
 
 			if (arena.getSettings().getBoolean("no-spawn-camping")) {
-				if (d.getLocation().distanceSquared(
-						arena.getTeam(p) == arena.getBlueTeam() ? arena
-								.getBlueSpawn() : arena.getRedSpawn()) <= Math
+				double distSq = Math
 						.pow(arena.getSettings().getDouble(
-								"spawn-camp-distance"), 2)) {
+								"spawn-camp-distance"), 2);
+				if (p.getLocation().distanceSquared(arena.getSpawn(p)) <= distSq
+						|| d.getLocation().distanceSquared(arena.getSpawn(p)) <= distSq) {
 					Messenger.tell(d, Msg.MISC_NO_SPAWN_CAMPING);
 					e.setCancelled(true);
 					return;
@@ -492,7 +507,7 @@ public class GlobalListener implements Listener {
 				}, 2l);
 
 				int safe = arena.getSettings().getInt("safe-respawn-time");
-				p.setNoDamageTicks(safe * 20);
+				p.setNoDamageTicks((int) Conversion.toTicks(safe));
 			}
 		}
 	}
