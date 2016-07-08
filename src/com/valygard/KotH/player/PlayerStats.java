@@ -16,8 +16,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.KotHLogger;
+import com.valygard.KotH.time.Conversion;
 import com.valygard.KotH.util.ConfigUtil;
-import com.valygard.KotH.util.TimeUtil;
 
 /**
  * @author Anand
@@ -380,7 +380,7 @@ public class PlayerStats {
 	}
 
 	public String getTimeSpent() {
-		return TimeUtil.formatIntoSentence(timespent);
+		return Conversion.formatIntoSentence(timespent);
 	}
 
 	public ConfigurationSection getClassData() {

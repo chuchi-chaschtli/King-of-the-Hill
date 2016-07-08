@@ -16,7 +16,7 @@ import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.framework.ArenaManager;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
-import com.valygard.KotH.util.TimeUtil;
+import com.valygard.KotH.time.Conversion;
 
 @CommandInfo(name = "info", pattern = "info.*|arenainfo", desc = "View some information about a specified arena.", argsRequired = 0)
 @CommandPermission("koth.user.info")
@@ -68,7 +68,7 @@ public class InfoCmd implements Command {
 					+ arena.getHillTimer().getBlueScore());
 			sender.sendMessage(ChatColor.YELLOW
 					+ "Time Remaining: "
-					+ TimeUtil.formatIntoHHMMSS(arena.getEndTimer()
+					+ Conversion.formatIntoHHMMSS(arena.getEndTimer()
 							.getRemaining()));
 			sender.sendMessage(" ");
 		}

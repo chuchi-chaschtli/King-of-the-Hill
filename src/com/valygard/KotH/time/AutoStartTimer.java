@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
-import com.valygard.KotH.util.TimeUtil;
 
 /**
  * Self-contained countdown timer which automatically starts the arena on
@@ -92,7 +91,7 @@ public class AutoStartTimer extends CountdownTimer {
 	 */
 	@Override
 	public void onCheckpoint(int remaining) {
-		String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
+		String timeLeft = Conversion.formatIntoHHMMSS(remaining);
 		Messenger.announce(arena, Msg.ARENA_AUTO_START, timeLeft);
 
 		for (Player p : arena.getPlayersInLobby()) {

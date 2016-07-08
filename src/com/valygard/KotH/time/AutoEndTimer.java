@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
-import com.valygard.KotH.util.TimeUtil;
 
 /**
  * Self-contained countdown timer which automatically ends the arena on
@@ -113,7 +112,7 @@ public class AutoEndTimer extends CountdownTimer {
 	 */
 	@Override
 	public synchronized void onCheckpoint(int remaining) {
-		String timeLeft = TimeUtil.formatIntoHHMMSS(remaining);
+		String timeLeft = Conversion.formatIntoHHMMSS(remaining);
 		Messenger.announce(arena, Msg.ARENA_AUTO_END, timeLeft);
 
 		for (Player p : arena.getPlayersInArena()) {
