@@ -1466,6 +1466,10 @@ public class Arena {
 	public boolean isReady() {
 		ready = (!(red == null || blue == null || spec == null || lobby == null || warps
 				.getConfigurationSection("hills") == null) && enabled);
+		
+		if (settings.getBoolean("teleport-to-end") && end == null) {
+			ready = false;
+		}
 
 		return ready;
 	}
