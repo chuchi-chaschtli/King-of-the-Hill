@@ -669,7 +669,7 @@ public class GlobalListener implements Listener {
 		ArenaClass ac = arena.getData(p).getArenaClass();
 
 		if (ac != null && ac.containsUnbreakableWeapons()) {
-			ItemStack weapon = p.getItemInHand();
+			ItemStack weapon = p.getInventory().getItemInMainHand();
 
 			if (ArenaClass.isWeapon(weapon))
 				weapon.setDurability((short) 0);
