@@ -684,7 +684,7 @@ public class Arena {
 	 * @param loc
 	 *            the location to launch the firework
 	 */
-	public void createFirework(Location loc) {
+	private void createFirework(Location loc) {
 		final Firework firework = loc.getWorld().spawn(loc, Firework.class);
 		FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
 
@@ -714,15 +714,12 @@ public class Arena {
 			break;
 		}
 
-		data.addEffects(FireworkEffect
-				.builder()
+		data.addEffects(FireworkEffect.builder()
 				.withColor(Color.fromRGB(red, green, blue))
-				.withFade(
-						Color.fromRGB(green, blue * 3 / 5 + 6, red * 5 / 6 + 2))
-				.with(type).build());
+				.withFade(Color.fromRGB(red, green, blue)).with(type).build());
 		firework.setFireworkMeta(data);
 		Vector dir = new Vector(0, 10, 0);
-		firework.setVelocity(dir.multiply(11 * 0.35));
+		firework.setVelocity(dir.multiply(4D));
 
 		for (Player p : arenaPlayers) {
 			playSound(p);
@@ -1283,7 +1280,6 @@ public class Arena {
 	 * 
 	 * @param p
 	 *            a Player
-	 * @return a boolean.
 	 */
 	public boolean hasPlayer(Player p) {
 		return arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p);
