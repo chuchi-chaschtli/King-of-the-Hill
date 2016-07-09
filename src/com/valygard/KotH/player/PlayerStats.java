@@ -94,7 +94,16 @@ public class PlayerStats {
 		this.path = "arenas." + name + ".";
 
 		if (file.exists()) {
-			loadFile();
+			try {
+				config.load(file);
+			}
+			catch (InvalidConfigurationException e) {
+				KotHLogger
+						.error("Could not load stats.yml for "
+								+ player.getName() + " - UUID: "
+								+ player.getUniqueId());
+				e.printStackTrace();
+			}
 			this.kills = config.getInt(path + "kills");
 			this.deaths = config.getInt(path + "deaths");
 
@@ -110,9 +119,8 @@ public class PlayerStats {
 
 			this.timespent = config.getInt(path + "time-spent");
 
-			this.data = ConfigUtil.makeSection(
-					config.getConfigurationSection("arenas." + name),
-					"class-data");
+			this.data = ConfigUtil.makeSection(config, "arenas." + name
+					+ ".class-data");
 		}
 		config.set("player", player.getName());
 
@@ -153,7 +161,6 @@ public class PlayerStats {
 	 * At the end of every arena, reset a player's killstreak.
 	 */
 	public void resetKillstreak() {
-		loadFile();
 		String s = "arenas." + name + ".killstreak";
 
 		killstreak = 0;
@@ -165,7 +172,6 @@ public class PlayerStats {
 	 * Reset the winstreak for a player.
 	 */
 	public void resetWinstreak() {
-		loadFile();
 		String s = "arenas." + name + ".winstreak";
 
 		winstreak = 0;
@@ -183,7 +189,6 @@ public class PlayerStats {
 		if (!tracking) {
 			return;
 		}
-		loadFile();
 		String s = this.path + path;
 
 		switch (path) {
@@ -253,8 +258,6 @@ public class PlayerStats {
 	 * ratios. It then saves the ratios to the configuration file.
 	 */
 	public void recalibrate() {
-		loadFile();
-
 		kdr = calculateRatio(kills, deaths);
 		config.set("arenas." + name + ".kdr", kdr);
 
@@ -274,16 +277,14 @@ public class PlayerStats {
 	}
 
 	/**
-	 * Tracks time spent in arena. Runs on a configurable interval for tracking.
-	 * While this creates imprecisions, it reduces server latency.
+	 * Tracks time spent in arena. Runs every second and adds time accordingly.
 	 */
-	public synchronized void startTiming() {
+	public void startTiming() {
 		if (!tracking)
 			return;
 
-		loadFile();
-		task = Bukkit.getScheduler().runTaskTimerAsynchronously(
-				arena.getPlugin(), new Runnable() {
+		task = Bukkit.getScheduler().runTaskTimer(arena.getPlugin(),
+				new Runnable() {
 					public void run() {
 						if (!arena.isRunning()) {
 							task.cancel();
@@ -295,7 +296,6 @@ public class PlayerStats {
 	}
 
 	public void collectClassData() {
-		loadFile();
 		ArenaClass ac = arena.getClass(player);
 		data.set(ac.getLowercaseName(), data.getInt(ac.getLowercaseName()) + 1);
 		saveFile();
@@ -307,17 +307,6 @@ public class PlayerStats {
 		}
 		catch (IOException e) {
 			KotHLogger.error("Could not save stats for player '"
-					+ player.getName() + "'.");
-			e.printStackTrace();
-		}
-	}
-
-	private void loadFile() {
-		try {
-			config.load(file);
-		}
-		catch (IOException | InvalidConfigurationException e) {
-			KotHLogger.error("Could not load stats for player '"
 					+ player.getName() + "'.");
 			e.printStackTrace();
 		}
