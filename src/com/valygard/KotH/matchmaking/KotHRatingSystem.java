@@ -30,7 +30,7 @@ public class KotHRatingSystem {
 	public final static double DRAW = 0.5;
 	public final static double LOSS = 0.0;
 
-	// attributes
+	// arena manager
 	private ArenaManager manager;
 
 	/**
@@ -49,7 +49,7 @@ public class KotHRatingSystem {
 	 *            to check
 	 * @return
 	 */
-	protected int getTeamMMR(Player player) {
+	private int getTeamMMR(Player player) {
 		Arena arena = manager.getArenaWithPlayer(player);
 		if (arena.getRedTeam().contains(player)) {
 			return getRedTeamMMR(arena);
@@ -63,7 +63,7 @@ public class KotHRatingSystem {
 	 * @param player
 	 * @return
 	 */
-	protected int getOpponentMMR(Player player) {
+	private int getOpponentMMR(Player player) {
 		Arena arena = manager.getArenaWithPlayer(player);
 		if (arena.getRedTeam().contains(player)) {
 			return getBlueTeamMMR(arena);
@@ -137,7 +137,7 @@ public class KotHRatingSystem {
 	}
 
 	/**
-	 * Get new rating.
+	 * Gets new rating.
 	 * 
 	 * @param player
 	 *            player to update
@@ -147,13 +147,11 @@ public class KotHRatingSystem {
 	 */
 	public int getNewRating(Player player, double score) {
 		Arena arena = manager.getArenaWithPlayer(player);
-		double kFactor = getKFactor(player);
+		double kFactor = getScoreConstant(player);
 		double expectedScore = getExpectedScore(getTeamMMR(player),
 				getOpponentMMR(player));
-		int newRating = calculateNewRating(arena.getStats(player).getMMR(),
-				score, expectedScore, kFactor);
-
-		return newRating;
+		return calculateNewRating(arena.getStats(player).getMMR(), score,
+				expectedScore, kFactor);
 	}
 
 	/**
@@ -171,8 +169,8 @@ public class KotHRatingSystem {
 	 * @return the new rating of the player
 	 */
 	private int calculateNewRating(int oldRating, double score,
-			double expectedScore, double kFactor) {
-		int newRating = oldRating + (int) (kFactor * (score - expectedScore));
+			double expectedScore, double constant) {
+		int newRating = oldRating + (int) (constant * (score - expectedScore));
 
 		// soft-cap the player's minimum mmr.
 		if (newRating < manager.getConfig().getInt("global.minimum-mmr")) {
@@ -183,16 +181,15 @@ public class KotHRatingSystem {
 	}
 
 	/**
-	 * K-factor in traditional elo-systems is the standard chess constant. This
-	 * is modified for KotH, and is impacted by 2 characteristics: games played
-	 * and current mmr. Like in chess, rating is more volatile for newer players
-	 * and less for veterans. Stronger players lose and gain less rating than
-	 * weaker players do.
+	 * Standard constant for traditional elo systems. A player's score constant
+	 * isimpacted by 2 characteristics: games played and current mmr. Like in
+	 * chess, rating is more volatile for newer players and less for veterans.
+	 * Stronger players lose and gain less rating than weaker players do.
 	 * 
 	 * @param player
 	 * @return
 	 */
-	private double getKFactor(Player player) {
+	private double getScoreConstant(Player player) {
 		Arena arena = manager.getArenaWithPlayer(player);
 		PlayerStats stats = arena.getStats(player);
 
