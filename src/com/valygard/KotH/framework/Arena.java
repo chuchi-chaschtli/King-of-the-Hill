@@ -251,8 +251,9 @@ public class Arena {
 			invManager.storeInventory(p);
 		}
 		catch (IOException e) {
-			KotHLogger.error("Could not store inventory of Player '"
-					+ p.getName() + "' (UUID: " + p.getUniqueId() + ")");
+			KotHLogger.getLogger().error(
+					"Could not store inventory of Player '" + p.getName()
+							+ "' (UUID: " + p.getUniqueId() + ")");
 			e.printStackTrace();
 		}
 		invManager.clearInventory(p);
@@ -297,7 +298,7 @@ public class Arena {
 
 		Messenger.tell(p, Msg.LEAVE_ARENA);
 		scoreboard.removePlayer(p);
-		
+
 		if (specPlayers.contains(p)) {
 			specPlayers.remove(p);
 			PlayerData data = getData(p);
@@ -333,8 +334,9 @@ public class Arena {
 				// Take a fine for quitting.
 				String fee = settings.getString("quit-charge");
 				if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-					KotHLogger.error("Quit-charge setting for arena '"
-							+ arenaName + "' is broken! Fix this boo-boo.");
+					KotHLogger.getLogger().error(
+							"Quit-charge setting for arena '" + arenaName
+									+ "' is broken! Fix this boo-boo.");
 					fee = String.valueOf(0.00);
 				}
 				if (fee.startsWith("$"))
@@ -413,9 +415,11 @@ public class Arena {
 			// Remove player from spec list to avoid invincibility issues
 			if (specPlayers.contains(p)) {
 				specPlayers.remove(p);
-				KotHLogger.info("Player " + p.getName()
-						+ " joined the arena from the spec area!");
-				KotHLogger.info("Invincibility glitch attempt stopped!");
+				KotHLogger.getLogger().info(
+						"Player " + p.getName()
+								+ " joined the arena from the spec area!");
+				KotHLogger.getLogger().info(
+						"Invincibility glitch attempt stopped!");
 			}
 
 			p.setHealth(p.getMaxHealth());
@@ -453,7 +457,7 @@ public class Arena {
 		hillTimer.start();
 
 		ah = new AbilityHandler(this);
-		
+
 		playSound(Sound.ENTITY_WITHER_DEATH, 0.382F, 0.1F);
 
 		// Collect data of players still remaining.
@@ -867,8 +871,9 @@ public class Arena {
 		String className = classes.remove(random.nextInt(classes.size()));
 		while (!plugin.has(p, "koth.classes." + className.toLowerCase())) {
 			if (classes.isEmpty()) {
-				KotHLogger.warn("Player '" + p.getName()
-						+ "' does not have access to any classes!");
+				KotHLogger.getLogger().warn(
+						"Player '" + p.getName()
+								+ "' does not have access to any classes!");
 				removePlayer(p, false);
 				return;
 			}
@@ -980,6 +985,7 @@ public class Arena {
 				while (loc.getBlock().isLiquid()) {
 					loc.getBlock().setType(Material.STONE);
 					KotHLogger
+							.getLogger()
 							.warn("The block was raised due to lava or water being found. "
 									+ "If you did not want this, set 'location-fixer' to false for arena '"
 									+ arenaName + "'.");
@@ -1282,7 +1288,8 @@ public class Arena {
 	 *            a Player
 	 */
 	public boolean hasPlayer(Player p) {
-		return arenaPlayers.contains(p) || lobbyPlayers.contains(p) || specPlayers.contains(p);
+		return arenaPlayers.contains(p) || lobbyPlayers.contains(p)
+				|| specPlayers.contains(p);
 	}
 
 	/**
@@ -1378,7 +1385,7 @@ public class Arena {
 		if (winner != newWinner) {
 			if (newWinner != redPlayers && newWinner != bluePlayers
 					&& newWinner != null) {
-				KotHLogger.error();
+				KotHLogger.getLogger().error();
 				throw new IllegalArgumentException(
 						"Invalid winner! The winner must be the red team, blue team, or null.");
 			}
@@ -1466,7 +1473,7 @@ public class Arena {
 	public boolean isReady() {
 		ready = (!(red == null || blue == null || spec == null || lobby == null || warps
 				.getConfigurationSection("hills") == null) && enabled);
-		
+
 		if (settings.getBoolean("teleport-to-end") && end == null) {
 			ready = false;
 		}
@@ -1551,8 +1558,8 @@ public class Arena {
 			stats.add(stat);
 		}
 		catch (IOException e) {
-			KotHLogger.error("Could not get the stats of player '"
-					+ p.getName() + "'!");
+			KotHLogger.getLogger().warn(
+					"Could not get the stats of player '" + p.getName() + "'!");
 			e.printStackTrace();
 			return null;
 		}

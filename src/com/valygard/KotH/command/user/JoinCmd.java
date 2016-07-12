@@ -52,7 +52,7 @@ public class JoinCmd implements Command {
 		String fee = arena.getSettings().getString("entry-fee");
 
 		if (!fee.matches("\\$?(([1-9]\\d*)|(\\d*.\\d\\d?))")) {
-			KotHLogger.warn("Entry-fee setting for arena '" + arena.getName()
+			KotHLogger.getLogger().warn("Entry-fee setting for arena '" + arena.getName()
 					+ "' is incorrect!");
 			fee = String.valueOf(0.00);
 		}

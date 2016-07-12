@@ -98,7 +98,7 @@ public class CommandManager implements CommandExecutor {
 		String second = (args.length > 1 ? args[1] : "");
 
 		if (first.equals("?") || first.equalsIgnoreCase("help")) {
-			KotHLogger.info(sender.getName() + " has used command: /koth help",
+			KotHLogger.getLogger().info(sender.getName() + " has used command: /koth help",
 					false);
 			if (!second.matches("\\d")) {
 				showHelp(sender);
@@ -176,7 +176,7 @@ public class CommandManager implements CommandExecutor {
 			showUsage(command, sender, true);
 		}
 
-		KotHLogger.info(
+		KotHLogger.getLogger().info(
 				sender.getName() + " has used command: /koth " + info.name(),
 				false);
 		return false;
@@ -214,7 +214,7 @@ public class CommandManager implements CommandExecutor {
 		if (!plugin.has(sender, perm.value()))
 			return;
 
-		KotHLogger.info(sender.getName()
+		KotHLogger.getLogger().info(sender.getName()
 				+ " has triggered usage for command: /koth " + info.name(),
 				false);
 

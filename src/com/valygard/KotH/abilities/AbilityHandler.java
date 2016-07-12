@@ -296,7 +296,7 @@ public class AbilityHandler implements Listener {
 		catch (IllegalArgumentException | SecurityException
 				| InstantiationException | IllegalAccessException
 				| InvocationTargetException | NoSuchMethodException e) {
-			KotHLogger.error();
+			KotHLogger.getLogger().error();
 			e.printStackTrace();
 			Messenger.tell(player, ChatColor.RED + exception + e.getMessage());
 			return false;

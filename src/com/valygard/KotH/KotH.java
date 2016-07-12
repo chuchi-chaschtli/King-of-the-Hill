@@ -45,6 +45,7 @@ public class KotH extends JavaPlugin {
 	private CommandManager cm;
 	private EconomyManager em;
 	private KotHRatingSystem matchmaking;
+	private KotHLogger logger;
 
 	private File cfgFile;
 	private FileConfiguration cfg;
@@ -82,7 +83,7 @@ public class KotH extends JavaPlugin {
 
 		// Register our listeners
 		registerListeners();
-		
+
 		// Start metrics
 		initMetrics();
 	}
@@ -110,7 +111,7 @@ public class KotH extends JavaPlugin {
 		em = new EconomyManager(this);
 		matchmaking = new KotHRatingSystem(am);
 
-		new KotHLogger(this);
+		logger = KotHLogger.getLogger(this);
 	}
 
 	private void registerCommands() {
@@ -138,7 +139,7 @@ public class KotH extends JavaPlugin {
 	private void loadVault() {
 		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
 		if (vault == null) {
-			KotHLogger.warn("Economy rewards cannot function without vault.");
+			logger.warn("Economy rewards cannot function without vault.");
 			return;
 		}
 
@@ -148,11 +149,10 @@ public class KotH extends JavaPlugin {
 
 		if (e != null) {
 			econ = e.getProvider();
-			KotHLogger.info("Vault v" + vault.getDescription().getVersion()
+			logger.info("Vault v" + vault.getDescription().getVersion()
 					+ " has been found! Economy rewards enabled.");
 		} else {
-			KotHLogger
-					.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
+			logger.warn("Vault found, but no economy plugin detected ... Economy rewards will not function!");
 		}
 	}
 
@@ -169,7 +169,7 @@ public class KotH extends JavaPlugin {
 		File file = new File(getDataFolder(), "messages.yml");
 		try {
 			if (file.createNewFile()) {
-				KotHLogger.info("messages.yml created.");
+				logger.info("messages.yml created.");
 				YamlConfiguration yaml = Msg.toYaml();
 				yaml.save(file);
 				return;
@@ -177,9 +177,8 @@ public class KotH extends JavaPlugin {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			KotHLogger.error("Could not create messages.yml!");
-			KotHLogger
-					.error("The plugin cannot work without messages; disabling plugin.");
+			logger.error("Could not create messages.yml!");
+			logger.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 
@@ -192,9 +191,8 @@ public class KotH extends JavaPlugin {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			KotHLogger.error("Could not load messages.yml!");
-			KotHLogger
-					.error("The plugin cannot work without messages; disabling plugin.");
+			logger.error("Could not load messages.yml!");
+			logger.error("The plugin cannot work without messages; disabling plugin.");
 			setEnabled(false);
 		}
 	}
@@ -284,23 +282,24 @@ public class KotH extends JavaPlugin {
 	public EconomyManager getEconomyManager() {
 		return em;
 	}
-	
+
 	public KotHRatingSystem getRatingSystem() {
 		return matchmaking;
 	}
-	
+
 	private void initMetrics() {
-        try {
-        	if (cfg.getBoolean("global.opt-out")) {
-        		KotHLogger.warn("Stat collection disabled :[");
-        		return;
-        	}
-            Metrics m = new Metrics(this);
-            m.start();
-        } catch (Exception e) {
-            KotHLogger.warn("Stat collection disabled :[");
-        }
-    }
+		try {
+			if (cfg.getBoolean("global.opt-out")) {
+				logger.warn("Stat collection disabled :[");
+				return;
+			}
+			Metrics m = new Metrics(this);
+			m.start();
+		}
+		catch (Exception e) {
+			logger.warn("Stat collection disabled :[");
+		}
+	}
 
 	public File getPluginFile() {
 		return getFile();

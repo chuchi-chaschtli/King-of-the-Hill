@@ -92,7 +92,7 @@ public class UpdateChecker {
 			public void run() {
 				for (String message : messages) {
 					if (player == null) {
-						KotHLogger.info(message);
+						KotHLogger.getLogger().info(message);
 					} else if (player.isOnline()) {
 						Messenger.tell(player, message);
 					}

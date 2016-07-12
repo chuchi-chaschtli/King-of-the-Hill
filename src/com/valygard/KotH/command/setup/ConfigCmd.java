@@ -28,14 +28,14 @@ public class ConfigCmd implements Command {
 		if (args[0].startsWith("save")) {
 			am.getPlugin().saveConfig();
 			Messenger.tell(sender, "Config-file saved.");
-			KotHLogger.info("Config-file saved.");
+			KotHLogger.getLogger().info("Config-file saved.");
 		}
 
 		else if (args[0].startsWith("reload")) {
 			try {
 				am.reloadConfig();
 				Messenger.tell(sender, "Config-file reloaded.");
-				KotHLogger.info("Config-file reloaded.");
+				KotHLogger.getLogger().info("Config-file reloaded.");
 			}
 			catch (Exception e) {
 				Messenger.tell(sender, ChatColor.RED

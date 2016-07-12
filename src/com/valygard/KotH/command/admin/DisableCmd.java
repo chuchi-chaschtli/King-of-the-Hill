@@ -30,6 +30,7 @@ public class DisableCmd implements Command {
 			am.setEnabled(false);
 			Messenger.tell(sender, "KotH disabled.");
 			KotHLogger
+					.getLogger()
 					.info("KotH has been disabled. Note: This is overrides all per-arena settings.");
 			return true;
 		}
@@ -46,7 +47,7 @@ public class DisableCmd implements Command {
 			}
 
 			arena.setEnabled(false);
-			KotHLogger.info("Arena '" + arena.getName() + "' disabled.");
+			KotHLogger.getLogger().info("Arena '" + arena.getName() + "' disabled.");
 			Messenger.tell(sender, "You have disabled '" + arena.getName()
 					+ "'.");
 		}

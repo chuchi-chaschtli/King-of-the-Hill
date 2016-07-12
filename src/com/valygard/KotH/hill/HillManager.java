@@ -50,7 +50,7 @@ public class HillManager {
 			incrementHills();
 		}
 		catch (IndexOutOfBoundsException e) {
-			KotHLogger.error("There are no hills for arena '" + arena.getName()
+			KotHLogger.getLogger().error("There are no hills for arena '" + arena.getName()
 					+ "'! Check your config!");
 		}
 	}
@@ -71,7 +71,7 @@ public class HillManager {
 	 */
 	public Hill getCurrentHill() {
 		if (current == null) {
-			KotHLogger.error("Error! Hill is null!");
+			KotHLogger.getLogger().error("Error! Hill is null!");
 			return null;
 		}
 		return current;

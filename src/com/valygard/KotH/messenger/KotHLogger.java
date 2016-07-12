@@ -15,20 +15,54 @@ import java.util.logging.Logger;
 import org.bukkit.plugin.Plugin;
 
 /**
+ * Global KotHLogger functions as a logger for both the server console as well
+ * as the specialized KotH log file.
+ * 
  * @author Anand
  * 
  */
 public class KotHLogger {
-	private static Plugin plugin;
+	private Plugin plugin;
 
-	private static Logger logger;
+	private Logger logger;
 	private static final String PREFIX = "[KotH] ";
 
-	public KotHLogger(Plugin plugin) {
-		KotHLogger.plugin = plugin;
-		KotHLogger.logger = plugin.getLogger();
+	private static KotHLogger instance;
+
+	/**
+	 * Constructor for Logger requires a Plugin instance
+	 * 
+	 * @param plugin
+	 *            the KotH plugin instance
+	 */
+	private KotHLogger(Plugin plugin) {
+		this.plugin = plugin;
+		this.logger = plugin.getLogger();
 
 		info("Logger successfully initialized!");
+	}
+
+	/**
+	 * Global accessor for the logger
+	 * 
+	 * @return the KotHLogger instance
+	 */
+	public static KotHLogger getLogger() {
+		return instance;
+	}
+
+	/**
+	 * Initial Accessor for logger lazily initializes the KotHLogger.
+	 * 
+	 * @param plugin
+	 *            the KotH plugin instance
+	 * @return the KotHLogger instance
+	 */
+	public static KotHLogger getLogger(Plugin plugin) {
+		if (instance == null) {
+			instance = new KotHLogger(plugin);
+		}
+		return instance;
 	}
 
 	/**
@@ -40,7 +74,7 @@ public class KotHLogger {
 	 * @param msg
 	 *            the String to log.
 	 */
-	private static void logMessage(String level, String msg) {
+	private void logMessage(String level, String msg) {
 		if (!plugin.getConfig().getBoolean("global.logging")) {
 			return;
 		}
@@ -99,7 +133,7 @@ public class KotHLogger {
 	 *            console.
 	 * @see #info(String)
 	 */
-	public static void info(String msg, boolean toConsole) {
+	public void info(String msg, boolean toConsole) {
 		if (toConsole) {
 			logger.log(Level.INFO, msg);
 		}
@@ -112,7 +146,7 @@ public class KotHLogger {
 	 * 
 	 * @param msg
 	 */
-	public static void info(String msg) {
+	public void info(String msg) {
 		info(msg, true);
 	}
 
@@ -122,7 +156,7 @@ public class KotHLogger {
 	 * @param msg
 	 *            the String to log.
 	 */
-	public static void warn(String msg) {
+	public void warn(String msg) {
 		logger.log(Level.WARNING, msg);
 		logMessage("warn", msg);
 	}
@@ -134,7 +168,7 @@ public class KotHLogger {
 	 * @param msg
 	 *            the String to log.
 	 */
-	public static void error(String msg) {
+	public void error(String msg) {
 		logger.log(Level.SEVERE, msg);
 		logMessage("error", msg);
 	}
@@ -145,7 +179,7 @@ public class KotHLogger {
 	 * 
 	 * @see #error(String)
 	 */
-	public static void error() {
+	public void error() {
 		String errMsg = "ERROR FOUND! Tell AoH_Ruthless on the issue tracker that he screwed up! "
 				+ "Be sure to include the error log."
 				+ '\n'

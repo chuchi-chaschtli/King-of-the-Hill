@@ -30,6 +30,7 @@ public class EnableCmd implements Command {
 			am.setEnabled(true);
 			Messenger.tell(sender, "KotH enabled.");
 			KotHLogger
+					.getLogger()
 					.info("KotH has been enabled. Note: This is overriden by per-arena settings.");
 			return true;
 		}
@@ -48,7 +49,8 @@ public class EnableCmd implements Command {
 
 			am.setEnabled(true);
 			arena.setEnabled(true);
-			KotHLogger.info("Arena '" + arena.getName() + "' enabled.");
+			KotHLogger.getLogger().info(
+					"Arena '" + arena.getName() + "' enabled.");
 			Messenger.tell(sender, "You have enabled '" + arena.getName()
 					+ "'.");
 		}

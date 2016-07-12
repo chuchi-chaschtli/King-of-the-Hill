@@ -98,10 +98,9 @@ public class PlayerStats {
 				config.load(file);
 			}
 			catch (InvalidConfigurationException e) {
-				KotHLogger
-						.error("Could not load stats.yml for "
-								+ player.getName() + " - UUID: "
-								+ player.getUniqueId());
+				KotHLogger.getLogger().error(
+						"Could not load stats.yml for " + player.getName()
+								+ " - UUID: " + player.getUniqueId());
 				e.printStackTrace();
 			}
 			this.kills = config.getInt(path + "kills");
@@ -306,8 +305,9 @@ public class PlayerStats {
 			config.save(file);
 		}
 		catch (IOException e) {
-			KotHLogger.error("Could not save stats for player '"
-					+ player.getName() + "'.");
+			KotHLogger.getLogger().error(
+					"Could not save stats for player '" + player.getName()
+							+ "'.");
 			e.printStackTrace();
 		}
 	}

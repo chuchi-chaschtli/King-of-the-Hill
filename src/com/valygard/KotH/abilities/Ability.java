@@ -78,8 +78,9 @@ public class Ability {
 		this.opponents = arena.getOpposingTeam(p);
 
 		if (team == null) {
-			KotHLogger.warn("Player '" + player.getName()
-					+ "' is not on a team. Kicking...");
+			KotHLogger.getLogger().warn(
+					"Player '" + player.getName()
+							+ "' is not on a team. Kicking...");
 			arena.kickPlayer(player);
 			throw new IllegalStateException("Player '" + player.getName()
 					+ "' must be on a team to use abilities!");
