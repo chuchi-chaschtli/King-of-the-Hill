@@ -18,7 +18,7 @@ import com.valygard.KotH.util.ConfigUtil;
  * @author Anand
  * @since 1.2.5
  */
-public class ArenaEvent extends KotHEvent {
+public abstract class ArenaEvent extends KotHEvent {
 
 	protected ArenaEvent(final Arena arena) {
 		super(arena);

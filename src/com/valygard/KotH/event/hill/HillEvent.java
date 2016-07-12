@@ -18,7 +18,7 @@ import com.valygard.KotH.hill.HillTask;
  * @author Anand
  * 
  */
-public class HillEvent extends KotHEvent implements Cancellable {
+public abstract class HillEvent extends KotHEvent implements Cancellable {
 	protected HillManager hm;
 	protected HillTask timer;
 

@@ -14,7 +14,7 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  * @since 1.2.11
  */
-public class KotHEvent extends Event {
+public abstract class KotHEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 

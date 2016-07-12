@@ -14,7 +14,7 @@ import com.valygard.KotH.framework.Arena;
  * @author Anand
  * 
  */
-public class ArenaPlayerEvent extends KotHEvent {
+public abstract class ArenaPlayerEvent extends KotHEvent {
 	protected Player player;
 
 	public ArenaPlayerEvent(Arena arena, Player player) {
