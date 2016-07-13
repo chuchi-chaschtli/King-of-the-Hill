@@ -1,5 +1,5 @@
 /**
- * PotionMatcher.java is a part of King of the Hill. 
+ * PotionAdapter.java is a part of King of the Hill. 
  */
 package com.valygard.KotH.util;
 
@@ -21,7 +21,7 @@ import com.valygard.KotH.messenger.KotHLogger;
  * @author Anand
  * 
  */
-public enum PotionMatcher {
+public enum PotionAdapter {
 	EMPTY(PotionType.UNCRAFTABLE, "empty", "uncraftable"),
 	WATER(PotionType.WATER, "water"),
 	MUNDANE(PotionType.MUNDANE, "mundane"),
@@ -78,7 +78,7 @@ public enum PotionMatcher {
 	 *            the String identifiers
 	 * @see #PotionMatcher(PotionType, boolean, boolean, String...)
 	 */
-	PotionMatcher(PotionType type, String... handles) {
+	PotionAdapter(PotionType type, String... handles) {
 		this(type, false, false, handles);
 	}
 
@@ -94,7 +94,7 @@ public enum PotionMatcher {
 	 * @param handles
 	 *            the String identifiers
 	 */
-	PotionMatcher(PotionType type, boolean extended, boolean upgraded,
+	PotionAdapter(PotionType type, boolean extended, boolean upgraded,
 			String... handles) {
 		this.type = type;
 		this.extended = extended;
@@ -119,17 +119,17 @@ public enum PotionMatcher {
 	}
 
 	/**
-	 * Grabs a PotionMatcher enumeration from a given PotionData. Iterates
+	 * Grabs a PotionAdapter enumeration from a given PotionData. Iterates
 	 * through all values to determine if {@code type}, {@code extended} and
 	 * {@code upgraded} are all equivalent and returns the corresponding
 	 * Potionmatcher value.
 	 * 
 	 * @param data
 	 *            the PotionData to analyze.
-	 * @return a PotionMatcher value.
+	 * @return a PotionAdapter value.
 	 */
-	public static PotionMatcher matchData(PotionData data) {
-		for (PotionMatcher pm : PotionMatcher.values()) {
+	public static PotionAdapter matchData(PotionData data) {
+		for (PotionAdapter pm : PotionAdapter.values()) {
 			if (pm.getType() == data.getType()
 					&& pm.isExtended() == data.isExtended()
 					&& pm.isUpgraded() == data.isUpgraded())
@@ -141,16 +141,16 @@ public enum PotionMatcher {
 	}
 
 	/**
-	 * Grabs a PotionMatcher value from a String identifier. Iterates through
+	 * Grabs a PotionAdapter value from a String identifier. Iterates through
 	 * all values to determine if the given {@code handle} is a valid
 	 * identifier. If not, a Water Bottle is created in its place.
 	 * 
 	 * @param handle
 	 *            the String identifier to parse
-	 * @return a PotionMatcher value
+	 * @return a PotionAdapter value
 	 */
-	public static PotionMatcher matchHandle(String handle) {
-		for (PotionMatcher pm : PotionMatcher.values()) {
+	public static PotionAdapter matchHandle(String handle) {
+		for (PotionAdapter pm : PotionAdapter.values()) {
 			if (pm.getIdentifiers().contains(
 					handle.toLowerCase().replace("_", "-")))
 				return pm;

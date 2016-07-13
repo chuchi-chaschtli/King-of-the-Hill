@@ -54,17 +54,17 @@ public class PotionUtils {
 
 		PotionMeta pm = (PotionMeta) stack.getItemMeta();
 		PotionData data = pm.getBasePotionData();
-		return PotionMatcher.matchData(data).getIdentifiers().get(0);
+		return PotionAdapter.matchData(data).getIdentifiers().get(0);
 	}
 
 	/**
 	 * Creates a potion given an ItemStack and a String identifier, which is
 	 * matched to the list of creative inventory potions. See
-	 * {@link PotionMatcher}
+	 * {@link PotionAdapter}
 	 * 
 	 * @param stack
 	 *            the ItemStack to parse
-	 * @param data
+	 * @param handle
 	 *            the given String data for the potion
 	 * @return an ItemStack with potion effects
 	 */
@@ -76,7 +76,7 @@ public class PotionUtils {
 			return null;
 		}
 		PotionMeta pm = (PotionMeta) stack.getItemMeta();
-		PotionMatcher matcher = PotionMatcher.matchHandle(handle);
+		PotionAdapter matcher = PotionAdapter.matchHandle(handle);
 
 		pm.setBasePotionData(matcher.buildPotionData());
 		stack.setItemMeta(pm);
