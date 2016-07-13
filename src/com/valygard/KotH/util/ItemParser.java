@@ -7,20 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.valygard.KotH.KotH;
 import com.valygard.KotH.messenger.KotHLogger;
-import com.valygard.KotH.time.Conversion;
 
 /**
  * @author Anand
@@ -72,7 +67,7 @@ public class ItemParser {
 
 		// <data> part
 		short durability = stack.getDurability();
-		short data = (durability != 0 ? durability : 0);
+		short data = (durability > 0 ? durability : 0);
 
 		// potion related
 		String effect = "";
@@ -84,15 +79,7 @@ public class ItemParser {
 
 		// Take potions into account
 		else if (PotionUtils.isPotion(stack)) {
-			for (PotionEffect pot : PotionUtils.getEffects(stack)) {
-				String name = pot.getType().getName().toLowerCase()
-						.replace("_", "-");
-				int duration = Conversion.toSeconds(pot.getDuration());
-				int amp = pot.getAmplifier();
-
-				effect = name + "@" + duration + "@" + amp + "!";
-			}
-			effect = effect.substring(0, effect.length() - 1);
+			effect = PotionUtils.getHandle(stack);
 		}
 
 		// <amount> part
@@ -124,29 +111,20 @@ public class ItemParser {
 		// <item>
 		String result = type;
 
-		/*
-		 * <item>(:<data>) or
-		 * item(:<effect>@<duration>@<amplifier>(!<effect>@<duration
-		 * >@<amplifier> ...))
-		 */
+		// <item>(:<data>) or item(:<effect>)
 		if (!effect.isEmpty()) {
 			result += ":" + effect;
 		} else if (data != 0) {
 			result += ":" + data;
 		}
 
-		/*
-		 * <item>(:<effect>@<duration>@<amplifier>(!<effect>@<duration
-		 * >@<amplifier> ...)|<data>):<amount>) - force if there is data or if
-		 * the item is a potion
-		 */
+		// <item>(:<effect>|<data>):<amount> - force if data or potion
 		if (amount > 1 || (data != 0 || !effect.isEmpty())) {
 			result += ":" + amount;
 		}
 
 		/*
-		 * <item>((:<effect>@<duration>@<amplifier>(!<effect>@<duration
-		 * >@<amplifier> ...):<data>):<amount>) (<eid>:<level>(;<eid>:<level>(;
+		 * <item>((:<effect>:<data>):<amount>) (<eid>:<level>(;<eid>:<level>(;
 		 * ... )))
 		 */
 		if (!enchantments.equals("")) {
@@ -227,8 +205,7 @@ public class ItemParser {
 			break;
 		}
 		if (result == null || result.getType() == Material.AIR) {
-			Logger.getLogger("Minecraft").warning(
-					"Failed to parse item: " + item);
+			KotHLogger.getLogger().warn("Failed to parse item: " + item);
 			return null;
 		}
 
@@ -287,27 +264,7 @@ public class ItemParser {
 		// potions data values are stored as min values for handling
 		if (d == Short.MIN_VALUE) {
 			ItemStack stack = new ItemStack(material);
-			PotionMeta pm = (PotionMeta) stack.getItemMeta();
-
-			String[] effects = data.split("!");
-			String[] parts = null;
-
-			// parse each effect
-			for (String effect : effects) {
-				parts = effect.split("@");
-
-				PotionEffectType type = PotionEffectType.getByName(parts[0]
-						.toUpperCase().replace("-", "_"));
-				int duration = (int) Conversion.toTicks(Integer
-						.parseInt(parts[1]));
-				int amplifier = Integer.parseInt(parts[2]);
-
-				// add to potion meta
-				pm.addCustomEffect(new PotionEffect(type, duration, amplifier),
-						true);
-			}
-			stack.setItemMeta(pm);
-			return stack;
+			return PotionUtils.createPotion(stack, data);
 		} else {
 			return new ItemStack(material, a, d);
 		}
@@ -321,7 +278,7 @@ public class ItemParser {
 	 */
 	private static Material getType(String item) {
 		if (!item.matches("[\\w[^d]]*")) {
-			KotHLogger.warn("Material Type must be a string!");
+			KotHLogger.getLogger().warn("Material Type must be a string!");
 			return null;
 		}
 
