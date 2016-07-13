@@ -13,6 +13,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -129,7 +130,7 @@ public class KotH extends JavaPlugin {
 	}
 
 	public boolean has(CommandSender sender, String s) {
-		if (sender instanceof ConsoleCommandSender
+		if (sender instanceof ConsoleCommandSender || sender instanceof ProxiedCommandSender
 				|| sender instanceof BlockCommandSender) {
 			return true;
 		}
