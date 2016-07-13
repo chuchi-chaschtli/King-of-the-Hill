@@ -25,7 +25,7 @@ public class KotHLogger {
 	private Plugin plugin;
 
 	private Logger logger;
-	private static final String PREFIX = "[KotH] ";
+	private String prefix = "[KotH] ";
 
 	private static KotHLogger instance;
 
@@ -43,7 +43,7 @@ public class KotHLogger {
 	}
 
 	/**
-	 * Global accessor for the logger
+	 * Global accessor assumes the logger has been initialized.
 	 * 
 	 * @return the KotHLogger instance
 	 */
@@ -67,7 +67,8 @@ public class KotHLogger {
 
 	/**
 	 * Logs a message to the log file using a PrintWriter, with a log level
-	 * (info, warn, error) if enabled in configuration.
+	 * (info, warn, error) if enabled in configuration. If the log file could
+	 * not be found, a new one is generated in the plugin's data folder.
 	 * 
 	 * @param level
 	 *            the Logger level analagous to Console log system.
@@ -89,7 +90,7 @@ public class KotHLogger {
 
 			if (fileName == null) {
 				fileName = "koth.log";
-				plugin.getConfig().set("global.log-file", "koth.log");
+				plugin.getConfig().set("global.log-file", fileName);
 				plugin.saveConfig();
 			} else {
 				String[] nameParts = fileName.split(".");
@@ -111,7 +112,7 @@ public class KotHLogger {
 
 			FileWriter fw = new FileWriter(file, true);
 			PrintWriter pw = new PrintWriter(fw);
-			pw.println(time + " " + PREFIX + "[" + level.toUpperCase() + "] : "
+			pw.println(time + " " + prefix + "[" + level.toUpperCase() + "] : "
 					+ msg);
 			pw.close();
 		}
@@ -149,7 +150,7 @@ public class KotHLogger {
 	public void info(String msg) {
 		info(msg, true);
 	}
-
+	
 	/**
 	 * Sends a warning message (by logging a message with level 'warn').
 	 * 
@@ -174,15 +175,14 @@ public class KotHLogger {
 	}
 
 	/**
-	 * Sends a default error message which basically describes how I screwed up
-	 * :)
+	 * Sends a default error message with the issue management tracker
 	 * 
 	 * @see #error(String)
 	 */
 	public void error() {
-		String errMsg = "ERROR FOUND! Tell AoH_Ruthless on the issue tracker that he screwed up! "
+		String errMsg = "ERROR FOUND! Please report this to the issue tracker! "
 				+ "Be sure to include the error log."
-				+ '\n'
+				+ System.getProperty("line.separator")
 				+ "https://github.com/AoHRuthless/King-of-the-Hill/issues/new";
 		error(errMsg);
 	}
