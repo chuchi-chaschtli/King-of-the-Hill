@@ -22,26 +22,28 @@ import com.valygard.KotH.messenger.KotHLogger;
  * 
  */
 public enum PotionAdapter {
+	// normal potions
 	EMPTY(PotionType.UNCRAFTABLE, "empty", "uncraftable"),
 	WATER(PotionType.WATER, "water"),
-	MUNDANE(PotionType.MUNDANE, "mundane"),
+	MUNDANE(PotionType.MUNDANE, "mundane", "normal"),
 	THICK(PotionType.THICK, "thick"),
 	AWKWARD(PotionType.AWKWARD, "awkward"),
 	NIGHT_VISION(PotionType.NIGHT_VISION, "night-vision", "vision", "night"),
 	INVISIBILITY(PotionType.INVISIBILITY, "invisibility"),
 	LEAPING(PotionType.JUMP, "jump", "leaping"),
 	SWIFTNESS(PotionType.SPEED, "speed", "swift", "swiftness"),
-	FIRE_RESISTANCE(PotionType.FIRE_RESISTANCE, "fire-resist", "fire-resistance"),
+	FIRE_RESISTANCE(PotionType.FIRE_RESISTANCE, "fire-resistance", "fire-resist"),
 	SLOWNESS(PotionType.SLOWNESS, "slow", "slowness"),
 	WATER_BREATHING(PotionType.WATER_BREATHING, "water-breathing"),
-	INSTANT_HEALTH(PotionType.INSTANT_HEAL, "instant-heal", "instant-health", "heal", "health"),
+	INSTANT_HEALTH(PotionType.INSTANT_HEAL, "heal", "instant-heal", "instant-health", "health"),
 	HARMING(PotionType.INSTANT_DAMAGE, "instant-damage", "damage", "harming"),
 	POISON(PotionType.POISON, "poison"),
-	REGEN(PotionType.REGEN, "regeneration", "regen"),
-	STRENGTH(PotionType.STRENGTH, "strength"),
+	REGEN(PotionType.REGEN, "regen", "regeneration"),
+	STRENGTH(PotionType.STRENGTH, "strength", "str"),
 	WEAKNESS(PotionType.WEAKNESS, "weakness", "weak"),
 	LUCK(PotionType.LUCK, "luck", "fortune"),
 
+	// extended potions
 	LONG_NIGHT_VISION(PotionType.NIGHT_VISION, true, false, "long-night-vision", "long-vision", "long-night"),
 	LONG_INVISIBILITY(PotionType.INVISIBILITY, true, false, "long-invisibility"),
 	LONG_LEAPING(PotionType.JUMP, true, false, "long-jump", "long-leaping"),
@@ -51,17 +53,18 @@ public enum PotionAdapter {
 	LONG_WATER_BREATHING(PotionType.WATER_BREATHING, true, false, "long-water-breathing"),
 	LONG_POISON(PotionType.POISON, true, false, "long-poison"),
 	LONG_REGEN(PotionType.REGEN, true, false, "long-regeneration", "long-regen"),
-	LONG_STRENGTH(PotionType.STRENGTH, true, false, "long-strength"),
+	LONG_STRENGTH(PotionType.STRENGTH, true, false, "long-strength", "long-str"),
 	LONG_WEAKNESS(PotionType.WEAKNESS, true, false, "long-weakness", "long-weak"),
 	LONG_LUCK(PotionType.LUCK, true, false, "long-luck", "long-fortune"),
 
+	// upgraded potions, mutually exclusive from extended potions
 	STRONG_LEAPING(PotionType.JUMP, false, true, "strong-jump", "strong-leaping"),
 	STRONG_SWIFTNESS(PotionType.SPEED, false, true, "strong-speed", "strong-swift", "strong-swiftness"),
 	STRONG_INSTANT_HEALTH(PotionType.INSTANT_HEAL, false, true, "strong-instant-heal", "strong-instant-health", "strong-heal", "strong-health"),
 	STRONG_HARMING(PotionType.INSTANT_DAMAGE, false, true, "strong-instant-damage", "strong-damage", "strong-harming"),
 	STRONG_POISON(PotionType.POISON, false, true, "strong-poison"),
 	STRONG_REGEN(PotionType.REGEN, false, true, "strong-regeneration", "strong-regen"),
-	STRONG_STRENGTH(PotionType.STRENGTH, false, true, "strong-strength");
+	STRONG_STRENGTH(PotionType.STRENGTH, false, true, "strong-strength", "strong-str");
 
 	// attributes
 	private PotionType type;
@@ -102,18 +105,39 @@ public enum PotionAdapter {
 		this.handles = Arrays.asList(handles);
 	}
 
+	/**
+	 * Grabs the {@code type} value
+	 * 
+	 * @return a PotionType enum value
+	 */
 	PotionType getType() {
 		return type;
 	}
 
+	/**
+	 * Grabs the {@code extended} value
+	 * 
+	 * @return a boolean flag, true if the potion is extended
+	 */
 	boolean isExtended() {
 		return extended;
 	}
 
+	/**
+	 * Grabs the {@code upgraded} value
+	 * 
+	 * @return a boolean flag, true if the potion is upgraded
+	 */
 	boolean isUpgraded() {
 		return upgraded;
 	}
 
+	/**
+	 * Grabs the String identifiers for the potion. Any one of these values is
+	 * usable to detect a different type of potion
+	 * 
+	 * @return a String list, all of a PotionAdapter's identifiers
+	 */
 	List<String> getIdentifiers() {
 		return Collections.unmodifiableList(handles);
 	}
@@ -155,10 +179,9 @@ public enum PotionAdapter {
 					handle.toLowerCase().replace("_", "-")))
 				return pm;
 		}
-		KotHLogger
-				.getLogger()
-				.warn(handle
-						+ " could not be parsed as a potion! Water Bottle created ...");
+		KotHLogger.getLogger().warn(
+				handle + " could not be parsed as a potion!"
+						+ " Water Bottle created ...");
 		return WATER;
 	}
 
