@@ -6,6 +6,7 @@ package com.valygard.KotH.economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,9 +23,9 @@ public class EconomyManager {
 		this.plugin = plugin;
 	}
 	
-	public boolean deposit(Player p, ItemStack item) {
+	public boolean deposit(OfflinePlayer p, ItemStack item) {
         if (plugin.getEconomy() != null) {
-            EconomyResponse result = plugin.getEconomy().depositPlayer(p.getName(), getAmount(item));
+            EconomyResponse result = plugin.getEconomy().depositPlayer(p, getAmount(item));
             return (result.type == ResponseType.SUCCESS);
         }
         return false;
@@ -34,9 +35,9 @@ public class EconomyManager {
         return withdraw(p, getAmount(item));
     }
 
-    public boolean withdraw(Player p, double amount) {
+    public boolean withdraw(OfflinePlayer p, double amount) {
         if (plugin.getEconomy() != null) {
-            EconomyResponse result = plugin.getEconomy().withdrawPlayer(p.getName(), amount);
+            EconomyResponse result = plugin.getEconomy().withdrawPlayer(p, amount);
             return (result.type == ResponseType.SUCCESS);
         }
         return false;
