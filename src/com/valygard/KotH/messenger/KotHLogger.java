@@ -52,17 +52,20 @@ public class KotHLogger {
 	}
 
 	/**
-	 * Initial Accessor for logger lazily initializes the KotHLogger.
+	 * Initializes the singleton Logger. Throws exception if used more than
+	 * once.
 	 * 
 	 * @param plugin
 	 *            the KotH plugin instance
-	 * @return the KotHLogger instance
+	 * @throws UnsupportedOperationException
+	 *             if the Logger is already initialized
 	 */
-	public static KotHLogger getLogger(Plugin plugin) {
-		if (instance == null) {
-			instance = new KotHLogger(plugin);
+	public static void setLogger(Plugin plugin) {
+		if (instance != null) {
+			throw new UnsupportedOperationException(
+					"Cannot re-initialized singleton Logger");
 		}
-		return instance;
+		instance = new KotHLogger(plugin);
 	}
 
 	/**
@@ -150,7 +153,7 @@ public class KotHLogger {
 	public void info(String msg) {
 		info(msg, true);
 	}
-	
+
 	/**
 	 * Sends a warning message (by logging a message with level 'warn').
 	 * 
