@@ -1158,6 +1158,20 @@ public class Arena {
 	}
 
 	/**
+	 * Grabs all players in the arena, whether the lobby, spectator area, or in
+	 * the arena.
+	 * 
+	 * @return an unmodifiable Player Set
+	 */
+	public Set<Player> getPlayers() {
+		Set<Player> result = new HashSet<Player>();
+		result.addAll(arenaPlayers);
+		result.addAll(specPlayers);
+		result.addAll(lobbyPlayers);
+		return Collections.unmodifiableSet(result);
+	}
+
+	/**
 	 * Grabs all players currently playing. This will return a set reflective of
 	 * both the blue and red teams.
 	 * 

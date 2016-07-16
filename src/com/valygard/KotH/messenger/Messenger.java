@@ -3,9 +3,6 @@
  */
 package com.valygard.KotH.messenger;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -40,11 +37,7 @@ public class Messenger {
     }
 
     public static void announce(Arena arena, String msg) {
-        List<Player> players = new ArrayList<Player>();
-        players.addAll(arena.getPlayersInArena());
-        players.addAll(arena.getPlayersInLobby());
-        players.addAll(arena.getSpectators());
-        for (Player p : players) {
+        for (Player p : arena.getPlayers()) {
             tell(p, msg);
         }
     }
