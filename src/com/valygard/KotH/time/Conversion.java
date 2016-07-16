@@ -3,6 +3,8 @@
  */
 package com.valygard.KotH.time;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Conversion utility from seconds<->ticks as well as times into strings
  * 
@@ -32,63 +34,46 @@ public class Conversion {
 	}
 
 	/**
-	 * This method was an edited version from the Bukkit Forums Resources
-	 * section, from a thread on enhanced time formatting.
-	 * <http://forums.bukkit.org/threads/tutorial
-	 * -better-time-formatting.173185/>
 	 * 
-	 * @author DevRosemberg
-	 * @param secs
-	 *            an amount of seconds.
+	 * @param s
+	 *            an integer amount of seconds.
 	 * @return a string
 	 */
-	public static String formatIntoHHMMSS(int secs) {
-		int remainder = secs % 3600;
+	public static String formatIntoHHMMSS(int s) {
+		long h = TimeUnit.SECONDS.toHours(s);
+		long m = TimeUnit.SECONDS.toMinutes(s);
 
-		int minutes = remainder / 60;
-		int seconds = remainder % 60;
-		int hours = (secs / 3600) % 24;
+		String hours = Long.toString(h);
+		String minutes = Long.toString(m - TimeUnit.HOURS.toMinutes(h));
+		String seconds = Long.toString(s - TimeUnit.MINUTES.toSeconds(m));
 
-		StringBuilder sb = new StringBuilder();
+		hours = (hours.length() < 2 ? "0" : "") + hours;
+		minutes = (minutes.length() < 2 ? "0" : "") + minutes;
+		seconds = (seconds.length() < 2 ? "0" : "") + seconds;
 
-		if (hours < 10 && hours > 0) {
-			sb.append("0");
-		}
-		if (hours > 0) {
-			sb.append(hours + ":");
-		}
-
-		if (minutes < 10 && minutes > 0) {
-			sb.append("0");
-		}
-		if (minutes > 0) {
-			sb.append(minutes + ":");
-		}
-
-		if (seconds < 10) {
-			sb.append("0");
-		}
-		sb.append(seconds);
-
-		return sb.toString();
+		return hours + ":" + minutes + ":" + seconds;
 	}
 
 	/**
-	 * For our stats command, the player could have played an arena for more
-	 * than just a few minutes.
+	 * Returns a given integer time parsed into a String which is much easier to
+	 * interpret. Parses the given integer, in seconds, to HH:MM:SS format using
+	 * {@code #formatIntoHHMMSS(int)}. This String is then split by : and the
+	 * amount of days is calculated.
 	 * 
 	 * @param secs
 	 *            an amount of seconds.
-	 * @return a string.
+	 * @return a String object.
 	 */
 	public static String formatIntoSentence(int secs) {
-		int remainder = secs % 3600;
+		String hhmmss = formatIntoHHMMSS(secs);
+		String[] parts = hhmmss.split(":");
 
-		int minutes = remainder / 60;
-		int seconds = remainder % 60;
+		int hours = Integer.valueOf(parts[0]);
+		int minutes = Integer.valueOf(parts[1]);
+		int seconds = Integer.valueOf(parts[2]);
 
-		int days = secs / 86400;
-		int hours = (secs / 3600) % 24;
+		int days = hours / 24;
+		hours %= 24;
 
 		String fDays = (days > 0 ? " " + days + " day" + (days > 1 ? "s" : "")
 				: "");
