@@ -3,8 +3,6 @@
  */
 package com.valygard.KotH.time;
 
-import org.bukkit.entity.Player;
-
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
@@ -19,10 +17,12 @@ import com.valygard.KotH.messenger.Msg;
  * @author Anand
  * 
  */
-public class AutoEndTimer extends CountdownTimer {
+public class AutoEndTimer extends CountdownTimer implements TimerCallback {
 
 	private Arena arena;
 	private int seconds;
+	
+	private TimerCallback callback;
 
 	/**
 	 * Default constructor for the end timer initialises by arena and duration.
@@ -33,11 +33,14 @@ public class AutoEndTimer extends CountdownTimer {
 	 *            the duration of the timer in seconds
 	 */
 	public AutoEndTimer(Arena arena, int seconds) {
-		super(arena.getPlugin(), Conversion.toTicks(seconds), new int[] { 1, 2,
-				3, 5, 10, 20, 30, 45, 60, 120, 180, 300, 600, 900, 1200 });
-
+		super(arena.getPlugin(), Conversion.toTicks(seconds));
+		super.setCallback(this);
+		
 		this.arena = arena;
 		this.seconds = seconds;
+		
+		this.callback = new IntervalCallback(arena, this, Msg.ARENA_AUTO_END, new int[] { 1, 2,
+				3, 5, 10, 20, 30, 45, 60, 120, 180, 300, 600, 900, 1200 });
 	}
 
 	/**
@@ -59,6 +62,7 @@ public class AutoEndTimer extends CountdownTimer {
 		this.seconds = arena.getSettings().getInt("arena-time");
 		setDuration(Conversion.toTicks(seconds));
 		Messenger.announce(arena, Msg.ARENA_START);
+		callback.onStart();
 	}
 
 	/**
@@ -68,6 +72,7 @@ public class AutoEndTimer extends CountdownTimer {
 	 */
 	@Override
 	public synchronized void onFinish() {
+		callback.onFinish();
 		this.seconds = arena.getSettings().getInt("arena-time");
 		setDuration(Conversion.toTicks(seconds));
 		arena.endArena();
@@ -83,7 +88,6 @@ public class AutoEndTimer extends CountdownTimer {
 	public synchronized void onTick() {
 		// Abort if the arena isn't running.
 		if (!arena.isRunning()) {
-			System.out.println(1);
 			return;
 		}
 
@@ -102,24 +106,7 @@ public class AutoEndTimer extends CountdownTimer {
 			super.stop();
 			return;
 		}
+		callback.onTick();
 		seconds--;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * At specific checkpoints, announce how much time is left in the arena.
-	 */
-	@Override
-	public synchronized void onCheckpoint(int remaining) {
-		String timeLeft = Conversion.formatIntoHHMMSS(remaining);
-		Messenger.announce(arena, Msg.ARENA_AUTO_END, timeLeft);
-
-		for (Player p : arena.getPlayersInArena()) {
-			arena.playSound(p);
-		}
-		for (Player p : arena.getSpectators()) {
-			arena.playSound(p);
-		}
 	}
 }

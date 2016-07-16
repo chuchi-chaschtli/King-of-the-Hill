@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import com.valygard.KotH.event.arena.ArenaScoreEvent;
 import com.valygard.KotH.framework.Arena;
 import com.valygard.KotH.time.CountdownTimer;
+import com.valygard.KotH.time.TimerCallback;
 
 /**
  * Countdown timer which handles hill management and contains the actual game
@@ -21,7 +22,7 @@ import com.valygard.KotH.time.CountdownTimer;
  * @author Anand
  * 
  */
-public class HillTask extends CountdownTimer {
+public class HillTask extends CountdownTimer implements TimerCallback {
 
 	private Arena arena;
 	private HillManager manager;
@@ -139,10 +140,4 @@ public class HillTask extends CountdownTimer {
 			}
 		}
 	}
-
-	/**
-	 * Not used, there are no checkpoints to listen for.
-	 */
-	@Override
-	public void onCheckpoint(int remaining) {}
 }

@@ -13,42 +13,22 @@ import com.valygard.KotH.KotH;
  * checkpoints.
  * <p>
  * Every time the tick interval has passed, the {@code onTick()} method in the
- * underlying {@link TimerStrategy} is called.
+ * underlying {@link TimerCallback} is called.
  * <p>
  * When the duration of the timer has passed, {@code onStop()} in the underlying
- * {@link TimerStrategy} is called
+ * {@link TimerCallback} is called
  * 
  * @author Anand
  * 
  */
-public abstract class CountdownTimer implements TimerStrategy {
+public class CountdownTimer {
 
 	private KotH plugin;
 	private long duration;
 	private long remaining;
 
-	private int[] intervals;
-
 	private Timer timer;
-
-	/**
-	 * Creates a countdown timer which will call {@code onTick()} every 20 ticks
-	 * (1 second) and {@code onStop()} when the timer is finished. Everytime an
-	 * {@code intervals} time checkpoint is reached, {@code onCheckpoint()} is
-	 * called.
-	 * 
-	 * @param plugin
-	 *            the instance of the plugin responsible for the countdown timer
-	 * @param duration
-	 *            the long duration of the timer
-	 * @param intervals
-	 *            the interval checkpoints
-	 */
-	public CountdownTimer(KotH plugin, long duration, int[] intervals) {
-		this(plugin, duration);
-
-		this.intervals = intervals;
-	}
+	private TimerCallback callback;
 
 	/**
 	 * Creates a countdown timer which will call {@code onTick()} every 20 ticks
@@ -67,6 +47,10 @@ public abstract class CountdownTimer implements TimerStrategy {
 
 		this.timer = null;
 	}
+	
+	public synchronized void setCallback(TimerCallback callback) {
+		this.callback = callback;
+	}
 
 	/**
 	 * Starts the timer.
@@ -78,7 +62,7 @@ public abstract class CountdownTimer implements TimerStrategy {
 			return;
 		}
 		remaining = duration;
-		onStart();
+		callback.onStart();
 		timer = new Timer();
 	}
 
@@ -92,7 +76,7 @@ public abstract class CountdownTimer implements TimerStrategy {
 		timer.stop();
 		timer = null;
 		remaining = 0l;
-		onFinish();
+		callback.onFinish();
 	}
 
 	/**
@@ -124,22 +108,8 @@ public abstract class CountdownTimer implements TimerStrategy {
 
 	private class Timer implements Runnable {
 		private BukkitTask task;
-		private int index;
 
 		public Timer() {
-			if (intervals == null || intervals.length == 0) {
-				index = -1;
-				reschedule();
-				return;
-			}
-
-			for (int i = 0; i < intervals.length; i++) {
-				if (Conversion.toSeconds(remaining) > intervals[i]) {
-					index = i;
-				} else {
-					break;
-				}
-			}
 			reschedule();
 		}
 
@@ -150,18 +120,11 @@ public abstract class CountdownTimer implements TimerStrategy {
 
 				if (remaining <= 0l) {
 					timer = null;
-					onFinish();
+					callback.onFinish();
 					return;
 				}
 
-				onTick();
-
-				if (index > -1) {
-					if (Conversion.toSeconds(remaining) == intervals[index]) {
-						onCheckpoint(Conversion.toSeconds(remaining));
-						index--;
-					}
-				}
+				callback.onTick();
 
 				if (task != null) {
 					reschedule();

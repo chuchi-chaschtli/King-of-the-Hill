@@ -3,10 +3,7 @@
  */
 package com.valygard.KotH.time;
 
-import org.bukkit.entity.Player;
-
 import com.valygard.KotH.framework.Arena;
-import com.valygard.KotH.messenger.Messenger;
 import com.valygard.KotH.messenger.Msg;
 
 /**
@@ -18,10 +15,12 @@ import com.valygard.KotH.messenger.Msg;
  * @author Anand
  * 
  */
-public class AutoStartTimer extends CountdownTimer {
+public class AutoStartTimer extends CountdownTimer implements TimerCallback {
 
 	private Arena arena;
 	private int seconds;
+
+	private TimerCallback callback;
 
 	/**
 	 * Default constructor for the end timer initialises by arena and duration.
@@ -32,12 +31,16 @@ public class AutoStartTimer extends CountdownTimer {
 	 *            the duration of the timer in seconds
 	 */
 	public AutoStartTimer(Arena arena, int seconds) {
-		super(arena.getPlugin(), Conversion.toTicks(seconds), new int[] { 1, 2,
-				3, 5, 10, 20, 30, 45, 60, 120, 180 });
+		super(arena.getPlugin(), Conversion.toTicks(seconds));
+		super.setCallback(this);
 
 		this.arena = arena;
 		this.seconds = seconds;
+
+		this.callback = new IntervalCallback(arena, this, Msg.ARENA_AUTO_START,
+				new int[] { 1, 2, 3, 5, 10, 20, 30, 45, 60, 120, 180 });
 	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -58,6 +61,7 @@ public class AutoStartTimer extends CountdownTimer {
 	@Override
 	public void onStart() {
 		setDuration(Conversion.toTicks(seconds));
+		callback.onStart();
 	}
 
 	/**
@@ -65,6 +69,7 @@ public class AutoStartTimer extends CountdownTimer {
 	 */
 	@Override
 	public void onFinish() {
+		callback.onFinish();
 		this.seconds = arena.getSettings().getInt("arena-auto-start");
 		setDuration(Conversion.toTicks(seconds));
 		arena.startArena();
@@ -76,6 +81,7 @@ public class AutoStartTimer extends CountdownTimer {
 	 */
 	@Override
 	public void onTick() {
+		callback.onTick();
 		if (arena.isRunning()
 				|| arena.getPlayersInLobby().size() < arena.getSettings()
 						.getInt("min-players")) {
@@ -84,19 +90,4 @@ public class AutoStartTimer extends CountdownTimer {
 		}
 		seconds--;
 	}
-
-	/**
-	 * Announce to players various points in the timer how long until the arena
-	 * begins
-	 */
-	@Override
-	public void onCheckpoint(int remaining) {
-		String timeLeft = Conversion.formatIntoHHMMSS(remaining);
-		Messenger.announce(arena, Msg.ARENA_AUTO_START, timeLeft);
-
-		for (Player p : arena.getPlayersInLobby()) {
-			arena.playSound(p);
-		}
-	}
-
 }
