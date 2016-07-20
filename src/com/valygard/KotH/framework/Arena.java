@@ -68,6 +68,7 @@ import com.valygard.KotH.util.inventory.InventoryManager;
  * 
  */
 public class Arena {
+
 	// General stuff
 	private KotH plugin;
 	private String arenaName;
@@ -339,8 +340,7 @@ public class Arena {
 									+ "' is broken! Fix this boo-boo.");
 					fee = String.valueOf(0.00);
 				}
-				if (fee.startsWith("$"))
-					fee = fee.substring(1);
+				if (fee.startsWith("$")) fee = fee.substring(1);
 
 				em.withdraw(p, Double.parseDouble(fee));
 
@@ -353,22 +353,17 @@ public class Arena {
 				|| this.end == null);
 
 		if (!end) {
-			if (arenaPlayers.contains(p))
-				arenaPlayers.remove(p);
+			if (arenaPlayers.contains(p)) arenaPlayers.remove(p);
 		}
 
-		if (bluePlayers.contains(p))
-			bluePlayers.remove(p);
+		if (bluePlayers.contains(p)) bluePlayers.remove(p);
 
-		if (redPlayers.contains(p))
-			redPlayers.remove(p);
+		if (redPlayers.contains(p)) redPlayers.remove(p);
 
-		if (lobbyPlayers.contains(p))
-			lobbyPlayers.remove(p);
+		if (lobbyPlayers.contains(p)) lobbyPlayers.remove(p);
 
 		if (redPlayers.size() <= 0 || bluePlayers.size() <= 0) {
-			if (!end)
-				endArena();
+			if (!end) endArena();
 		}
 	}
 
@@ -409,8 +404,8 @@ public class Arena {
 			arenaPlayers.add(p);
 		}
 		lobbyPlayers.clear();
-
-		// Teleport players, give full health, initialize map
+		
+		// Initial iteration prevents glitching and balances teams
 		for (Player p : arenaPlayers) {
 			// Remove player from spec list to avoid invincibility issues
 			if (specPlayers.contains(p)) {
@@ -421,7 +416,13 @@ public class Arena {
 				KotHLogger.getLogger().info(
 						"Invincibility glitch attempt stopped!");
 			}
+			balanceTeams(p);
+		}
+		// rebalance teams
+		rebalance();
 
+		// Teleport players, give full health, initialize map
+		for (Player p : arenaPlayers) {
 			p.setHealth(p.getMaxHealth());
 			p.setFireTicks(0);
 			p.setAllowFlight(false);
@@ -430,8 +431,6 @@ public class Arena {
 			p.setExp(0.0F);
 			p.setLevel(0);
 			p.setGameMode(GameMode.SURVIVAL);
-
-			balanceTeams(p);
 
 			// Teleport players and initialize scoreboards
 			if (redPlayers.contains(p)) {
@@ -484,8 +483,7 @@ public class Arena {
 		winner = getWinnerByScore();
 		if (winner != null) {
 			if (winner.equals(redPlayers)) {
-				if (redPlayers.size() <= 0)
-					winner = bluePlayers;
+				if (redPlayers.size() <= 0) winner = bluePlayers;
 			}
 			if (winner.equals(bluePlayers)) {
 				if (bluePlayers.size() <= 0) {
@@ -521,6 +519,7 @@ public class Arena {
 						plugin, "KotH"));
 				Messenger.tell(p, Msg.ARENA_RATE);
 				scheduleTask(new Runnable() {
+
 					public void run() {
 						p.removeMetadata("canRate" + arenaName, plugin);
 					}
@@ -557,10 +556,8 @@ public class Arena {
 	 */
 	public void setSpectator(Player p) {
 		if (hasPlayer(p)) {
-			if (bluePlayers.contains(p))
-				bluePlayers.remove(p);
-			if (redPlayers.contains(p))
-				redPlayers.remove(p);
+			if (bluePlayers.contains(p)) bluePlayers.remove(p);
+			if (redPlayers.contains(p)) redPlayers.remove(p);
 			arenaPlayers.remove(p);
 		}
 
@@ -594,38 +591,59 @@ public class Arena {
 	}
 
 	/**
+	 * In the event teams remain unbalanced, which usually occurs when the vast
+	 * majority of players choose a specific team and balancing cannot affect
+	 * them, redistribute the teams for an even match.
+	 * <p>
+	 * This bypasses team choosing, but switches teams in a reverse order, so
+	 * players who chose their team first are more likely to remain where they
+	 * stayed.
+	 */
+	private void rebalance() {
+		while (redPlayers.size() - bluePlayers.size() > 1) {
+			List<Player> removable = new ArrayList<>(redPlayers);
+			Player p = removable.get(removable.size() - 1);
+			redPlayers.remove(p);
+			bluePlayers.add(p);
+			Messenger.tell(p, "Due to unbalanced teams, you are now on the "
+					+ ChatColor.BLUE + "Blue team!");
+		}
+
+		while (bluePlayers.size() - redPlayers.size() > 1) {
+			List<Player> removable = new ArrayList<>(bluePlayers);
+			Player p = removable.get(removable.size() - 1);
+			bluePlayers.remove(p);
+			redPlayers.add(p);
+			Messenger.tell(p, "Due to unbalanced teams, you are now on the "
+					+ ChatColor.RED + "Red team!");
+		}
+	}
+
+	/**
 	 * Balance the red and blue team to have equal amounts of players. However,
 	 * there is a chance the blue team will have one extra player, given that no
 	 * players choose their own teams. This method takes into account players
-	 * who have chosen their own team using '/koth chooseteam'
+	 * who have chosen their own team using '/koth chooseteam' by balancing
+	 * teams around them.
 	 * 
 	 * @param p
 	 *            the next player.
 	 */
-	public void balanceTeams(Player p) {
-		String team;
-		if (redPlayers.size() >= bluePlayers.size()) {
-			if (redPlayers.contains(p)) {
-				redPlayers.remove(p);
-				Messenger
-						.tell(p,
-								"You are now on the blue team because there were not enough blue players.");
-			} else if (bluePlayers.contains(p)) {
-				return;
-			}
+	private void balanceTeams(Player p) {
+		if (redPlayers.contains(p) || bluePlayers.contains(p)) {
+			return;
+		}
+		int redsize = redPlayers.size();
+		int bluesize = bluePlayers.size();
+		int diff = redsize - bluesize;
+
+		String team = "";
+		if (diff >= 0) {
 			bluePlayers.add(p);
 			team = "blue";
 		} else {
-			if (bluePlayers.contains(p)) {
-				bluePlayers.remove(p);
-				Messenger
-						.tell(p,
-								"You are now on the red team because there were not enough red players.");
-			} else if (redPlayers.contains(p)) {
-				return;
-			}
 			redPlayers.add(p);
-			team = "red";
+			team = "blue";
 		}
 		Messenger.tell(p, Msg.MISC_TEAM_JOINED,
 				ChatColor.valueOf(team.toUpperCase()) + team);
@@ -673,8 +691,7 @@ public class Arena {
 			getStats(p).increment("wins");
 		}
 
-		if (loser == null)
-			return;
+		if (loser == null) return;
 
 		for (Player p : loser) {
 			getStats(p).increment("losses");
@@ -785,8 +802,7 @@ public class Arena {
 	 *            the player to give a compass to
 	 */
 	public void giveCompass(Player p) {
-		if (!settings.getBoolean("use-compasses"))
-			return;
+		if (!settings.getBoolean("use-compasses")) return;
 
 		ItemStack compass = new ItemStack(Material.COMPASS);
 		ItemMeta im = compass.getItemMeta();
@@ -803,8 +819,7 @@ public class Arena {
 	 * When the hill changes, change the compass target to the new hill.
 	 */
 	public void resetCompass() {
-		if (!settings.getBoolean("use-compasses"))
-			return;
+		if (!settings.getBoolean("use-compasses")) return;
 
 		for (Player p : arenaPlayers) {
 			if (hillManager.getNextHill() == null) {
@@ -1005,10 +1020,8 @@ public class Arena {
 	 * @return a Location.
 	 */
 	public Location getSpawn(Player p) {
-		if (redPlayers.contains(p))
-			return red;
-		if (bluePlayers.contains(p))
-			return blue;
+		if (redPlayers.contains(p)) return red;
+		if (bluePlayers.contains(p)) return blue;
 		return null;
 	}
 
@@ -1288,8 +1301,7 @@ public class Arena {
 	 */
 	public PlayerData getData(Player p) {
 		for (PlayerData pd : data) {
-			if (pd.getPlayer().equals(p))
-				return pd;
+			if (pd.getPlayer().equals(p)) return pd;
 		}
 		return null;
 	}
@@ -1415,12 +1427,9 @@ public class Arena {
 	 * @return a Player set.
 	 */
 	public Set<Player> getLoser() {
-		if (winner == null)
-			return null;
-		if (winner.equals(redPlayers))
-			return bluePlayers;
-		if (winner.equals(bluePlayers))
-			return redPlayers;
+		if (winner == null) return null;
+		if (winner.equals(redPlayers)) return bluePlayers;
+		if (winner.equals(bluePlayers)) return redPlayers;
 		return null;
 	}
 
@@ -1434,8 +1443,7 @@ public class Arena {
 	public Set<Player> getTeam(Player p) {
 		if (redPlayers.contains(p))
 			return redPlayers;
-		else if (bluePlayers.contains(p))
-			return bluePlayers;
+		else if (bluePlayers.contains(p)) return bluePlayers;
 		return null;
 	}
 
@@ -1602,8 +1610,7 @@ public class Arena {
 	public void chooseTeam(Player p, String team) {
 		if (team.equalsIgnoreCase("red"))
 			redPlayers.add(p);
-		else if (team.equalsIgnoreCase("blue"))
-			bluePlayers.add(p);
+		else if (team.equalsIgnoreCase("blue")) bluePlayers.add(p);
 	}
 
 	/**
