@@ -64,6 +64,19 @@ import com.valygard.KotH.util.ConfigUtil;
 import com.valygard.KotH.util.inventory.InventoryManager;
 
 /**
+ * The Arena object is the general amalgamation of all of an Arena's data. While
+ * the {@code ArenaManager} instance is responsible for the creation, load,
+ * unload and removal of all arenas, it does not maintain or contain any
+ * arena-specific info.
+ * <p>
+ * The Arena is instantiated with a String identifier (which also will be its
+ * name) as well as underlying KotH instance.
+ * <p>
+ * The Arena is responsible for handling all timers, configuration of the arena
+ * settings and locations (including hills), player data storage, statistics
+ * tracking for the Arena and all its Players, and a valid AbilityHandler
+ * instance for Ability management.
+ * 
  * @author Anand
  * 
  */
@@ -124,12 +137,9 @@ public class Arena {
 	// AbilityHandler
 	private AbilityHandler ah;
 
-	// --------------------------- //
-	// constructor
-	// --------------------------- //
-
 	/**
-	 * Our primary constructor.
+	 * Default constructor initializes the arena using a KotH instance and a
+	 * String name for the Arena.
 	 * 
 	 * @param plugin
 	 *            the main class
@@ -201,12 +211,10 @@ public class Arena {
 				config.getConfigurationSection("arenas." + arenaName));
 	}
 
-	// --------------------------- //
-	// New methods in refactoring
-	// --------------------------- //
-
 	/**
-	 * Add a player to the arena.
+	 * Adds a player to the arena. A series of checks are called before the
+	 * player is allowed to join the arena. If the {@code ArenaPlayerJoinEvent}
+	 * is cancelled, the player is barred from joining the match.
 	 * 
 	 * @param p
 	 *            the player
@@ -280,7 +288,10 @@ public class Arena {
 	}
 
 	/**
-	 * Remove a player from the arena.
+	 * Removes a player from the arena. Called when either the arena ends or
+	 * when the player leaves. The underlying {@code ArenaPlayerLeaveEvent}
+	 * cannot be cancelled, because this removes essential data from being
+	 * cleaned up and puts the player in an awkward state.
 	 * 
 	 * @param p
 	 *            the player
@@ -368,7 +379,9 @@ public class Arena {
 	}
 
 	/**
-	 * Start an arena that is currently in 'lobby' mode.
+	 * Attempts to begin the arena. The arena must be in its 'lobby phase' or it
+	 * cannot be started. If the {@code ArenaStartEvent} is cancelled, the arena
+	 * will not begin.
 	 * 
 	 * @return true if the arena started; false otherwise
 	 */
@@ -404,7 +417,7 @@ public class Arena {
 			arenaPlayers.add(p);
 		}
 		lobbyPlayers.clear();
-		
+
 		// Initial iteration prevents glitching and balances teams
 		for (Player p : arenaPlayers) {
 			// Remove player from spec list to avoid invincibility issues
@@ -465,7 +478,10 @@ public class Arena {
 	}
 
 	/**
-	 * End a running arena and cleanup after.
+	 * End a running arena and cleanup after. The underlying
+	 * {@code ArenaEndEvent} cannot be cancelled, as it puts the status of the
+	 * arena in an awkward state. The event is called before the winner is
+	 * determined.
 	 * 
 	 * @return true if the arena successfully ended; false otherwise
 	 */
@@ -532,7 +548,7 @@ public class Arena {
 	}
 
 	/**
-	 * Force an arena to begin.
+	 * Force an arena to begin and manually stops the ticking {@code startTimer}
 	 */
 	public void forceStart() {
 		startTimer.stop();
@@ -540,8 +556,7 @@ public class Arena {
 	}
 
 	/**
-	 * Forcibly end an arena.
-	 * 
+	 * Forces the arena to end and manually stops the ticking {@code endTimer}
 	 */
 	public void forceEnd() {
 		endTimer.stop();
@@ -748,14 +763,14 @@ public class Arena {
 	}
 
 	/**
-	 * Play the classic note sound that everybody loves on a player.
+	 * Play the Pling Noteblock sound to a player. Used primarily in timers to
+	 * mark specific intervals.
 	 * 
 	 * @param p
 	 *            the player to play the note pling to.
-	 * @return true if the sound was played.
 	 */
-	public boolean playSound(Player p) {
-		return playSound(p, Sound.BLOCK_NOTE_PLING, 3F, 1.2F);
+	public void playSound(Player p) {
+		playSound(p, Sound.BLOCK_NOTE_PLING, 3F, 1.2F);
 	}
 
 	/**
@@ -764,18 +779,15 @@ public class Arena {
 	 * @param s
 	 *            the sound to play.
 	 */
-	public void playSound(Sound s, float vol, float pitch) {
-		Set<Player> players = new HashSet<Player>();
-		players.addAll(arenaPlayers);
-		players.addAll(lobbyPlayers);
-		players.addAll(specPlayers);
-		for (Player p : players) {
+	private void playSound(Sound s, float vol, float pitch) {
+		for (Player p : getPlayers()) {
 			playSound(p, s, vol, pitch);
 		}
 	}
 
 	/**
-	 * Play any sound to a player at a specified volume.
+	 * Play any sound to a player at a specified volume if play-sounds is set to
+	 * true in the configuration for the arena.
 	 * 
 	 * @param p
 	 *            the player to play the sound.
@@ -785,14 +797,11 @@ public class Arena {
 	 *            the volume
 	 * @param pitch
 	 *            the pitch
-	 * @return whether or not the sound was played.
 	 */
-	public boolean playSound(Player p, Sound s, float vol, float pitch) {
+	private void playSound(Player p, Sound s, float vol, float pitch) {
 		if (settings.getBoolean("play-sounds")) {
 			p.playSound(p.getLocation(), s, vol, pitch);
-			return true;
 		}
-		return false;
 	}
 
 	/**
@@ -1403,11 +1412,10 @@ public class Arena {
 	 * 
 	 * @param newWinner
 	 *            a team
-	 * @return the new victors of the arena.
 	 * @throws IllegalArgumentException
 	 *             if the winner specified is not a valid one.
 	 */
-	public Set<Player> setWinner(Set<Player> newWinner) {
+	public void setWinner(Set<Player> newWinner) {
 		if (winner != newWinner) {
 			if (newWinner != redPlayers && newWinner != bluePlayers
 					&& newWinner != null) {
@@ -1418,7 +1426,6 @@ public class Arena {
 			winner = newWinner;
 			declareWinner();
 		}
-		return winner;
 	}
 
 	/**
@@ -1588,8 +1595,14 @@ public class Arena {
 		return stat;
 	}
 
-	public ArrayList<PlayerStats> getStats() {
-		return stats;
+	/**
+	 * Returns a List of all PlayerStats references currently stored in this
+	 * arena.
+	 * 
+	 * @return an unmodifiable ArrayList
+	 */
+	public List<PlayerStats> getStats() {
+		return Collections.unmodifiableList(stats);
 	}
 
 	/**
