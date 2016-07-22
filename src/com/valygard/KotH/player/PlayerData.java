@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
@@ -28,13 +29,14 @@ public class PlayerData {
 
 	private Map<ItemStack, Integer> contents;
 	private ItemStack head, chest, legs, feet;
+	private ItemStack main, off;
 	private Location loc = null;
 	private double health;
 	private int level, food;
 	private float exp;
 	private GameMode mode = null;
 	private Collection<PotionEffect> potions;
-	private boolean flying;
+	private boolean flying, collidable;
 	private Set<Player> blind;
 
 	// Although it isn't necessary data, this is the fitting place for the
@@ -46,16 +48,21 @@ public class PlayerData {
 	 */
 	public PlayerData(Player player) {
 		this.player = player;
+		
+		PlayerInventory inv = player.getInventory();
 
 		this.contents = new HashMap<ItemStack, Integer>();
 		for (int i = 0; i < 36; i++) {
-			contents.put(player.getInventory().getItem(i), i);
+			contents.put(inv.getItem(i), i);
 		}
 
-		this.head = player.getInventory().getHelmet();
-		this.chest = player.getInventory().getChestplate();
-		this.legs = player.getInventory().getLeggings();
-		this.feet = player.getInventory().getBoots();
+		this.head = inv.getHelmet();
+		this.chest = inv.getChestplate();
+		this.legs = inv.getLeggings();
+		this.feet = inv.getBoots();
+		
+		this.main = inv.getItemInMainHand();
+		this.off = inv.getItemInOffHand();
 
 		this.loc = player.getLocation();
 		this.mode = player.getGameMode();
@@ -67,6 +74,7 @@ public class PlayerData {
 		this.exp = player.getExp();
 
 		this.flying = player.isFlying();
+		this.collidable = player.isCollidable();
 
 		this.blind = new HashSet<Player>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -92,20 +100,24 @@ public class PlayerData {
 		if (teleportToPriorLoc) {
 			player.teleport(loc);
 		}
+		PlayerInventory inv = player.getInventory();
 
 		for (ItemStack i : contents.keySet()) {
 			parseItem(i);
-			player.getInventory().setItem(contents.get(i), i);
+			inv.setItem(contents.get(i), i);
 		}
-		player.getInventory().setHelmet(parseItem(head));
-		player.getInventory().setChestplate(parseItem(chest));
-		player.getInventory().setLeggings(parseItem(legs));
-		player.getInventory().setBoots(parseItem(feet));
+		inv.setHelmet(parseItem(head));
+		inv.setChestplate(parseItem(chest));
+		inv.setLeggings(parseItem(legs));
+		inv.setBoots(parseItem(feet));
+		inv.setItemInMainHand(parseItem(main));
+		inv.setItemInOffHand(parseItem(off));
 
 		player.setGameMode(mode);
 		player.addPotionEffects(potions);
 		player.updateInventory();
 
+		player.setCollidable(collidable);
 		// In case they are no longer allowed to fly, even if they were flying
 		// they cannot anymore.
 		player.setFlying(!flying ? false : player.getAllowFlight());
