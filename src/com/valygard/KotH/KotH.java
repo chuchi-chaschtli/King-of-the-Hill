@@ -79,9 +79,6 @@ public class KotH extends JavaPlugin {
 
 		// Register our listeners
 		registerListeners();
-
-		// Start metrics
-		initMetrics();
 	}
 
 	public void onDisable() {
@@ -281,20 +278,6 @@ public class KotH extends JavaPlugin {
 
 	public KotHRatingSystem getRatingSystem() {
 		return matchmaking;
-	}
-
-	private void initMetrics() {
-		try {
-			if (cfg.getBoolean("global.opt-out")) {
-				KotHLogger.getLogger().warn("Stat collection disabled :[");
-				return;
-			}
-			Metrics m = new Metrics(this);
-			m.start();
-		}
-		catch (Exception e) {
-			KotHLogger.getLogger().warn("Stat collection disabled :[");
-		}
 	}
 
 	public File getPluginFile() {

@@ -6,4 +6,3 @@ logging: true
 log-file: koth.log
 starting-mmr: 1000
 minimum-mmr: 200
-opt-out: false
