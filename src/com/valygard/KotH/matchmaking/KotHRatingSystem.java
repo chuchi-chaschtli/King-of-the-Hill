@@ -198,23 +198,16 @@ public class KotHRatingSystem {
 
 		int base = manager.getConfig().getInt("global.starting-mmr");
 
-		if (played < 12) {
-			return 0.03 * base;
-		}
-		if (played > 120 && rating > 1.75 * base) {
-			return 0.01 * base;
-		}
+		double scoreFactor = (rating * 1D) / (base * 1D);
+		double playFactor = played * 0.01D;
 
-		if (rating > 2.5 * base) {
-			return 0.01 * base;
+		if (rating >= base) {
+			return 0.05D / (scoreFactor + (played * 0.01D));
 		}
-		if (rating > 2.0 * base) {
-			return 0.016 * base;
+		if (rating >= 0) {
+			return (0.001D / (0.03D - (0.01D * scoreFactor) + (playFactor * 0.005D)));
 		}
-		if (rating > 1.5 * base) {
-			return 0.0225 * base;
-		}
-		return 0.03 * base;
+		return (0.001D / (-0.03D - (0.01D * scoreFactor) + (playFactor * 0.005D)));
 	}
 
 	/**
