@@ -207,7 +207,7 @@ public class KotHRatingSystem {
 		if (rating >= 0) {
 			return (0.001D / (0.035D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
 		}
-		return (0.001D / (-0.035D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
+		return (0.001D / (-0.015D - (0.01D * scoreFactor) + (playFactor * 0.0035D)));
 	}
 
 	/**
