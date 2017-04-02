@@ -1,7 +1,7 @@
 <h2>King of the Hill</h2> 
-**Travis-CI** - [![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
+<h4>Dev Builds</h4>
 
-**Development Builds** - [![Build Status](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/status.png)](https://drone.io/github.com/AoHRuthless/King-of-the-Hill/latest)
+[![Build Status](https://travis-ci.org/AoHRuthless/King-of-the-Hill.svg?branch=master)](https://travis-ci.org/AoHRuthless/King-of-the-Hill)
 
 <a href="https://dl.bintray.com/aohruthless/maven/">**Maven Artifacts**</a>
 
